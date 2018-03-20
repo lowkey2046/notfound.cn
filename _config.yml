@@ -24,6 +24,13 @@ github_username: lowkey2046
 
 # Build settings
 markdown: kramdown
+asciidoc:
+  processor: asciidoctor
+asciidoctor:
+  attributes:
+    idprefix: _
+    source-highlighter: pygments
+    pygments-css: style
 theme: minima
 plugins:
   - jekyll-feed
