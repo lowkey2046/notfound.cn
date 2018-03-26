@@ -73,6 +73,14 @@ git config --global grep.lineNumber true
 
 * 执行 `git grep` 命令时显示行号
 
+**git status 中文编码问题**
+
+[source, bash]
+----
+git config --global core.quotepath false
+----
+
+
 **其他**
 
 * 全局配置文件位置 `~/.gitconfig`
