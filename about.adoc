@@ -1,0 +1,13 @@
+---
+layout: page
+title: About
+permalink: /about/
+---
+
+=== TODO list ===
+
+- [ ] 代码高亮样式
+
+=== 更新日志 ===
+
+* 2018.3.20 搭建完成，选择 AsciiDoc。
