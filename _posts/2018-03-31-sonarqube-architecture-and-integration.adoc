@@ -1,0 +1,55 @@
+---
+layout: post
+title:  "SonarQube 架构与集成"
+date:   2018-03-31 18:00:00 +0800
+categories: tools sonar
+---
+
+== SonarQube 简介
+
+https://www.sonarqube.org/[SonarQube(Sonar)] 是一个开源平台，用于管理源代码的质量。SonarQube 不只是一个质量数据报告工具，更是代码质量管理平台。
+
+== 架构与集成
+=== 架构
+
+SonarQube 平台主要由四个组件组成:
+
+image::/images/2018/03/31/sonarqube-architecture.png[]
+
+. **SonarQube Server** 由三部分组成:
+.. **Web Server** 开发者、管理员可通过该服务浏览质量快照以及配置 SonarQube 实例。
+.. **Search Server** 基于 Elasticsearch 的搜索服务。
+.. **Compute Engine Server** 负责处理代码分析报告，并将这些报告保存到数据库。
+. **SonarQube Database**
+.. 保存 SonarQube 配置实例，如：安全、插件相关配置等。
+.. 项目质量快照、视图等。
+. **SonarQube Plugins** 服务器可安装大量插件，包括语言、软件配置管理(SCM)、集成、认证、治理等插件。
+. **SonarQube Scanners** 运行在构建、持续集成服务器上，用来对对项目进行质量分析。
+
+==== 主要工作过程
+
+. **SonarQube Scanners** 对项目进行分析，生成报告发送给 **SonarQube Server**。
+. **Compute Engine Server** 处理分析报告，将报告保存到数据库。
+. **Web Server** 从数据库中读取分析快照，向开发者或管理员展示。
+. **Search Server** 可进行搜索。
+
+=== 集成
+
+以下的模式展示了 SonarQube 如何与其他应用生命周期管理(ALM)工具集成以及 SonarQube 各种组件使用场景：
+
+image::/images/2018/03/31/sonarqube-integration.png[]
+
+. 开发者通过的 IDE 工具编写代码并使用 http://www.sonarlint.org/[SonarLint] 来执行本地分析。
+. 开发者将代码推送到他们最喜欢的 SCM 中：git，SVN，TFVC ......。
+. 持续集成服务器会触发自动构建，并执行 SonarQube Scanner 来对项目进行质量分析。
+. 分析报告会被发送到 SonarQube Server，该服务会对报告进行处理。
+. SonarQube Server 对分析报告进行处理，将处理结果存储在 SonarQube Database 中，该结果可在 UI 中展示。
+. 开发者通过 SonarQube UI 对代码进行审查、评论、解决 issue(challenge their Issues) 以管理和减少技术债务。
+. 管理者可从从分析结果中导出报告：
+** 使用 API ​​来自动配置并从 SonarQube 中提取数据。
+** 使用JMX来监控 SonarQube 服务。
+
+
+== 参考
+
+https://docs.sonarqube.org/display/SONAR/Architecture+and+Integration
