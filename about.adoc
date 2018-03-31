@@ -6,7 +6,8 @@ permalink: /about/
 
 === TODO list ===
 
-- [ ] 列表样式
+- [ ] jekyll-archives
+- [ ] jekyll-sitemap
 
 === 更新日志 ===
 
