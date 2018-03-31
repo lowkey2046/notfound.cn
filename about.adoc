@@ -6,7 +6,6 @@ permalink: /about/
 
 === TODO list ===
 
-- [ ] 代码高亮样式
 - [ ] 列表样式
 
 === 更新日志 ===
