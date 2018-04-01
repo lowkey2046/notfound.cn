@@ -1,0 +1,135 @@
+---
+layout: post
+title:  "使用 GitHub、Travis CI 以及 SonarCloud 进行代码质量分析"
+date:   2018-04-01 13:37:00 +0800
+categories: tools sonar
+---
+
+== 简介
+
+**GitHub:** 不解释。
+
+**Travis CI:** https://travis-ci.org[Travis CI] 提供持续集成服务。
+
+**SonarCloud:** https://about.sonarcloud.io/[SonarCloud] 是由 SonarSource 开发的一项服务，可保存代码质量分析结果。
+
+在 Travis CI 上执行 SonarQube Scanner 对代码进行扫描，之后将扫描报告发送给 SonarCloud，开发者可在 SonarCloud 浏览分析报告。
+
+通过配置 SonarCloud 可对 GitHub Pull Request 代码行发起评论。
+
+== GitHub && Travis CI
+
+配置 GitHub 和 Travis CI，可以在 GitHub 代码更新、或者创建 Pull Request 时自动触发 Travis CI 构建任务。
+
+GitHub 和上使用 Travis CI 可参考： https://notfound.cn/2018/04/01/github-travis-ci.html
+
+== Travis CI && SonarCloud
+
+配置 Travis CI 和 SonarCloud 可对代码进行扫描，扫描结果发送给 SonarCloud，开发者可通过 SonarCloud 浏览代码质量分析结果、发起 issue 评论等。
+
+=== 使用 SonarQube Scanner 进行代码扫描
+
+**生成 SonarCloud token**
+
+在 SonarCloud 账号上 https://sonarcloud.io/account/security[生成一个 token]:
+
+image::/images/2018/04/01/sonarcloud-token.png[]
+
+**加密 token**
+
+使用 `travis encrypt abcdef0123456789` https://docs.travis-ci.com/user/encryption-keys/#Usage[加密 token] 或者在 https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-Repository-Settings[Repository Settings] 中定义 `SONAR_TOKEN`。
+
+使用加密方式保存 token 时，需要安装 travis gem 包：
+[source, bash]
+----
+$ sudo gem install travis
+$ travis encrypt 567*************************************
+Please add the following to your .travis.yml file:
+
+  secure:
+  "LqCwckuK5zGSLAcVcFXcqncXps17PiOhrQKf4FTwiRVc/un2KehY51086URJ0KgLEFHaQ5p+eSjmDYMcvtvXQcjVTNe7JN4Kg+480BXNUz0vVgY7Do/RB+HhgQATjNLo/zY1HaYCn0Hby3X+av1+SFh4dV+yH94298LjWWfNDAjUBAAZdUBqpMHX2FO2T+PB8kfIBsMZ9zFisNL+Y8TcU6c8Ryffk1pGxg3uSWYg6I9Kqp4td19G2uKFTprnV1T52AbplFh2Ca6sf9FqoX08F0KHWTNwVPHy4m3NqnORtDIddM2jEhzud2lyZ4uH3uGsVwj4DQYNNNxfttSsXppcLT0tYbXghCShWM+hUdLcEUsoFDWmrvXj8w7SOoNPNKoiHHbCFkWV/prQyX91dSgy3N+5pJxTnyJHvN2Nu3oYSBRG/46/ceqKd1kZg1lv2pBTyuvEXysbudjqnkaiFoQX2wokOH4XsvmVgWsAl6MbxVha4JFFJ+OFtipR4ctzHRgUAYg6A3eZBQbbBZowRgOSfKr5WK2k+g9uRq7VfOYms/0q3uDVbs3FCul0g/e5TyeT04Az2d7UDwfwNn2K76V1834ZSzZAFkaE8R8R8mug4TvKi3gRgIFVHcO9fYnrgbm0tslGm3KR+OvthnbpzG6Lo+K33NjwLvTx19VB/W71z04="
+
+  Pro Tip: You can add it automatically by running with --add.
+----
+
+**Travis CI 配置**
+
+在仓库中添加文件 `.travis.yml` ，使用之前生成的内容替换 secure 内容:
+
+[source, yml]
+----
+language: java
+dist: trusty
+
+addons:
+  sonarcloud:
+    organization: "lowkey2046"
+    token:
+      secure: "LqCwckuK5zGSLAcVcFXcqncXps17PiOhrQKf4FTwiRVc/un2KehY51086URJ0KgLEFHaQ5p+eSjmDYMcvtvXQcjVTNe7JN4Kg+480BXNUz0vVgY7Do/RB+HhgQATjNLo/zY1HaYCn0Hby3X+av1+SFh4dV+yH94298LjWWfNDAjUBAAZdUBqpMHX2FO2T+PB8kfIBsMZ9zFisNL+Y8TcU6c8Ryffk1pGxg3uSWYg6I9Kqp4td19G2uKFTprnV1T52AbplFh2Ca6sf9FqoX08F0KHWTNwVPHy4m3NqnORtDIddM2jEhzud2lyZ4uH3uGsVwj4DQYNNNxfttSsXppcLT0tYbXghCShWM+hUdLcEUsoFDWmrvXj8w7SOoNPNKoiHHbCFkWV/prQyX91dSgy3N+5pJxTnyJHvN2Nu3oYSBRG/46/ceqKd1kZg1lv2pBTyuvEXysbudjqnkaiFoQX2wokOH4XsvmVgWsAl6MbxVha4JFFJ+OFtipR4ctzHRgUAYg6A3eZBQbbBZowRgOSfKr5WK2k+g9uRq7VfOYms/0q3uDVbs3FCul0g/e5TyeT04Az2d7UDwfwNn2K76V1834ZSzZAFkaE8R8R8mug4TvKi3gRgIFVHcO9fYnrgbm0tslGm3KR+OvthnbpzG6Lo+K33NjwLvTx19VB/W71z04="
+script:
+  - sonar-scanner
+----
+
+如果使用 maven 方式，需要修改 `.travis.yml` 文件中的 `sonar-scanner` 属性:
+
+[source, yml]
+----
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+----
+
+**sonar 配置文件**
+
+在仓库中添加文件 `sonar-project.properties` (详细信息可参考 http://redirect.sonarsource.com/doc/install-configure-scanner.html[官方文档])
+
+[source, conf]
+----
+sonar.projectKey=sonar-scanner-travis-project
+sonar.projectName=SonarCloud using Travis
+sonar.projectVersion=1.0-SNAPSHOT
+
+# =====================================================
+#   Meta-data for the project
+# =====================================================
+
+sonar.links.homepage=https://github.com/lowkey2046/sonarqube-scanner-maven
+sonar.links.ci=https://travis-ci.org/lowkey2046/sonarqube-scanner-maven
+sonar.links.scm=https://github.com/lowkey2046/sonarqube-scanner-maven
+sonar.links.issue=https://github.com/lowkey2046/sonarqube-scanner-maven/issues
+
+# =====================================================
+#   Properties that will be shared amongst all modules
+# =====================================================
+
+# SQ standard properties
+sonar.sources=.
+sonar.java.binaries=.
+----
+
+推送代码后，Travis CI 运行 SonarQube Scanner 对代码进行扫描，并将扫描结果发送到 SonarCloud 上，访问 SonarCloud 可以查看代码质量分析结果。
+
+=== 分析 Pull Request
+
+SonarCloud 可以分析 Pull Request，并对存在问题的代码行发起评论。
+
+. 在 GitHub 上生成一个用户访问令牌，SonarCloud 使用该令牌发起评论。
+.. 该 GitHub 用户不应该是开发者，但对仓库拥有写权限。
+.. 令牌必须拥有如下权限
+... 对于公开仓库拥有 “repo:status” 和 “public_repo”
+... 对于私有仓库拥有整个 “repo” 
+. SonarCloud 项目页面 “Administration > General Settings > Pull Requests”
+.. 将 GitHub token 保存在 “GitHub > Authentication token”。
+
+image::/images/2018/04/01/sonarcloud-pull-request.png[]
+
+在 GitHub 上创建新的 Pull Request 时，Travis CI 会执行 SonarQube Scanner，并将报告发送给 SonarCloud，SonarCloud 分析报告后，会对该 Pull Request 发起代码评论：
+
+image::/images/2018/04/01/sonarcloud-github-pull-request-comment.png[]
+
+== 参考
+
+* https://www.liaoxuefeng.com/article/0014631488240837e3633d3d180476cb684ba7c10fda6f6000[使用Travis进行持续集成]
+* https://docs.travis-ci.com/user/sonarcloud/[Using SonarCloud with Travis CI]
+* https://docs.travis-ci.com/user/languages/java/[(Travis CI)Building a Java project]
+* GitHub 仓库示例 https://github.com/lowkey2046/sonarqube-scanner-maven/pull/1
+* SonarCloud 示例 https://sonarcloud.io/dashboard?id=sonar-scanner-travis-project

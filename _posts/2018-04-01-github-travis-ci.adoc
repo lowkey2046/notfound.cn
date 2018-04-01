@@ -51,4 +51,4 @@ image:/images/2018/04/01/travis-ci-build.png[Travis CI Build]
 == 参考
 
 * https://www.liaoxuefeng.com/article/0014631488240837e3633d3d180476cb684ba7c10fda6f6000[使用Travis进行持续集成]
-* https://docs.travis-ci.com/user/languages/java/[Travis CI 官方文档(java)]
+* https://docs.travis-ci.com/user/languages/java/[(Travis CI)Building a Java project]
