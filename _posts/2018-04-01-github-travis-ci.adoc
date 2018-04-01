@@ -1,0 +1,54 @@
+---
+layout: post
+title:  "GitHub 使用 Travis CI 进行持续集成"
+date:   2018-04-01 10:04:00 +0800
+categories: tools
+---
+
+* 以 Java Maven 项目为例
+
+== GitHub && Travis CI
+
+=== 授权
+
+打开 https://travis-ci.org/profile ，通过 GitHub 账号进行登录。
+
+授权Travis CI 访问 GitHub 仓库：
+
+image:/images/2018/04/01/travis-ci-github-repository.png[Travis CI Auth]
+
+=== 构建 Java 项目
+
+添加在 GitHub 仓库中添加 `.travis.yml` https://docs.travis-ci.com/user/languages/java/[官方文档]
+
+[source, yml]
+----
+language: java
+----
+
+Java 语言环境默认会安装 Gradle、Maven 和 Ant。
+
+==== Maven 项目
+
+在构建之前，Travis CI 首先会安装依赖：
+
+[source, bash]
+----
+mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+----
+
+如果仓库根目录中包含了 `pom.xml` 但是 `build.gradle` 文件，Travis CI 将会使用 Maven 3 构建项目。
+
+[source, bash]
+----
+mvn test -B
+----
+
+更新代码后，会触发自动构建。
+
+image:/images/2018/04/01/travis-ci-build.png[Travis CI Build]
+
+== 参考
+
+* https://www.liaoxuefeng.com/article/0014631488240837e3633d3d180476cb684ba7c10fda6f6000[使用Travis进行持续集成]
+* https://docs.travis-ci.com/user/languages/java/[Travis CI 官方文档(java)]
