@@ -5,8 +5,14 @@ sitemap: false
 permalink: /about/
 ---
 
-=== TODO list ===
+=== To Do Lists
 
-=== 更新日志 ===
+- [ ] 博客文章样式
+- [ ] 文件列表样式
+- [ ] 添加评论?
+- [ ] 访问统计？
 
-* 2018.3.20 搭建完成，选择 AsciiDoc。
+=== 更新日志
+
+* 2018.04.05 使用 jekyll-archives 插件对文章分类。
+* 2018.03.20 使用 jekyll 搭建完成，选择 AsciiDoc 写文档。
