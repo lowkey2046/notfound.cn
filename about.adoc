@@ -7,8 +7,6 @@ permalink: /about/
 
 === TODO list ===
 
-- [ ] jekyll-archives
-
 === 更新日志 ===
 
 * 2018.3.20 搭建完成，选择 AsciiDoc。

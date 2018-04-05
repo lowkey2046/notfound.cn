@@ -2,7 +2,7 @@
 layout: post
 title:  "GitHub 使用 Travis CI 进行持续集成"
 date:   2018-04-01 10:04:00 +0800
-categories: tools
+categories: Tools
 ---
 
 * 以 Java Maven 项目为例

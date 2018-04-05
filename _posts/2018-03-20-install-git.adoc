@@ -2,7 +2,7 @@
 layout: post
 title:  "Ubuntu 安装配置 Git"
 date:   2018-03-20 23:31:05 +0800
-categories: tools
+categories: Tools
 ---
 
 系统环境：Ubuntu 16.04

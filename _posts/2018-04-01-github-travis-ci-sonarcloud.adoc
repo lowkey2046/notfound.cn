@@ -2,7 +2,7 @@
 layout: post
 title:  "使用 GitHub、Travis CI 以及 SonarCloud 进行代码质量分析"
 date:   2018-04-01 13:37:00 +0800
-categories: tools sonar
+categories: SonarQube
 ---
 
 == 简介

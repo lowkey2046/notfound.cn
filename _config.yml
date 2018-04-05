@@ -24,6 +24,7 @@ url: "https://notfound.cn" # the base hostname & protocol for your site, e.g. ht
 
 # Build settings
 markdown: kramdown
+
 asciidoc:
   processor: asciidoctor
 asciidoctor:
@@ -31,9 +32,21 @@ asciidoctor:
     idprefix: _
     source-highlighter: pygments
     pygments-css: style
+
+jekyll-archives:
+  enabled: ['categories']
+  layout: 'archive'
+  permalinks:
+    year: '/:year/'
+    month: '/:year/:month/'
+    day: '/:year/:month/:day/'
+    tag: '/tag/:name/'
+    category: '/category/:name/'
+
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-archives
   - jekyll-sitemap
 
 permalink: /:year/:month/:day/:title:output_ext

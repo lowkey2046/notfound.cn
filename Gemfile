@@ -21,8 +21,9 @@ gem 'pygments.rb', '~> 1.2'
 # If you have any plugins, put them here!
 group :jekyll_plugins do
   gem 'jekyll-asciidoc', '~> 2.1'
-  gem "jekyll-feed", "~> 0.6"
+  gem 'jekyll-archives', '~> 2.1'
   gem 'jekyll-sitemap', '~> 1.2'
+  gem "jekyll-feed", "~> 0.6"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
