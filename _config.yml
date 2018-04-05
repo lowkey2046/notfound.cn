@@ -20,7 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://notfound.cn" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
-github_username: lowkey2046
+# github_username: lowkey2046
 
 # Build settings
 markdown: kramdown
@@ -34,6 +34,7 @@ asciidoctor:
 theme: minima
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
 
 permalink: /:year/:month/:day/:title:output_ext
 

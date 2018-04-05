@@ -1,13 +1,13 @@
 ---
 layout: page
 title: About
+sitemap: false
 permalink: /about/
 ---
 
 === TODO list ===
 
 - [ ] jekyll-archives
-- [ ] jekyll-sitemap
 
 === 更新日志 ===
 
