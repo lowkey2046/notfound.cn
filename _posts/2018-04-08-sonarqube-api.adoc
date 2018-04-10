@@ -1,0 +1,130 @@
+---
+layout: post
+title:  "通过 SonarQube Web API 获取分析结果"
+date:   2018-04-08 17:30:00 +0800
+categories: SonarQube
+---
+
+== 简介
+
+SonarQube 采用前后端分离设计，提供了大量的 Web API。Web API 的详细列表可以通过 http://localhost:9000/web_api 查看。
+
+* api/authentication: 认证，登录、登出。
+* api/components: 获取有关组件（文件，目录，项目...）信息。
+* api/issues: 获取和更新 issue。
+* api/languages: 获取支持的编程语言列表。
+* api/measures: 获取具有指定度量的组件或子项。
+* api/metrics: 获取指标的信息，并管理自定义指标。
+* ...
+
+主要介绍如何通过 API 获取项目 measures 信息。
+
+前提：本地搭建了 SonarQube，使用默认端口号 9000。
+
+== SonarQube Web API
+
+=== 获取指标(metrics) Key
+
+首先，需要知道 SonarQube 支持哪些指标(metrics)。
+
+----
+GET api/metrics/search
+----
+
+可以通过 API http://localhost:9000/api/metrics/search?f=description 获取所有指标的以及其描述信息，默认结果分成了多页。
+
+==== 示例
+
+项目列表页显示如下：
+
+image::/images/2018/04/10/sonarqube-metrics.png[]
+
+其中包含的指标包括了：
+
+* Bugs: 包括 Reliability Rating (reliability_rating) Bugs 数量 (bugs)。
+* Vulnerabilities: 包括 Security Rating (security_rating) 和 Vulnerabilities 数量 (vulnerabilities)。
+* Code Smells: 包括 Maintainability Rating (sqale_rating) 和 Code Smells 数量 (code_smells)。
+* Coverage: Coverage (coverage) 。
+* Duplications: Duplicated Lines Density (duplicated_lines_density) 。
+* ...
+
+=== 获取项目度量(measures)
+
+获取具有指定度量的组件或子项。
+
+----
+GET api/measures/component
+----
+
+* component: Component key。
+* metricKeys: 用逗号分割的 metric key 列表, 可从 `api/metrics/search` 获取。
+
+==== 示例
+
+获取项目的 bugs 数量和 Reliability Rating。
+
+http://localhost:9000/api/measures/component?component=pkey-10&metricKeys=bugs%2Creliability_rating
+
+* pkey-10: 使用 SonarQube Scanner 进行分析的 projectKey
+* `%2C`: `,` URL 转义后的字符
+
+执行结果：
+
+[source, json]
+----
+{
+    "component": {
+        "id": "AWKj-Gh_Ue0ZdVL_VUNj",
+        "key": "pkey-10",
+        "name": "notfound/sample",
+        "qualifier": "TRK",
+        "measures": [
+            {
+                "metric": "reliability_rating",
+                "value": "3.0",
+                "periods": [
+                    {
+                        "index": 1,
+                        "value": "0.0"
+                    }
+                ]
+            },
+            {
+                "metric": "bugs",
+                "value": "1",
+                "periods": [
+                    {
+                        "index": 1,
+                        "value": "0"
+                    }
+                ]
+            }
+        ]
+    }
+}
+----
+
+Ruby 简单脚本，执行时以 metrics key 为参数：
+
+[source, ruby]
+----
+#!/usr/bin/env ruby
+
+require 'rest-client'
+require 'json'
+
+url = "http://localhost:9000/api/measures/component"
+
+response = RestClient.get(url, {
+  params: {
+    component: "pkey-10",
+    metricKeys: ARGV.join(",") }
+})
+
+puts JSON.parse(response.body)
+----
+
+== 参考
+
+* https://docs.sonarqube.org/display/DEV/Web+API
+* https://docs.sonarqube.org/display/SONAR/Metric+Definitions
