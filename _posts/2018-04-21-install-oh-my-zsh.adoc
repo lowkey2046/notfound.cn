@@ -1,0 +1,48 @@
+---
+layout: post
+title:  "Ubuntu 安装 oh-my-zsh"
+date:   2018-04-21 17:30:00 +0800
+categories: Tools
+---
+
+安装 zsh
+
+[source, bash]
+----
+sudo apt-get install zsh
+----
+
+将 zsh 设置为默认 shell
+
+[source, bash]
+----
+chsh -s $(which zsh)
+----
+
+安装 oh-my-zsh
+
+[source, bash]
+----
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+----
+
+配置 zsh plugins, 编辑文件 `~/.zshrc`
+
+[source, bash]
+----
+plugins=(rails git ruby)
+----
+
+agnoster 主题乱码
+
+[source, bash]
+----
+git clone https://github.com/powerline/fonts.git
+cd fonts && ./install.sh
+----
+
+设置 powerline 字体即可
+
+== 参考
+
+* https://github.com/robbyrussell/oh-my-zsh
