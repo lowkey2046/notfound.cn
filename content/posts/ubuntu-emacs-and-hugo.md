@@ -55,6 +55,15 @@ hugo -s notfound.cn -d /var/www/notfound.cn
 hugo server -D
 ```
 
+远程编译：
+
+```shell
+ssh -T notfound.cn hugo -s work/notfound.cn -d /var/www/notfound.cn
+```
+
+- 需要配置 ssh key
+- 直接在服务上执行命令，省掉了登录的步骤
+
 ## Emacs hugo 配置
 
 修改 spacemacs 配置，开启 org hugo 支持 [Hugo support](https://github.com/syl20bnr/spacemacs/tree/develop/layers/+emacs/org#hugo-support)

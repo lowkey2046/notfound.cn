@@ -72,7 +72,7 @@ jar:file:/home/notfound/test/demo/target/demo-1.0-SNAPSHOT.jar!/data.txt
 
 ## Q
 
-### 1. 在 jar 中，如何通过 `RandomAccessFile` 读取文件内容？
+### 在 jar 中，如何通过 `RandomAccessFile` 读取文件内容？
 
 jar 中的内容已经被压缩处理，无法随机读取。可以将内容写入到临时文件中，然后通过 `RandomAccessFile` 读取临时文件。
 

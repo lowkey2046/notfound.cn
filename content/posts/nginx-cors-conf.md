@@ -2,18 +2,41 @@
 title: "Nginx CORS 配置"
 date: 2020-05-01T12:23:24+08:00
 tags: ["nginx", "cors"]
-draft: true
+draft: false
 ---
 
-```nginx wrap
+Nginx CORS 配置
+
+### 配置
+
+```nginx 
 add_header 'Access-Control-Allow-Origin' '*';
 add_header 'Access-Control-Allow-Methods' 'GET,POST,OPTIONS';
-add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,DNT,Cache-Control,X-Mx-ReqToken,X-Requested-With';
+add_header 'Access-Control-Allow-Headers' 'Authorization,Content-Type,Accept,Origin,User-Agent,Cache-Control';
 
 if ($request_method = 'OPTIONS') {
 	return 204;
 }
 ```
+
+- `Access-Control-Allow-Origin`: `*` 表示允许所有站点。也可以设置为具体的站点，如 `http://example.com`。
+- `Access-Control-Allow-Methods`: 允许客户端发起 `GET`、`POST` 和 `OPTIONS` 请求。
+- `Access-Control-Allow-Headers`: 允许携带的头部。
+
+## Q
+
+### 添加后无效 `Access-Control-Allow-Origin` 依旧无效
+
+```nginx
+add_header ‘Access-Control-Allow-Origin’ '*' always;
+```
+
+- 无论何时都生效。
+
+### 携带认证信息
+
+1. 一般而言，对于跨域 XMLHttpRequest 或 Fetch 请求，浏览器不会发送身份凭证信息。如果要发送凭证信息，需要设置 XMLHttpRequest 的某个特殊标志位。
+2. 对于附带身份凭证的请求，服务器不得设置 Access-Control-Allow-Origin 的值为“*”。
 
 ## 参考
 
