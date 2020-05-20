@@ -41,14 +41,14 @@ end
 ```ruby
 class Simple < WEBrick::HTTPServlet::AbstractServlet
   def do_GET(request, response)
-    status, content_type, body = do_stuff_with request
+    status, content_type, body = do_stuff_with(request)
 
     response.status = 200
     response['Content-Type'] = 'text/plain'
     response.body = "object_id: #{object_id}\n"
   end
 
-  def do_stuff_with request
+  def do_stuff_with(request)
     return 200, 'text/plain', 'you got a page'
   end
 end
