@@ -1,7 +1,7 @@
 ---
 title: "PostgreSQL 安装与使用"
 date: 2020-05-26T19:17:49+08:00
-tags: ["sql"]
+tags: ["database"]
 draft: false
 ---
 
@@ -32,6 +32,14 @@ sudo apt install postgresql-12 pgadmin4
   ```shell
   sudo su - postgres
   psql
+  ```
+
+- `\?`
+
+  ```psql
+  \?    -- 帮助
+  \l    -- 列出所有数据库
+  \du   -- 列出角色
   ```
 
 - 以指定角色（用户）登录指定数据库
