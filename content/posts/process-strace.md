@@ -44,3 +44,6 @@ draft: false
     ```
 
 ## 参考
+
+- `man strace`
+- `man pstree`
