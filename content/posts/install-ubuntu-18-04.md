@@ -172,6 +172,16 @@ sudo apt install fonts-noto-color-emoji
 sudo ubuntu-drivers autoinstall
 ```
 
+## 修改 DNS
+
+```shell
+sudo vim /etc/systemd/resolved.conf
+sudo service systemd-resolved restart
+systemd-resolve --status
+```
+
+[参考](https://askubuntu.com/questions/973017/wrong-nameserver-set-by-resolvconf-and-networkmanager)
+
 ## 其他
 
 - `eog` 图片查看工具
