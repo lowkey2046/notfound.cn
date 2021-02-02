@@ -52,7 +52,10 @@ heap 中的每个 RValue 结构体大小为 40bytes，并不能存放 long_str �
 ## 参考
 
 - [关于 Ruby 内存使用的一些优化和探索](https://ruby-china.org/topics/27057)
-- [Ruby GC 自述](https://ruby-china.org/topics/37118)
 - [Understanding Ruby GC through GC.stat](https://ruby-china.org/topics/37982)
 - [Ruby 内存分配](https://www.jianshu.com/p/e4f184e92375)
 - [How Ruby Uses Memory](https://ruby-china.org/topics/25790)
+- [Ruby 的好朋友 -- jemalloc](https://ruby-china.org/topics/37699)
+- [Malloc 会加倍 Ruby 多线程应用的内存消耗](https://www.jianshu.com/p/cf98f86e82d7)
+- [Ruby GC自述](https://www.jianshu.com/p/af6549f3eda0)
+- [](https://medium.com/rubyinside/how-we-halved-our-memory-consumption-in-rails-with-jemalloc-86afa4e54aa3)
