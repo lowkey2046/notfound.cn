@@ -2,7 +2,7 @@
 title = "Gradle 入门"
 author = ["likui"]
 date = 2021-02-16T15:11:00+08:00
-lastmod = 2021-02-16T15:19:04+08:00
+lastmod = 2021-02-27T22:05:36+08:00
 tags = ["gradle"]
 draft = false
 +++
@@ -46,7 +46,7 @@ gradle init --type=basic --dsl=groovy --project-name=example
         }
     }
     ```
-2.  修改 `build.gradle`
+2.  修改 `build.gradle` ，把所有依赖一起打包：
 
     ```groovy
     plugins {
@@ -56,6 +56,10 @@ gradle init --type=basic --dsl=groovy --project-name=example
     jar {
         manifest {
             attributes "Main-Class": "example.Main"
+        }
+        from {
+            configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+            configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
         }
     }
     ```
@@ -183,3 +187,4 @@ gradle init --type=basic --dsl=groovy --project-name=example
 -   [The Java Plugin](https://docs.gradle.org/current/userguide/java%5Fplugin.html)
 -   [Creating a Fat Jar in Gradle](https://www.baeldung.com/gradle-fat-jar)
 -   [Using JUnit 5](https://docs.gradle.org/current/userguide/java%5Ftesting.html#using%5Fjunit5)
+-   [How do I create an executable fat jar with Gradle with implementation dependencies](https://stackoverflow.com/questions/49278063/how-do-i-create-an-executable-fat-jar-with-gradle-with-implementation-dependenci)
