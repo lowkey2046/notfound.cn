@@ -1,16 +1,19 @@
 +++
-title = "Manjaro 安装配置 Tomcat9"
+title = "Linux 安装配置 Tomcat 9"
 author = ["likui"]
 date = 2021-02-16T15:22:00+08:00
-lastmod = 2021-02-16T15:32:34+08:00
-tags = ["tomcat"]
+lastmod = 2021-03-07T14:10:32+08:00
+tags = ["tomcat", "java"]
 draft = false
 +++
 
-## Manjaro 安装配置 Tomcat9 {#manjaro-安装配置-tomcat9}
+## Linux 安装配置 Tomcat 9 {#linux-安装配置-tomcat-9}
 
 
-### 安装 tomcat9 tomcat-native {#安装-tomcat9-tomcat-native}
+### Manjaro Linux {#manjaro-linux}
+
+
+#### 安装 tomcat9 tomcat-native {#安装-tomcat9-tomcat-native}
 
 执行 pacman 直接安装：
 
@@ -19,7 +22,7 @@ sudo pacman -S tomcat9 tomcat-native
 ```
 
 
-### 通过 systemd 控制 Tomcat {#通过-systemd-控制-tomcat}
+#### 通过 systemd 控制 Tomcat {#通过-systemd-控制-tomcat}
 
 systemctl 可启动、重启、停止、查看日志：
 
@@ -41,7 +44,7 @@ journalctl -f --unit=tomcat9.service
 访问 <http://localhost:8080/>
 
 
-### 查看环境变量 {#查看环境变量}
+#### 查看环境变量 {#查看环境变量}
 
 `export` 环境变量，方便操作：
 
@@ -52,7 +55,7 @@ export CATALINA_HOME=/usr/share/tomcat9
 ```
 
 
-### 页面查看 Tomcat 运行状态 {#页面查看-tomcat-运行状态}
+#### 页面查看 Tomcat 运行状态 {#页面查看-tomcat-运行状态}
 
 修改 `$CATALINA_HOME/conf/tomcat-users.xml` ，在 `tomcat-users` 标签之间添加：
 
@@ -63,13 +66,13 @@ export CATALINA_HOME=/usr/share/tomcat9
 访问 <http://localhost:8080/manager/status> ，输入用户名和密码后，可查看 Tomcat 状态。
 
 
-### War 部署 {#war-部署}
+#### War 部署 {#war-部署}
 
 1.  将 war 放置到 `$CATALINA_HOME/webapps/` ，文件会自动解压，访问路径会有文件名前缀。如 `app.war` 访问 URL 为 <http://localhost:8080/app>
 2.  `ROOT.war` ，URL 路径会从根开始，不带任何前缀
 
 
-### 绑定新端口 8081 {#绑定新端口-8081}
+#### 绑定新端口 8081 {#绑定新端口-8081}
 
 1.  编辑 `$CATALINA_HOME/conf/server.xml`
 
@@ -102,3 +105,17 @@ export CATALINA_HOME=/usr/share/tomcat9
     # 设置根路径 war
     sudo cp app.war /var/lib/tomcat9/app/ROOT.war
     ```
+
+
+### 手动下载安装 {#手动下载安装}
+
+```shell
+wget https://mirrors.bfsu.edu.cn/apache/tomcat/tomcat-9/v9.0.43/bin/apache-tomcat-9.0.43.tar.gz
+tar -zxvf apache-tomcat-9.0.43.tar.gz
+sudo mv apache-tomcat-9.0.43 /opt/tomcat
+export CATALINA_HOME=/opt/tomcat
+# 启动
+$CATALINA_HOME/bin/startup.sh
+# 停止
+$CATALINA_HOME/bin/shutdown.sh
+```
