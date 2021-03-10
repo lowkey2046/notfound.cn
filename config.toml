@@ -1,4 +1,4 @@
-baseURL = ""
+baseURL = "https://notfound.cn"
 languageCode = "zh-cn"
 title = "NotFound"
 theme="diary"

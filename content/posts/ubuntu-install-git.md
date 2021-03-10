@@ -10,13 +10,13 @@ draft = false
 
 ## 安装
 
-```shell
+```bash
 sudo apt install git
 ```
 
 ## 配置 ssh key
 
-```shell
+```bash
 ssh-keygen -t rsa -b 4096 -C "username@example.com"
 ```
 
@@ -26,14 +26,14 @@ ssh-keygen -t rsa -b 4096 -C "username@example.com"
 
 ## 配置用户名、邮箱
 
-```shell
+```bash
 git config --global user.name $USERNAME
 git config --global user.email $EMAIL
 ```
 
 ## 配置编辑器
 
-```shell
+```bash
 git config --global core.editor vim
 ```
 
@@ -41,7 +41,7 @@ git config --global core.editor vim
 
 ## 配置 diff 工具
 
-```shell
+```bash
 git config --global diff.tool vimdiff
 git config --global difftool.prompt no
 ```
@@ -52,7 +52,7 @@ git config --global difftool.prompt no
 
 ## 设置 https 密码保存
 
-```shell
+```bash
 git config --global credential.helper cache
 ```
 
@@ -62,7 +62,7 @@ git config --global credential.helper cache
 
 ## 配置 grep
 
-```shell
+```bash
 git config --global grep.lineNumber true
 ```
 
@@ -70,16 +70,21 @@ git config --global grep.lineNumber true
 
 ## git status 中文编码
 
-```shell
+```bash
 git config --global core.quotepath false
 ```
 
 ## 允许普通仓库推送代码
 
-```shell
+```bash
 git config --local receive.denyCurrentBranch updateInstead
 ```
 
+## 设置 HTTP 代理
+
+```bash
+git config --global http."https://github.com/".proxy http://127.0.0.1:8118
+```
 ## 其他
 
 - 全局配置文件位置 `~/.gitconfig`
