@@ -2,7 +2,7 @@
 title = "使用 Java 实现 Git SSH 服务端"
 author = ["likui"]
 date = 2021-03-13T18:00:00+08:00
-lastmod = 2021-03-13T18:23:32+08:00
+lastmod = 2021-03-13T18:31:32+08:00
 tags = ["java", "git"]
 draft = false
 +++
@@ -21,7 +21,11 @@ draft = false
 ```groovy
 implementation group: 'org.apache.sshd', name: 'sshd-core', version: '2.6.0'
 implementation group: 'org.apache.sshd', name: 'sshd-git', version: '2.6.0'
+// SSH KEY ed25519
+// implementation group: 'net.i2p.crypto', name: 'eddsa', version: '0.3.0'
 ```
+
+-   如果需要支持 ed25519，需要引入单独的包
 
 
 ### 代码 {#代码}
