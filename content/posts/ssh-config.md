@@ -59,6 +59,17 @@ Host notfound
 
 直接执行 `ssh notfound` 即可登录服务器。
 
+## 客户端心跳
+
+客户端上编辑文件 `~/.ssh/config`：
+
+```ssh
+Host notfound
+  ServerAliveInterval 60
+```
+
+- `ServerAliveInterval` 客户端 60s 未接收到服务端数据时，发送一个数据包给服务端
+
 ## 远程执行命令
 
 配置好服务器免密登录后，通过 `ssh -T HOST command` 可以直接在服务器 HOST 上执行 command 命令。
@@ -84,3 +95,8 @@ git clone notfound:demo.git
 # 如果未配置 `~/.ssh/config`, 则执行
 git clone user@notfound.cn:demo.git
 ```
+
+## 参考
+
+- https://man.openbsd.org/ssh_config#ServerAliveInterval
+- https://einverne.github.io/post/2017/05/ssh-keep-alive.html
