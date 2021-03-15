@@ -28,6 +28,11 @@ tar -zxvf grafana-6.7.3.linux-amd64.tar.gz
 1. 添加数据源 Prometheus
 2. 添加 Dashboard
 
+## 忘记密码
+
+```shell
+grafana-cli admin reset-admin-password <new password>
+```
 ## 参考
 
 - [Install on Debian or Ubuntu](https://grafana.com/docs/grafana/latest/installation/debian/)
