@@ -64,11 +64,23 @@ Host notfound
 客户端上编辑文件 `~/.ssh/config`：
 
 ```ssh
-Host notfound
   ServerAliveInterval 60
 ```
 
 - `ServerAliveInterval` 客户端 60s 未接收到服务端数据时，发送一个数据包给服务端
+
+## 连接复用
+
+客户端上编辑文件 `~/.ssh/config`：
+
+```ssh
+  ControlMaster auto
+  ControlPath ~/.ssh/connection-%r@%h:%p
+  ControlPersist 4h
+```
+
+- 终端多个窗口连接同一个服务器可以复用一个网络连接。
+- 连接保持 4 小时
 
 ## 远程执行命令
 
@@ -98,5 +110,5 @@ git clone user@notfound.cn:demo.git
 
 ## 参考
 
-- https://man.openbsd.org/ssh_config#ServerAliveInterval
-- https://einverne.github.io/post/2017/05/ssh-keep-alive.html
+- <https://man.openbsd.org/ssh_config#ServerAliveInterval>
+- <https://einverne.github.io/post/2017/05/ssh-keep-alive.html>

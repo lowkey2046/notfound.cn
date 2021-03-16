@@ -30,7 +30,7 @@ tar -zxvf grafana-6.7.3.linux-amd64.tar.gz
 
 ## 忘记密码
 
-```shell
+```bash
 grafana-cli admin reset-admin-password <new password>
 ```
 ## 参考
