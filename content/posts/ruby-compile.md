@@ -2,7 +2,7 @@
 title = "Linux 编译安装 Ruby"
 author = ["likui"]
 date = 2021-03-18T20:00:00+08:00
-lastmod = 2021-03-19T13:47:20+08:00
+lastmod = 2021-03-20T11:42:07+08:00
 tags = ["ruby", "linux"]
 draft = false
 +++
@@ -85,7 +85,7 @@ make -j8
 ```
 
 
-#### 问题 {#问题}
+#### 可能遇到问题 {#可能遇到问题}
 
 ```text
 $ gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
@@ -101,9 +101,27 @@ export SSL_CERT_DIR=/etc/ssl/certs
 ```
 
 
+### 环境变量 {#环境变量}
+
+输出 gem 信息：
+
+```bash
+gem env
+gem env path
+gem env home
+```
+
+通过设置 `GEM_PATH` 修改 gem 查找路径：
+
+```bash
+export GEM_PATH=/home/notfound/app/vendor/bundle/ruby/2.7.0
+```
+
+
 ### 参考 {#参考}
 
 -   <https://github.com/rbenv/ruby-build/issues/1215>
 -   <https://wiki.openssl.org/index.php/Compilation%5Fand%5FInstallation>
 -   <https://github.com/jemalloc/jemalloc/wiki/Getting-Started>
 -   <https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html>
+-   <https://stackoverflow.com/questions/11277227/whats-the-difference-between-gem-home-and-gem-path>
