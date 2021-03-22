@@ -85,6 +85,15 @@ git config --local receive.denyCurrentBranch updateInstead
 ```bash
 git config --global http."https://github.com/".proxy http://127.0.0.1:8118
 ```
+
+## linguist 语言分析
+
+```bash
+gem install github-linguist
+git linguist stats --commit=98164e9585e02e31dcf1377a553efe076c15f8c6
+```
+- `git linguist` 命令实际会执行 `git-linguist`
+
 ## 其他
 
 - 全局配置文件位置 `~/.gitconfig`
