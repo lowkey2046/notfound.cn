@@ -2,8 +2,8 @@
 title = "GraphQL Java 以及 Spring Boot: Schema"
 author = ["likui"]
 date = 2021-03-26T21:00:00+08:00
-lastmod = 2021-03-26T21:38:57+08:00
-tags = ["java", "graphql"]
+lastmod = 2021-03-27T09:43:26+08:00
+tags = ["java", "graphql", "spring"]
 categories = ["graphql"]
 draft = false
 +++
