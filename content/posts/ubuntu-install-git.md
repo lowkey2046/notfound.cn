@@ -94,6 +94,12 @@ git linguist stats --commit=98164e9585e02e31dcf1377a553efe076c15f8c6
 ```
 - `git linguist` 命令实际会执行 `git-linguist`
 
+## 删除所有 remote 分支
+
+```bash
+git for-each-ref "refs/remotes/**" --format="%(refname:lstrip=2)" | xargs git branch -d -r
+```
+
 ## 其他
 
 - 全局配置文件位置 `~/.gitconfig`
