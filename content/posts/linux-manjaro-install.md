@@ -2,8 +2,8 @@
 title = "Manjaro 安装记录"
 author = ["likui"]
 date = 2021-03-20T13:00:00+08:00
-lastmod = 2021-03-20T14:43:10+08:00
-tags = ["linux"]
+lastmod = 2021-04-10T09:00:53+08:00
+tags = ["linux", "tool"]
 draft = false
 +++
 
@@ -48,7 +48,14 @@ sudo pacman -Sy yay
 之后可以通过 yay 安装 aur 中的软件，如:
 
 ```bash
-yay -s dingtalk-linux
+# 安装软件
+yay -S packagename
+# 移除包
+yay -R packagename
+# 移除包以及不需要的依赖
+yay -Rns packagename
+# 移除不需要的软件包
+yay -Yc
 ```
 
 
@@ -94,10 +101,60 @@ sudo pacman -Sy ttf-cascadia-code
 ```
 
 
+### pacman 常用命令 {#pacman-常用命令}
+
+```bash
+# 远程数据库中查询软件包
+pacman -Ss gimp
+# 本地数据库与远程数据库同步、升级所有软件包
+sudo pacman -Syu
+# 在本地数据库中查看软件包中的内容
+pacman -Ql protobuf
+```
+
+
+### xclip {#xclip}
+
+剪切板工具。
+
+```bash
+# 复制文件
+xclip -selection clipboard test.txt
+# 复制管道
+uptime | xclip -selection clipboard
+# 输出
+xclip -o
+xclip -o > out.txt
+```
+
+
+### KDE wallet (KDE 钱包) {#kde-wallet--kde-钱包}
+
+凭据管理器。
+
+```bash
+# 保存密码
+kwallet-query -f test -w notfound kdewallet
+# 读取密码
+kwallet-query -f test -r notfound kdewallet
+# 读取并复制，末尾会有换行符
+kwallet-query -f test -r notfound kdewallet | xclip -selection clipboard
+```
+
+-   `-f test` 指定 kwallet 文件夹 `test`
+-   `-r notfound` 读取 `notfound` entry
+-   `-w notfound` 写入 `notfound` entry
+-   `wallet` wallet 名称
+
+
 ### 参考 {#参考}
 
+-   <https://www.makeuseof.com/how-to-install-and-remove-packages-arch-linux>
 -   <https://mirrors.tuna.tsinghua.edu.cn/help/archlinuxcn/>
 -   <https://zhuanlan.zhihu.com/p/114904008>
 -   <https://wiki.archlinux.org/index.php/Pacman%5F(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)>
 -   <https://blog.csdn.net/qq%5F37284020/article/details/112206977>
 -   <https://wiki.archlinux.org/index.php/Microsoft%5Ffonts%5F(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87)>
+-   <https://sleeplessbeastie.eu/2012/08/12/git-how-to-avoid-typing-your-password-repeatedly/>
+-   <https://wiki.archlinux.org/index.php/KDE%5FWallet>
+-   <https://wiki.archlinux.org/index.php/Clipboard>
