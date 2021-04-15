@@ -100,6 +100,14 @@ git linguist stats --commit=98164e9585e02e31dcf1377a553efe076c15f8c6
 git for-each-ref "refs/remotes/**" --format="%(refname:lstrip=2)" | xargs git branch -d -r
 ```
 
+## 调试
+
+```bash
+GIT_TRACE=1 git log
+```
+
+- `man git` 可看其他环境变量
+
 ## 其他
 
 - 全局配置文件位置 `~/.gitconfig`
