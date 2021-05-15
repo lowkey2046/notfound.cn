@@ -108,7 +108,29 @@ git clone notfound:demo.git
 git clone user@notfound.cn:demo.git
 ```
 
+## 将本地公钥复制到远程
+
+```bash
+ssh-copy-id -i ~/.ssh/id_rsa.pub notfound@notfound.cn
+```
+
+## ProxyCommand
+
+```ssh
+Host host_a
+   User a
+   Port 22
+   HostName a.notfound.cn
+Host host_b
+   User b
+   Port 22
+   HostName b.notfound.cn
+   ProxyCommand ssh -W %h:%p host_a
+```
+- 通过 `host_a` 跳转到 `host_b`
+  
 ## 参考
 
 - <https://man.openbsd.org/ssh_config#ServerAliveInterval>
 - <https://einverne.github.io/post/2017/05/ssh-keep-alive.html>
+- <https://askubuntu.com/questions/87956/can-you-set-passwords-in-ssh-config-to-allow-automatic-login>
