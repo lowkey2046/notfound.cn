@@ -2,7 +2,7 @@
 title = "Ruby Process.spawn 缓冲区满导致阻塞"
 author = ["likui"]
 date = 2021-05-13T21:00:00+08:00
-lastmod = 2021-05-26T10:15:05+08:00
+lastmod = 2021-05-26T11:00:36+08:00
 tags = ["ruby"]
 draft = false
 +++
@@ -12,11 +12,9 @@ draft = false
 
 ### Ruby Process.spawn 阻塞 {#ruby-process-dot-spawn-阻塞}
 
-Ruby 中使用 `Process.spawn` 和 `pipe` 时，缓冲区为 64 KB，如果不及时读取数据，将会发生阻塞。
+Ruby 中使用 `Process.spawn` 和 `pipe` 时，pipe 缓冲区为 64 KB，如果不及时读取数据，将会发生阻塞。
 
 ```ruby
-#!/usr/bin/env ruby
-
 # 未超出缓冲区容量
 # cmd = "bash -c 'for i in {1..6500}; do echo '123456789'; done'"
 # 超出缓冲区容量
@@ -35,7 +33,25 @@ puts "child: cmd out length = #{out.length}; Exit status: #{exitstatus}"
 
 -   标准输出缓冲区满，进程无法结束， `Process.wait` 一直等待
 
-可以创建新线程读取缓冲区内容，或者创建新线程等待子进程结束：
+
+#### 新线程读缓冲区: {#新线程读缓冲区}
+
+```ruby
+cmd = "bash -c 'for i in {1..6600}; do echo '123456789'; done'"
+
+out_r, out_w = IO.pipe
+cmd_pid = Process.spawn(cmd, :out => out_w, :err => out_w)
+out_reader = Thread.new { out_r.read }
+out_w.close
+
+Process.wait(cmd_pid)
+exitstatus = $?.exitstatus
+
+puts "child: cmd out length = #{out_reader.value.length}; Exit status: #{exitstatus}"
+```
+
+
+#### 新线程等待子进程结束： {#新线程等待子进程结束}
 
 ```ruby
 Thread.new do
