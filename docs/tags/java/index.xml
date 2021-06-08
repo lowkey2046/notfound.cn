@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>java on NotFound</title>
+    <link>https://notfound.cn/tags/java/</link>
+    <description>Recent content in java on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 27 Mar 2021 17:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Context</title>
+      <link>https://notfound.cn/posts/graphql-java-context/</link>
+      <pubDate>Sat, 27 Mar 2021 17:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-context/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Context  OpenJDK 11 Gradle 6.8  DataFetchingEnvironment 中存在一个 Context ，在整个查询生命周期中不变。
+修改了示例 [https://notfound.cn/posts/graphql-java-getting-started/] 在 context 中传递 user 信息。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-security&amp;#39; implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; testImplementation &amp;#39;org.springframework.security:spring-security-test&amp;#39; Spring Security 配置 @Configuration @EnableWebSecurity public class WebSecurityConfig extends WebSecurityConfigurerAdapter { @Override protected void configure(HttpSecurity http) throws Exception { http.csrf().disable() .authorizeRequests().anyRequest().permitAll() .and() .httpBasic(); } @Bean @Override public UserDetailsService userDetailsService() { UserDetails user = User.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Batching</title>
+      <link>https://notfound.cn/posts/graphql-java-batching/</link>
+      <pubDate>Sat, 27 Mar 2021 09:40:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-batching/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Batching  OpenJDK 11 Gradle 6.8  通过 java-dataloader 处理 N+1 问题。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39;  graphql-java 中已将添加 java-dataloader 依赖，不需要额外添加。  源码 @Component public class StarWarsWiring { private final DataLoaderRegistry dataLoaderRegistry; public StarWarsWiring() { this.dataLoaderRegistry = new DataLoaderRegistry(); dataLoaderRegistry.register(&amp;#34;characters&amp;#34;, newCharacterDataLoader()); } //提供 DataLoaderRegistry 给 graphql-java-spring-webmvc 使用  @Bean public DataLoaderRegistry dataLoaderRegistry() { // DataLoaderRegistry 是全局的，在它之上注册的 DataLoader 也是全局的  // 所有请求都会共用相同的缓存  return dataLoaderRegistry; } private DataLoader&amp;lt;String,Character&amp;gt; newCharacterDataLoader() { return new DataLoader&amp;lt;&amp;gt;(characterBatchLoader); } private BatchLoader&amp;lt;String, Character&amp;gt; characterBatchLoader = keys -&amp;gt; { // BatchLoader 中存在缓存，多次请求相同数据时也会使用缓存  return CompletableFuture.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Schema</title>
+      <link>https://notfound.cn/posts/graphql-java-schema/</link>
+      <pubDate>Fri, 26 Mar 2021 21:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-schema/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Schema  OpenJDK 11 Gradle 6.8  依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; graphql dsl 创建 src/main/resources/starWarsSchema.graphqls :
+schema { query: Query } type Query { hero(episode: Episode) : Character human(id: String) : Human droid(id: ID!): Droid } enum Episode { NEWHOPE EMPIRE JEDI } interface Character { id: ID! name: String! friends: [Character] appearsIn: [Episode]!</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot 入门</title>
+      <link>https://notfound.cn/posts/graphql-java-getting-started/</link>
+      <pubDate>Wed, 24 Mar 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-getting-started/</guid>
+      <description>GraphQL Java 以及 Spring Boot 入门  OpenJDK 11 Gradle 6.8  Spring Initializr Spring Initializr 生成 Spring Boot 项目，只需要选择 Spring Web 一项
+依赖 添加 graphql-java 以及 graphql-java-spring-boot-starter-webmvc ，所有依赖如下：
+implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; Schema 新建文件 src/main/resources/schema.graphqls
+type Query{ hello: String } GraphQLProvider 需要提供 GraphQL bean 给 graphql-java-spring-boot-starter-webmvc 使用。
+新建文件 src/main/java/cn/notfound/GraphQLProvider.java
+@Component public class GraphQLProvider { private GraphQL graphQL; private GraphQLDataFetchers dataFetchers; @Autowired public GraphQLProvider(GraphQLDataFetchers dataFetchers) { this.</description>
+    </item>
+    
+    <item>
+      <title>Java cli 以及配置文件路径处理</title>
+      <link>https://notfound.cn/posts/java-cli-and-config-path/</link>
+      <pubDate>Sun, 14 Mar 2021 16:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-cli-and-config-path/</guid>
+      <description>Java cli 以及配置文件路径处理  OpenJDK 11 Gradle 6.8 Apache Commons CLI  命令参数处理 依赖 修改 build.gradle ：
+implementation group: &amp;#39;commons-cli&amp;#39;, name: &amp;#39;commons-cli&amp;#39;, version: &amp;#39;1.4&amp;#39; 源码 大致执行步骤：
+CommandLineParser parser = new DefaultParser(); Options options = new Options(); options.addOption(&amp;#34;a&amp;#34;, &amp;#34;all&amp;#34;, false, &amp;#34;do not hide entries starting with .&amp;#34;); options.addOption(&amp;#34;A&amp;#34;, &amp;#34;almost-all&amp;#34;, false, &amp;#34;do not list implied . and ..&amp;#34;); options.addOption(Option.builder() .longOpt(&amp;#34;block-size&amp;#34;) .desc(&amp;#34;use SIZE-byte blocks&amp;#34;) .hasArg() .argName(&amp;#34;SIZE&amp;#34;) .build()); if (args.length == 0) { HelpFormatter formatter = new HelpFormatter(); formatter.</description>
+    </item>
+    
+    <item>
+      <title>使用 Java 实现 Git SSH 服务端</title>
+      <link>https://notfound.cn/posts/java-ssh-git-server-start/</link>
+      <pubDate>Sat, 13 Mar 2021 18:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-ssh-git-server-start/</guid>
+      <description>使用 Java 实现 Git SSH 服务端  OpenJDK 11 Gradle 6.8 Apache MINA SSHD  依赖 修改 build.gradle 文件：
+implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-core&amp;#39;, version: &amp;#39;2.6.0&amp;#39; implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-git&amp;#39;, version: &amp;#39;2.6.0&amp;#39; // SSH KEY ed25519 // implementation group: &amp;#39;net.i2p.crypto&amp;#39;, name: &amp;#39;eddsa&amp;#39;, version: &amp;#39;0.3.0&amp;#39;  如果需要支持 ed25519，需要引入单独的包  代码 服务端主要使用包内自带的处理方式：
+public static void main(String[] args) throws IOException, InterruptedException { SshServer sshd = SshServer.setUpDefaultServer(); sshd.setPort(8082); sshd.setHost(&amp;#34;127.0.0.1&amp;#34;); // 设置服务端私钥  sshd.setKeyPairProvider(new FileKeyPairProvider(Path.</description>
+    </item>
+    
+    <item>
+      <title>ActiveMQ Artemis 安装和使用</title>
+      <link>https://notfound.cn/posts/java-artemis-start/</link>
+      <pubDate>Wed, 03 Mar 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-artemis-start/</guid>
+      <description>ActiveMQ Artemis 安装和使用 安装 wget https://mirrors.tuna.tsinghua.edu.cn/apache/activemq/activemq-artemis/2.17.0/apache-artemis-2.17.0-bin.tar.gz tar -zxvf apache-artemis-2.17.0-bin.tar.gz sudo mv apache-artemis-2.17.0 /opt/artemis sudo chown -R root:root /opt/artemis export ARTEMIS_HOME=/opt/artemis 命令 启动、停止等命令：
+# 创建 broker 实例 $ARTEMIS_HOME/bin/artemis create /srv/example # 启动服务 /srv/example/bin/artemis run # 启动服务，后台运行 /srv/example/bin/artemis-service start # 查看服务状态 /srv/example/bin/artemis-service status # 停止服务 /srv/example/bin/artemis-service stop 服务启动后，可进入页面管理 http://localhost:8161/console
+基本使用 添加依赖
+implementation group: &amp;#39;org.apache.activemq&amp;#39;, name: &amp;#39;artemis-jms-client-all&amp;#39;, version: &amp;#39;2.17.0&amp;#39; 生产者 Connection connection = null; try { ConnectionFactory cf = new ActiveMQConnectionFactory(&amp;#34;tcp://localhost:61616&amp;#34;); // 创建 JMS 连接  connection = cf.</description>
+    </item>
+    
+    <item>
+      <title>Servlet 中使用 Freemarker</title>
+      <link>https://notfound.cn/posts/java-servlet-freemarker-start/</link>
+      <pubDate>Sat, 27 Feb 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-servlet-freemarker-start/</guid>
+      <description>Servlet 使用 freemarker  OpenJDK 11 Gradle Freemarker  依赖 新建 build.gradle ：
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;org.freemarker&amp;#39;, name: &amp;#39;freemarker&amp;#39;, version: &amp;#39;2.3.31&amp;#39; } 添加模板 添加 src/main/webapp/template/hello.ftlh ：
+Hello, ${name}!   需要禁止直接访问 .*ftlh 文件，可在 web.xml 中配置。
+  新版本(2.3.24+)的 freemarker 文件后缀为 .ftlh ：
+ templates whose source name ends with &amp;ldquo;.ftlh&amp;rdquo; gets &amp;ldquo;HTML&amp;rdquo; output format, and those with &amp;ldquo;.</description>
+    </item>
+    
+    <item>
+      <title>Java Mail 发送邮件</title>
+      <link>https://notfound.cn/posts/java-mail-send-start/</link>
+      <pubDate>Wed, 24 Feb 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-mail-send-start/</guid>
+      <description>Java Mail 发送邮件  OpenJDK 11 Tomcat9 Gradle  使用本地测试邮件服务器 mailcatcher
+依赖 新建文件 build.gradle
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;javax.mail&amp;#39;, name: &amp;#39;javax.mail-api&amp;#39;, version: &amp;#39;1.6.2&amp;#39; implementation group: &amp;#39;com.sun.mail&amp;#39;, name: &amp;#39;javax.mail&amp;#39;, version: &amp;#39;1.6.2&amp;#39; implementation group: &amp;#39;javax.activation&amp;#39;, name: &amp;#39;javax.activation-api&amp;#39;, version: &amp;#39;1.2.0&amp;#39; implementation group: &amp;#39;com.sun.activation&amp;#39;, name: &amp;#39;javax.activation&amp;#39;, version: &amp;#39;1.2.0&amp;#39; } Servlet 新建文件 src/main/java/MailServlet.java
+@MultipartConfig @WebServlet( urlPatterns = {&amp;#34;/mail.do&amp;#34;}, initParams = { @WebInitParam(name = &amp;#34;mailHost&amp;#34;, value = &amp;#34;127.</description>
+    </item>
+    
+    <item>
+      <title>Linux 安装配置 Tomcat 9</title>
+      <link>https://notfound.cn/posts/java-tomcat-install/</link>
+      <pubDate>Tue, 16 Feb 2021 15:22:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-tomcat-install/</guid>
+      <description>Linux 安装配置 Tomcat 9 Manjaro Linux 安装 tomcat9 tomcat-native 执行 pacman 直接安装：
+sudo pacman -S tomcat9 tomcat-native 通过 systemd 控制 Tomcat systemctl 可启动、重启、停止、查看日志：
+# 启动 tomcat9 sudo systemctl start tomcat9.service # 停止 tomcat9 sudo systemctl stop tomcat9.service # 重启 tomcat9 sudo systemctl restart tomcat9.service # 开机启动 tomcat9 sudo systemctl enable tomcat9.service # 查看 tomcat9 启动状态 systemctl status tomcat9.service # 查看日志 journalctl -f --unit=tomcat9.service 访问 http://localhost:8080/
+查看环境变量 export 环境变量，方便操作：
+# 查看环境变量 systemctl show tomcat9.</description>
+    </item>
+    
+    <item>
+      <title>Gradle 入门</title>
+      <link>https://notfound.cn/posts/java-gradle-start/</link>
+      <pubDate>Tue, 16 Feb 2021 15:11:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-gradle-start/</guid>
+      <description>Gradle 入门  Gradle 6.8  初始化项目 gradle init 可初始化项目：
+gradle init --type=basic --dsl=groovy --project-name=example 生成的目录结构如下：
+. ├── build.gradle ├── .gitattributes ├── .gitignore ├── .gradle ├── gradle/wrapper/ ├── gradlew ├── gradlew.bat └── settings.gradle 包含 Main 方法的 jar   新建文件 src/main/java/example/Main.java
+package example; public class Main { public static void main(String[] args) { System.out.println(&amp;#34;Hello World!&amp;#34;); } }   修改 build.gradle ，把所有依赖一起打包：
+plugins { id &amp;#39;java&amp;#39; } jar { manifest { attributes &amp;#34;Main-Class&amp;#34;: &amp;#34;example.</description>
+    </item>
+    
+    <item>
+      <title>Maven 基本使用</title>
+      <link>https://notfound.cn/posts/maven-basic/</link>
+      <pubDate>Tue, 19 May 2020 21:08:56 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/maven-basic/</guid>
+      <description>Apache Maven 3.6.3  生成 maven 工程 mvn archetype:generate \  -DarchetypeGroupId=org.apache.maven.archetypes \  -DarchetypeArtifactId=maven-archetype-quickstart \  -DarchetypeVersion=1.4 \  -DarchetypeCatalog=internal \  -DgroupId=com.example \  -DartifactId=demo \  -Dversion=0.0.1-SNAPSHOT \  -Dpackage=com.example.demo pom.xml 修改编译目标版本：
+&amp;lt;properties&amp;gt; &amp;lt;project.build.sourceEncoding&amp;gt;UTF-8&amp;lt;/project.build.sourceEncoding&amp;gt; &amp;lt;maven.compiler.source&amp;gt;1.8&amp;lt;/maven.compiler.source&amp;gt; &amp;lt;maven.compiler.target&amp;gt;1.8&amp;lt;/maven.compiler.target&amp;gt; &amp;lt;/properties&amp;gt; 编译、测试、打包等 # 移除 target 目录 mvn clean # 编译 mvn compile # 测试 mvn test # 打包 mvn package # 安装 mvn install 可执行 jar 默认情况 jar 找不到 Main 方法：</description>
+    </item>
+    
+    <item>
+      <title>JNI 基本使用</title>
+      <link>https://notfound.cn/posts/java-native-interface-start/</link>
+      <pubDate>Sat, 16 May 2020 11:48:23 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-native-interface-start/</guid>
+      <description>系统环境 Ubuntu 18.04 cmake 编译 c 源码 maven 打包  基本用法 静态方法，不涉及参数和返回值传递。
+项目目录结构如下：
+. ├── pom.xml └── src └── main ├── java │ └── com │ └── example │ ├── App.java │ └── HelloNative.java # 加载 .so 和调用 c 方法的 class ├── jni │ ├── CMakeLists.txt │ ├── com_example_HelloNative.c # c 函数文件 │ └── com_example_HelloNative.h # javah 生成的头文件 └── resources └── native └── linux └── libHelloNative.so # 编译生成的 so 文件目录   添加 HelloNative.</description>
+    </item>
+    
+    <item>
+      <title>读取 Java Resource 中的文件</title>
+      <link>https://notfound.cn/posts/java-resource/</link>
+      <pubDate>Fri, 01 May 2020 13:10:22 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-resource/</guid>
+      <description>读取 Java Resource 中的文件
+源码 package com.example; import java.io.IOException; public class App { public static void main( String[] args ) throws IOException { from(); fromClassLoader(); App app = new App(); app.fromInstance(); app.fromInstanceClassLoader(); } public static void from() throws IOException { System.out.println(App.class.getResource(&amp;#34;/data.txt&amp;#34;).toString()); // App.class.getResourceAsStream(&amp;#34;/data.txt&amp;#34;);  } public static void fromClassLoader() throws IOException { System.out.println(App.class.getClassLoader().getResource(&amp;#34;data.txt&amp;#34;).toString()); // App.class.getClassLoader().getResourceAsStream(&amp;#34;data.txt&amp;#34;);  } public void fromInstance() { System.out.println(getClass().getResource(&amp;#34;/data.txt&amp;#34;)); // getClass().getResourceAsStream(&amp;#34;/data.txt&amp;#34;);  } public void fromInstanceClassLoader() { System.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ssh on NotFound</title>
+    <link>https://notfound.cn/tags/ssh/</link>
+    <description>Recent content in ssh on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Fri, 01 May 2020 14:45:05 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/ssh/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SSH 配置</title>
+      <link>https://notfound.cn/posts/ssh-config/</link>
+      <pubDate>Fri, 01 May 2020 14:45:05 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ssh-config/</guid>
+      <description>系统环境 Ubuntu
+客户端配置 KEY 可以实现：
+ 同一主机使用不同 KEY。 不同主机使用不同 KEY。  编辑文件 ~/.ssh/config：
+Host gh1 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ecdsa Host gh2 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ed25519 SSH 客户端通过 Host 即可使用对应的配置。
+git clone gh1:owner/repo.git git clone gh2:owner/repo.git  git 调用了 ssh 命令  服务器免密登录 在服务器编辑文件 ~/.ssh/authorized_keys，添加客户端的 SSH 公钥(如 ~/.ssh/id_ed25519.pub)：
+ssh-ed25519 AAAA***************************************************************7 notfound@ubuntu  ~/.ssh/authorized_keys 文件或者 ~/.ssh 目录权限过大或者不正确时不会生效。  在客户端上编辑文件 ~/.ssh/config：
+Host notfound User notfound Hostname notfound.</description>
+    </item>
+    
+  </channel>
+</rss>

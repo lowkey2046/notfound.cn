@@ -1,0 +1,849 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NotFound</title>
+    <link>https://notfound.cn/</link>
+    <description>Recent content on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 15 May 2021 16:00:00 +0800</lastBuildDate>
+    
+        <atom:link href="https://notfound.cn/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+        <item>
+        <title>Unicorn 启动、重启和终止</title>
+        <link>https://notfound.cn/posts/unicorn-progress/</link>
+        <pubDate>Fri, 15 May 2020 20:43:44 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/unicorn-progress/</guid>
+        <description>NotFound https://notfound.cn/posts/unicorn-progress/ -&lt;p&gt;起因，需要在 unicorn master 上开启一个线程定时收集 Ruby 进程运行数据。&lt;/p&gt;
+&lt;p&gt;Unicorn 生命周期中设置了多个回调： &lt;code&gt;after_fork&lt;/code&gt;、&lt;code&gt;before_fork&lt;/code&gt;、&lt;code&gt;before_exec&lt;/code&gt;、&lt;code&gt;after_worker_exit&lt;/code&gt; 和 &lt;code&gt;after_worker_ready&lt;/code&gt;，需要在合适的时间点创建线程。&lt;/p&gt;
+&lt;h2 id=&#34;启动重启和终止&#34;&gt;启动、重启和终止&lt;/h2&gt;
+&lt;p&gt;在 unicorn 配置文件代码中打上日志，就可以知道大致的工作过程：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# local variable to guard against running a hook multiple times&lt;/span&gt;
+run_once &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt;
+
+before_fork &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;server, worker&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+  server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;info &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;before_fork&amp;#34;&lt;/span&gt;
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; run_once
+    server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;info &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;before_fork run_once&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# do_something_once_here ...&lt;/span&gt;
+    run_once &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# prevent from firing again&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+  old_pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;config&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;:pid&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;.oldbin&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; old_pid &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pid
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;begin&lt;/span&gt;
+      sig &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; (worker&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;nr &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;) &lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;=&lt;/span&gt; server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;worker_processes ? &lt;span style=&#34;color:#e6db74&#34;&gt;:QUIT&lt;/span&gt; : &lt;span style=&#34;color:#e6db74&#34;&gt;:TTOU&lt;/span&gt;
+      server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;info &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;kill &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;File&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;read(old_pid)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;strip&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;sig&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;kill(sig, &lt;span style=&#34;color:#66d9ef&#34;&gt;File&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;read(old_pid)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;to_i)
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;rescue&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Errno&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ENOENT&lt;/span&gt;, &lt;span style=&#34;color:#66d9ef&#34;&gt;Errno&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;ESRCH&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+before_exec &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;server&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+  server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;info &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;before_exec&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+after_fork &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;server, worker&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;
+  server&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;logger&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;info &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;after_fork&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;启动&#34;&gt;启动&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;启动 master&lt;/li&gt;
+&lt;li&gt;执行 before_fork，每个 worker 都会执行一次&lt;/li&gt;
+&lt;li&gt;启动 worker&lt;/li&gt;
+&lt;li&gt;执行 after_fork，每一个 woker 进程都会执行一次&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-log&#34; data-lang=&#34;log&#34;&gt;[#25404 master-n] : Refreshing Gem list
+[#25404 master-n] : listening on addr=0.0.0.0:8080 fd=20
+[#25404 master-n] : before_fork
+[#25404 master-n] : before_fork run_once   # 执行一次
+[#25404 master-n] : before_fork
+[#25407 worker-0] : after_fork
+[#25404 master-n] : before_fork
+[#25407 worker-0] : worker=0 ready
+[#25410 worker-1] : after_fork
+[#25410 worker-1] : worker=1 ready
+[#25404 master-n] : master process ready
+[#25413 worker-2] : after_fork
+[#25413 worker-2] : worker=2 ready
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;重启&#34;&gt;重启&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;启动 new master 进程&lt;/li&gt;
+&lt;li&gt;new master 执行 before_exec&lt;/li&gt;
+&lt;li&gt;new master 执行 before_fork，并向 old master 发送 TTOU 信号。创建最后一个 worker 进程前(before_fork)，向 old master 发送 QUIT 信号&lt;/li&gt;
+&lt;li&gt;new worker 执行 after_exec&lt;/li&gt;
+&lt;li&gt;old master 接收到 QUIT 信号后，结束掉 old woker 进程，然后退出&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-log&#34; data-lang=&#34;log&#34;&gt;[#25513 master-n] : executing [&amp;quot;unicorn&amp;quot;, &amp;quot;-c&amp;quot;, &amp;quot;config/unicorn.conf.rb&amp;quot;, &amp;quot;-D&amp;quot;] # 创建新的 master
+[#25513 master-n] : before_exec
+[#25513 master-n] : inherited addr=0.0.0.0:8080 fd=20
+[#25513 master-n] : Refreshing Gem list
+[#25513 master-n] : before_fork
+[#25513 master-n] : before_fork run_once     # 执行一次
+[#25513 master-n] : kill 25404 TTOU          # 创建 woker 前(before_fork) 向旧的 master 发送 TTOU
+[#25513 master-n] : before_fork
+[#25513 master-n] : kill 25404 TTOU
+[#25524 worker-0] : after_fork
+[#25524 worker-0] : worker=0 ready
+[#25513 master-n] : before_fork
+[#25513 master-n] : kill 25404 QUIT          # 创建最后一个 woker (before_fork)前后向旧的 master 发送 QUIT
+[#25527 worker-1] : after_fork
+[#25527 worker-1] : worker=1 ready
+[#25513 master-n] : master process ready
+[#25530 worker-2] : after_fork
+[#25530 worker-2] : worker=2 ready
+[#25404 master-o] : reaped #&amp;lt;Process::Status: pid 25407 exit 0&amp;gt; worker=0  # 旧的 master 开始清理旧的 woker
+[#25404 master-o] : reaped #&amp;lt;Process::Status: pid 25410 exit 0&amp;gt; worker=1
+[#25404 master-o] : reaped #&amp;lt;Process::Status: pid 25413 exit 0&amp;gt; worker=2
+[#25404 master-o] : master complete                                       # 旧的 master 退出
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;关键点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;新的 master 和所有的 woker 就绪之后，才会终止旧的进程&lt;/li&gt;
+&lt;li&gt;新的 master 和旧的 master 通过信号通信&lt;/li&gt;
+&lt;li&gt;旧的 master 负责清理旧的 woker，然后退出&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;终止&#34;&gt;终止&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;master 结束掉所有的 worker 进程，然后退出。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-log&#34; data-lang=&#34;log&#34;&gt;[#25513] : reaped #&amp;lt;Process::Status: pid 25524 exit 0&amp;gt; worker=0
+[#25513] : reaped #&amp;lt;Process::Status: pid 25527 exit 0&amp;gt; worker=1
+[#25513] : reaped #&amp;lt;Process::Status: pid 25530 exit 0&amp;gt; worker=2
+[#25513] : master complete
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;master-主要工作&#34;&gt;master 主要工作&lt;/h2&gt;
+&lt;p&gt;master 负责管理子进程，在无限循环中等待信号、以及检查 woker 数量和是否超时，当 woker 数量减少时会创建新的 woker，当 woker 运行超时时会被 kill：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;@sig_queue &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt;
+@queue_sigs &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;:WINCH&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:QUIT&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:INT&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:TERM&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:USR1&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:USR2&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:HUP&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:TTIN&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:TTOU&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;
+@queue_sigs&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;each { &lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt;sig&lt;span style=&#34;color:#f92672&#34;&gt;|&lt;/span&gt; trap(sig) { @sig_queue &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;lt;&lt;/span&gt; sig } }
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;log&lt;/span&gt;(message)
+  puts &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pid&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;message&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;master&lt;/span&gt;(pid)
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;detach(pid)
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;loop&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;case&lt;/span&gt; @sig_queue&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;shift
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;when&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;nil&lt;/span&gt;
+      &lt;span style=&#34;color:#75715e&#34;&gt;# 检查 worker 超时&lt;/span&gt;
+      &lt;span style=&#34;color:#75715e&#34;&gt;# 检查 worker 数量&lt;/span&gt;
+      sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;5&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;when&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;:USR1&lt;/span&gt;
+      log &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;receive :USR1&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;when&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;:USR2&lt;/span&gt;
+      log &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;receive :USR2&amp;#34;&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;when&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;:TERM&lt;/span&gt;
+      log &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;receive :TERM&amp;#34;&lt;/span&gt;
+      &lt;span style=&#34;color:#66d9ef&#34;&gt;break&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+  sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;worker&lt;/span&gt;(ppid)
+  &lt;span style=&#34;color:#75715e&#34;&gt;# TODO&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+ppid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pid
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; fork
+  master(pid)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;
+  worker(ppid)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://ruby-doc.org/core-2.5.0/Signal.html&#34;&gt;trap&lt;/a&gt; 方法可以注册信号处理函数。当信号发生时，会执行 &lt;code&gt;trap&lt;/code&gt; 后面的代码块。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;问题线程与进程&#34;&gt;问题：线程与进程&lt;/h2&gt;
+&lt;p&gt;线程创建后执行 &lt;code&gt;fork&lt;/code&gt; 操作，正在执行的线程会是怎样的存在？在 Linux 中并不推荐多线程中使用 fork，充满了不确定性，可参考 &lt;a href=&#34;https://www.cnblogs.com/liyuan989/p/4279210.html&#34;&gt;谨慎使用多线程中的fork&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;来段代码，测试几个比较关心的问题：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;也就是说除了调用 fork 的线程外，其他线程在子进程中“蒸发”了。&lt;/li&gt;
+&lt;li&gt;假设在 fork 之前，一个线程对某个锁进行的 lock 操作，即持有了该锁，然后另外一个线程调用了 fork 创建子进程。可是在子进程中持有那个锁的线程却&amp;quot;消失&amp;quot;了，从子进程的角度来看，这个锁被“永久”的上锁了，因为它的持有者“蒸发”了。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;log&lt;/span&gt;(message )
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;STDERR&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;puts &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;#&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;pid&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;message&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;parent pid&amp;#34;&lt;/span&gt;)
+mutex &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Mutex&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;new
+
+t &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;Thread&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;new &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt;
+  mutex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;synchronize &lt;span style=&#34;color:#66d9ef&#34;&gt;do&lt;/span&gt;
+    log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;thread mutex start&amp;#34;&lt;/span&gt;)
+    sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+  log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;thread mutex end&amp;#34;&lt;/span&gt;)
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 让线程先执行&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; pid &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; fork
+  log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;parent before, alive?: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;t&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;alive?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;, locked: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;mutex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;locked?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt; )
+  sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+  log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;parent after, alive?: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;t&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;alive?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;, locked: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;mutex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;locked?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt; )
+&lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt;
+  &lt;span style=&#34;color:#75715e&#34;&gt;# 线程占用 mutex 时，子进程被创建&lt;/span&gt;
+  log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;child before, alive?: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;t&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;alive?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;, locked: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;mutex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;locked?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt; )
+  sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;2&lt;/span&gt;
+  log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;child after, alive?: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;t&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;alive?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;, locked: &lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;#{&lt;/span&gt;mutex&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;locked?&lt;span style=&#34;color:#e6db74&#34;&gt;}&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt; )
+&lt;span style=&#34;color:#66d9ef&#34;&gt;end&lt;/span&gt;
+
+log(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;done&amp;#34;&lt;/span&gt;)
+
+sleep &lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出结果如下(ruby 2.5.1p57 x86_64-linux-gnu)：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-log&#34; data-lang=&#34;log&#34;&gt;#9544 parent pid                                 # 父进程 id
+#9544 thread mutex start                         # 父进程中，线程启动，持有 mutex
+#9544 parent before, alive?: true, locked: true  # 父进程中，mutex 被占用
+#9547 child before, alive?: false, locked: false # 子进程中，mutex 未被占用，线程没有执行
+#9544 thread mutex end                           # 父进程中，线程结束，释放 mutex
+#9544 parent after, alive?: false, locked: false
+#9547 child after, alive?: false, locked: false  # 子进程中，线程依旧没有执行
+#9547 done
+#9544 done
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;fork 前创建线程，fork 后线程并不会在子进程中继续执行&lt;/li&gt;
+&lt;li&gt;fork 前线程占用了 Mutex，在 fork 后子进程并不会继续占用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;又产生了新的问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ruby 中的 Mutex 是否和 Linux 系统中的锁对应呢？ Ruby 中的多线程是否和 Linux 中的多线程对应呢？还是 Ruby 语言本身进行了特殊的处理？&lt;/li&gt;
+&lt;li&gt;如果进程中存在文件的读、写操作，是否会造成死锁？或者调用某些方法是否会造成死锁？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;如果在 fork 时线程持有了锁， fork 之后，子进程中的线程不会执行，锁也就无法释放，此时如果子进程尝试获取锁就会一直等待。(上面的示例并没有出现这种情况，原因未知)&lt;/p&gt;
+&lt;p&gt;当前需求是在 master 进程中执行监控线程。woker 进程不需要执行线程以及占用相同的锁，发生上述问题也不会产生不良影响。&lt;/p&gt;
+&lt;h2 id=&#34;结论&#34;&gt;结论&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;大部分时间 master 都是比较清闲的&lt;/li&gt;
+&lt;li&gt;可以考虑在 &lt;code&gt;befork_fork&lt;/code&gt; 回调里 &lt;code&gt;run_once&lt;/code&gt; 启动一个单独的线程进行监控数据收集&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://yhbt.net/unicorn/&#34;&gt;unicorn&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://ruby-doc.org/core-2.5.0/Signal.html&#34;&gt;Signal&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;man 7 signal&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.cnblogs.com/liyuan989/p/4279210.html&#34;&gt;谨慎使用多线程中的fork&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.codingnow.com/2011/01/fork_multi_thread.html&#34;&gt;极不和谐的 fork 多线程程序&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/unicorn-progress/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>监控 Ruby 进程</title>
+        <link>https://notfound.cn/posts/monitoring-process-ruby/</link>
+        <pubDate>Thu, 14 May 2020 20:12:27 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/monitoring-process-ruby/</guid>
+        <description>NotFound https://notfound.cn/posts/monitoring-process-ruby/ -&lt;ul&gt;
+&lt;li&gt;系统环境 Ubuntu 18.04&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;指标&#34;&gt;指标&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;当前进程占用的内存：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;cat /proc/self/status | grep VmRSS
+VmRSS:       &lt;span style=&#34;color:#ae81ff&#34;&gt;740&lt;/span&gt; kB
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;match &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;File&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;read(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/proc/self/status&amp;#39;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;match(&lt;span style=&#34;color:#e6db74&#34;&gt;/VmRSS:\s+(\d+)/&lt;/span&gt;)
+match &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; match&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;].&lt;/span&gt;to_f &lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;1024&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当前进程打开的文件描述符总数：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;ls /proc/self/fd | wc -l
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Dir&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;glob(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/proc/self/fd/*&amp;#39;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;length
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当前进程可打开的最大文件描述符数量：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;cat /proc/self/limits | grep &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Max open files&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;match &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;File&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;read(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;/proc/self/limits&amp;#39;&lt;/span&gt;)&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;match(&lt;span style=&#34;color:#e6db74&#34;&gt;/Max open files\s*(\d+)/&lt;/span&gt;)
+match &lt;span style=&#34;color:#f92672&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; match&lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;进程 CPU 时钟：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;clock_gettime(&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CLOCK_PROCESS_CPUTIME_ID&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:float_second&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;墙上时钟，受系统时间影响，调整系统时间时会发生变化：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;clock_gettime(&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CLOCK_REALTIME&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:float_second&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;系统启动时一直计数，不会受到系统时间的影响：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;clock_gettime(&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CLOCK_MONOTONIC&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:float_second&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;线程 CPU 时钟：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;clock_gettime(&lt;span style=&#34;color:#66d9ef&#34;&gt;Process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;::&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CLOCK_THREAD_CPUTIME_ID&lt;/span&gt;, &lt;span style=&#34;color:#e6db74&#34;&gt;:float_second&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;测量 Ruby 代码执行时间：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ruby&#34; data-lang=&#34;ruby&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;Benchmark&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;measure { &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1_000_000_000&lt;/span&gt; }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;返回 用户 CPU 时间、系统 CPU 时间、用户 CPU 时间以及 系统 CPU 时间之和。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;man 2 clock_gettime&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://ruby-doc.org/core-2.6.1/Process.html&#34;&gt;Process&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://ruby-doc.org/stdlib-2.6.1/libdoc/benchmark/rdoc/Benchmark.html&#34;&gt;Benchmark&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/monitoring-process-ruby/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 安装 Grafana</title>
+        <link>https://notfound.cn/posts/monitoring-grafana/</link>
+        <pubDate>Thu, 14 May 2020 18:39:26 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/monitoring-grafana/</guid>
+        <description>NotFound https://notfound.cn/posts/monitoring-grafana/ -&lt;ul&gt;
+&lt;li&gt;系统环境 Ubuntu 18.04&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;
+&lt;p&gt;下载 &lt;a href=&#34;https://prometheus.io/download/&#34;&gt;https://prometheus.io/download/&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下载&lt;/span&gt;
+wget https://dl.grafana.com/oss/release/grafana-6.7.3.linux-amd64.tar.gz
+&lt;span style=&#34;color:#75715e&#34;&gt;# 解压&lt;/span&gt;
+tar -zxvf grafana-6.7.3.linux-amd64.tar.gz
+&lt;span style=&#34;color:#75715e&#34;&gt;# 启动&lt;/span&gt;
+./bin/grafana-server web
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;访问 &lt;a href=&#34;http://localhost:9090&#34;&gt;http://localhost:9090&lt;/a&gt; ，用户名: admin，密码: admin。&lt;/p&gt;
+&lt;h2 id=&#34;配置&#34;&gt;配置&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;添加数据源 Prometheus&lt;/li&gt;
+&lt;li&gt;添加 Dashboard&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;忘记密码&#34;&gt;忘记密码&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;grafana-cli admin reset-admin-password &amp;lt;new password&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://grafana.com/docs/grafana/latest/installation/debian/&#34;&gt;Install on Debian or Ubuntu&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/monitoring-grafana/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 搭建 Prometheus</title>
+        <link>https://notfound.cn/posts/monitoring-prometheus/</link>
+        <pubDate>Thu, 14 May 2020 18:38:20 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/monitoring-prometheus/</guid>
+        <description>NotFound https://notfound.cn/posts/monitoring-prometheus/ -&lt;ul&gt;
+&lt;li&gt;系统环境 Ubuntu 18.04&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;
+&lt;p&gt;下载 &lt;a href=&#34;https://prometheus.io/download/&#34;&gt;https://prometheus.io/download/&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 下载&lt;/span&gt;
+wget https://github.com/prometheus/prometheus/releases/download/v2.18.1/prometheus-2.18.1.linux-amd64.tar.gz
+&lt;span style=&#34;color:#75715e&#34;&gt;# 解压　&lt;/span&gt;
+tar -zxvf prometheus-2.18.1.linux-amd64.tar.gz
+&lt;span style=&#34;color:#75715e&#34;&gt;# 启动&lt;/span&gt;
+./prometheus --config.file&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;prometheus.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;访问 &lt;a href=&#34;http://localhost:9090&#34;&gt;http://localhost:9090&lt;/a&gt; 即可。&lt;/p&gt;
+&lt;p&gt;目录结构如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;....
+├── data            # 数据目录
+├── prometheus      # 执行文件
+├── prometheus.yml  # 配置文件
+├── promtool        # 工具（没用过
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置&#34;&gt;配置&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-yml&#34; data-lang=&#34;yml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;global&lt;/span&gt;:
+  &lt;span style=&#34;color:#f92672&#34;&gt;scrape_interval&lt;/span&gt;:     &lt;span style=&#34;color:#ae81ff&#34;&gt;15s&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 收集数据的时间间隔&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;scrape_configs&lt;/span&gt;:
+  - &lt;span style=&#34;color:#f92672&#34;&gt;job_name&lt;/span&gt;: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;prometheus&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 作业名称&lt;/span&gt;
+
+    &lt;span style=&#34;color:#75715e&#34;&gt;# metrics_path defaults to &amp;#39;/metrics&amp;#39;&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;# scheme defaults to &amp;#39;http&amp;#39;.&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;static_configs&lt;/span&gt;:
+    - &lt;span style=&#34;color:#f92672&#34;&gt;targets&lt;/span&gt;: [&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;localhost:9090&amp;#39;&lt;/span&gt;]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;metric-类型&#34;&gt;Metric 类型&lt;/h3&gt;
+&lt;h4 id=&#34;counter&#34;&gt;Counter&lt;/h4&gt;
+&lt;p&gt;累加 metric。累加，如 &lt;code&gt;prometheus_http_requests_total&lt;/code&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;gauge&#34;&gt;Gauge&lt;/h4&gt;
+&lt;p&gt;常规 metric。某个值，如 &lt;code&gt;go_goroutines&lt;/code&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;histogram&#34;&gt;Histogram&lt;/h4&gt;
+&lt;p&gt;直方图。请求处理时间，如 &lt;code&gt;prometheus_http_request_duration_seconds_bucket{handler=&amp;quot;/&amp;quot;,le=&amp;quot;0.1&amp;quot;}&lt;/code&gt;&lt;/p&gt;
+&lt;h4 id=&#34;summary&#34;&gt;Summary&lt;/h4&gt;
+&lt;p&gt;类似于 Histogram, 典型的应用如：请求持续时间，响应大小。如 &lt;code&gt;prometheus_http_response_size_bytes_bucket{handler=&amp;quot;/api/v1/query_range&amp;quot;,le=&amp;quot;100&amp;quot;}&lt;/code&gt;&lt;/p&gt;
+&lt;h2 id=&#34;promql&#34;&gt;PromQL&lt;/h2&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://prometheus.io/docs/prometheus/latest/getting_started/&#34;&gt;GETTING STARTED&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.ibm.com/developerworks/cn/cloud/library/cl-lo-prometheus-getting-started-and-practice/index.html&#34;&gt;Prometheus 入门与实践&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/monitoring-prometheus/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>SSH 配置</title>
+        <link>https://notfound.cn/posts/ssh-config/</link>
+        <pubDate>Fri, 01 May 2020 14:45:05 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ssh-config/</guid>
+        <description>NotFound https://notfound.cn/posts/ssh-config/ -&lt;p&gt;系统环境 Ubuntu&lt;/p&gt;
+&lt;h2 id=&#34;客户端配置-key&#34;&gt;客户端配置 KEY&lt;/h2&gt;
+&lt;p&gt;可以实现：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;同一主机使用不同 KEY。&lt;/li&gt;
+&lt;li&gt;不同主机使用不同 KEY。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;编辑文件 &lt;code&gt;~/.ssh/config&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ssh&#34; data-lang=&#34;ssh&#34;&gt;Host gh1
+  User git
+  Hostname github.com
+  Port 22
+  IdentityFile ~/.ssh/id_ecdsa
+Host gh2
+  User git
+  Hostname github.com
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;SSH 客户端通过 Host 即可使用对应的配置。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone gh1:owner/repo.git
+git clone gh2:owner/repo.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;git 调用了 ssh 命令&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;服务器免密登录&#34;&gt;服务器免密登录&lt;/h2&gt;
+&lt;p&gt;在服务器编辑文件 &lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt;，添加客户端的 SSH 公钥(如 &lt;code&gt;~/.ssh/id_ed25519.pub&lt;/code&gt;)：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;ssh-ed25519 AAAA***************************************************************7 notfound@ubuntu
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;~/.ssh/authorized_keys&lt;/code&gt; 文件或者 &lt;code&gt;~/.ssh&lt;/code&gt; 目录权限过大或者不正确时不会生效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在客户端上编辑文件 &lt;code&gt;~/.ssh/config&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ssh&#34; data-lang=&#34;ssh&#34;&gt;Host notfound
+  User notfound
+  Hostname notfound.cn
+  Port 22
+  IdentityFile ~/.ssh/id_ecdsa
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;直接执行 &lt;code&gt;ssh notfound&lt;/code&gt; 即可登录服务器。&lt;/p&gt;
+&lt;h2 id=&#34;客户端心跳&#34;&gt;客户端心跳&lt;/h2&gt;
+&lt;p&gt;客户端上编辑文件 &lt;code&gt;~/.ssh/config&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ssh&#34; data-lang=&#34;ssh&#34;&gt;  ServerAliveInterval 60
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ServerAliveInterval&lt;/code&gt; 客户端 60s 未接收到服务端数据时，发送一个数据包给服务端&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;连接复用&#34;&gt;连接复用&lt;/h2&gt;
+&lt;p&gt;客户端上编辑文件 &lt;code&gt;~/.ssh/config&lt;/code&gt;：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ssh&#34; data-lang=&#34;ssh&#34;&gt;  ControlMaster auto
+  ControlPath ~/.ssh/connection-%r@%h:%p
+  ControlPersist 4h
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;终端多个窗口连接同一个服务器可以复用一个网络连接。&lt;/li&gt;
+&lt;li&gt;连接保持 4 小时&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;远程执行命令&#34;&gt;远程执行命令&lt;/h2&gt;
+&lt;p&gt;配置好服务器免密登录后，通过 &lt;code&gt;ssh -T HOST command&lt;/code&gt; 可以直接在服务器 HOST 上执行 command 命令。&lt;/p&gt;
+&lt;p&gt;如 hugo 编译，省去了手动登录的步骤：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;ssh -T notfound hugo -s work/notfound.cn -d /var/www/notfound.cn
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;自建服务器保存-git-仓库&#34;&gt;自建服务器保存 Git 仓库&lt;/h2&gt;
+&lt;p&gt;配置服务器免密，登录服务器创建 git 仓库，在 &lt;code&gt;$HOME&lt;/code&gt; 目录执行：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git init --bare demo.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;客户端配置 &lt;code&gt;~/.ssh/config&lt;/code&gt; 后， 执行：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone notfound:demo.git
+&lt;span style=&#34;color:#75715e&#34;&gt;# 如果未配置 `~/.ssh/config`, 则执行&lt;/span&gt;
+git clone user@notfound.cn:demo.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;将本地公钥复制到远程&#34;&gt;将本地公钥复制到远程&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;ssh-copy-id -i ~/.ssh/id_rsa.pub notfound@notfound.cn
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;proxycommand&#34;&gt;ProxyCommand&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ssh&#34; data-lang=&#34;ssh&#34;&gt;Host host_a
+   User a
+   Port 22
+   HostName a.notfound.cn
+Host host_b
+   User b
+   Port 22
+   HostName b.notfound.cn
+   ProxyCommand ssh -W %h:%p host_a
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;通过 &lt;code&gt;host_a&lt;/code&gt; 跳转到 &lt;code&gt;host_b&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://man.openbsd.org/ssh_config#ServerAliveInterval&#34;&gt;https://man.openbsd.org/ssh_config#ServerAliveInterval&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://einverne.github.io/post/2017/05/ssh-keep-alive.html&#34;&gt;https://einverne.github.io/post/2017/05/ssh-keep-alive.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://askubuntu.com/questions/87956/can-you-set-passwords-in-ssh-config-to-allow-automatic-login&#34;&gt;https://askubuntu.com/questions/87956/can-you-set-passwords-in-ssh-config-to-allow-automatic-login&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ssh-config/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>读取 Java Resource 中的文件</title>
+        <link>https://notfound.cn/posts/java-resource/</link>
+        <pubDate>Fri, 01 May 2020 13:10:22 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-resource/</guid>
+        <description>NotFound https://notfound.cn/posts/java-resource/ -&lt;p&gt;读取 Java Resource 中的文件&lt;/p&gt;
+&lt;h2 id=&#34;源码&#34;&gt;源码&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; com.example&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.io.IOException&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;App&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt; String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; args &lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    from&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    fromClassLoader&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+    App app &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; App&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    app&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;fromInstance&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    app&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;fromInstanceClassLoader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;from&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;App&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;class&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getResource&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/data.txt&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// App.class.getResourceAsStream(&amp;#34;/data.txt&amp;#34;);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;fromClassLoader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;App&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;class&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getClassLoader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getResource&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// App.class.getClassLoader().getResourceAsStream(&amp;#34;data.txt&amp;#34;);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;fromInstance&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;getClass&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getResource&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/data.txt&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// getClass().getResourceAsStream(&amp;#34;/data.txt&amp;#34;);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+  &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;fromInstanceClassLoader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;getClass&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getClassLoader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getResource&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;data.txt&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// getClass().getClassLoader().getResourceAsStream(&amp;#34;data.txt&amp;#34;);
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;  &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;未打包时，路径为普通文件路径，可以直接读取：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;cd target/classes
+java com.example.App 
+file:/home/notfound/test/demo/target/classes/data.txt
+file:/home/notfound/test/demo/target/classes/data.txt
+file:/home/notfound/test/demo/target/classes/data.txt
+file:/home/notfound/test/demo/target/classes/data.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;打包成 jar 后，路径为 jar URL，无法直接通过路径读取文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;java -jar target/demo-1.0-SNAPSHOT.jar
+jar:file:/home/notfound/test/demo/target/demo-1.0-SNAPSHOT.jar!/data.txt
+jar:file:/home/notfound/test/demo/target/demo-1.0-SNAPSHOT.jar!/data.txt
+jar:file:/home/notfound/test/demo/target/demo-1.0-SNAPSHOT.jar!/data.txt
+jar:file:/home/notfound/test/demo/target/demo-1.0-SNAPSHOT.jar!/data.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;－可以通过 &lt;code&gt;getResourceAsStream&lt;/code&gt; 来获取 &lt;code&gt;InputStream&lt;/code&gt; 对象，对文件内容进行读取。&lt;/p&gt;
+&lt;h2 id=&#34;q&#34;&gt;Q&lt;/h2&gt;
+&lt;h3 id=&#34;在-jar-中如何通过-randomaccessfile-读取文件内容&#34;&gt;在 jar 中，如何通过 &lt;code&gt;RandomAccessFile&lt;/code&gt; 读取文件内容？&lt;/h3&gt;
+&lt;p&gt;jar 中的内容已经被压缩处理，无法随机读取。可以将内容写入到临时文件中，然后通过 &lt;code&gt;RandomAccessFile&lt;/code&gt; 读取临时文件。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://maven.apache.org/plugins/maven-shade-plugin/examples/executable-jar.html&#34;&gt;Executable JAR&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/questions/23420976/randomaccessfile-to-read-files-in-a-jar-file&#34;&gt;RandomAccessFile to read files in a Jar file&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-resource/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Nginx CORS 配置</title>
+        <link>https://notfound.cn/posts/nginx-cors-conf/</link>
+        <pubDate>Fri, 01 May 2020 12:23:24 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/nginx-cors-conf/</guid>
+        <description>NotFound https://notfound.cn/posts/nginx-cors-conf/ -&lt;p&gt;Nginx CORS 配置&lt;/p&gt;
+&lt;h3 id=&#34;配置&#34;&gt;配置&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;add_header&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Access-Control-Allow-Origin&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;*&amp;#39;&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;add_header&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Access-Control-Allow-Methods&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;GET,POST,OPTIONS&amp;#39;&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;add_header&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Access-Control-Allow-Headers&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Authorization,Content-Type,Accept,Origin,User-Agent,Cache-Control&amp;#39;&lt;/span&gt;;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;(&lt;/span&gt;$request_method = &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;OPTIONS&amp;#39;)&lt;/span&gt; {
+	&lt;span style=&#34;color:#f92672&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;204&lt;/span&gt;;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt;: &lt;code&gt;*&lt;/code&gt; 表示允许所有站点。也可以设置为具体的站点，如 &lt;code&gt;http://example.com&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Methods&lt;/code&gt;: 允许客户端发起 &lt;code&gt;GET&lt;/code&gt;、&lt;code&gt;POST&lt;/code&gt; 和 &lt;code&gt;OPTIONS&lt;/code&gt; 请求。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Access-Control-Allow-Headers&lt;/code&gt;: 允许携带的头部。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;q&#34;&gt;Q&lt;/h2&gt;
+&lt;h3 id=&#34;添加后无效-access-control-allow-origin-依旧无效&#34;&gt;添加后无效 &lt;code&gt;Access-Control-Allow-Origin&lt;/code&gt; 依旧无效&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;add_header&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;‘Access-Control-Allow-Origin’&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;*&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;always&lt;/span&gt;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;无论何时都生效。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;携带认证信息&#34;&gt;携带认证信息&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;一般而言，对于跨域 XMLHttpRequest 或 Fetch 请求，浏览器不会发送身份凭证信息。如果要发送凭证信息，需要设置 XMLHttpRequest 的某个特殊标志位。&lt;/li&gt;
+&lt;li&gt;对于附带身份凭证的请求，服务器不得设置 Access-Control-Allow-Origin 的值为“*”。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.ruanyifeng.com/blog/2016/04/cors.html&#34;&gt;跨域资源共享 CORS 详解&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Access_control_CORS&#34;&gt;HTTP访问控制（CORS）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.csdn.net/xiojing825/article/details/83383524&#34;&gt;nginx 配置add_header &amp;lsquo;Access-Control-Allow-Origin&amp;rsquo; &amp;lsquo;*&amp;rsquo; 依然存在跨域问题&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://enable-cors.org/server_nginx.html&#34;&gt;CORS on Nginx&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/nginx-cors-conf/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>配置 gradle 和 maven 源</title>
+        <link>https://notfound.cn/posts/gradle-maven-mirror/</link>
+        <pubDate>Fri, 03 May 2019 13:05:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/gradle-maven-mirror/</guid>
+        <description>NotFound https://notfound.cn/posts/gradle-maven-mirror/ -&lt;p&gt;配置 gradle 和 maven 源，环境为 Ubuntu 18.04。&lt;/p&gt;
+&lt;h2 id=&#34;配置-gradle-源&#34;&gt;配置 gradle 源&lt;/h2&gt;
+&lt;p&gt;编辑文件 &lt;code&gt;~/.gradle/init.gradle&lt;/code&gt; :&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;allprojects &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; google_uri  &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; URI&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://maven.aliyun.com/repository/google&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; central_uri &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; URI&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://maven.aliyun.com/repository/central&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; jcenter_uri &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; URI&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://maven.aliyun.com/repository/jcenter&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+
+    repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        all &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            ArtifactRepository repo &lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;repo &lt;span style=&#34;color:#66d9ef&#34;&gt;instanceof&lt;/span&gt; MavenArtifactRepository&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; url &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;url&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+                &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://repo.maven.apache.org/maven2/&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;||&lt;/span&gt; url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://repo1.maven.org/maven2&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                    project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${central_uri}.&amp;#34;&lt;/span&gt;
+                    repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;central_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://jcenter.bintray.com/&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                    project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${jcenter_uri}.&amp;#34;&lt;/span&gt;
+                    repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;jcenter_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://dl.google.com/dl/android/maven2&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                    project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${google_uri}.&amp;#34;&lt;/span&gt;
+                    repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;google_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+    buildscript &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            maven &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt; url &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://maven.aliyun.com/repository/public/&amp;#39;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+            all &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt; ArtifactRepository repo &lt;span style=&#34;color:#f92672&#34;&gt;-&amp;gt;&lt;/span&gt;
+                &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;repo &lt;span style=&#34;color:#66d9ef&#34;&gt;instanceof&lt;/span&gt; MavenArtifactRepository&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                    &lt;span style=&#34;color:#66d9ef&#34;&gt;def&lt;/span&gt; url &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;url&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;toString&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+                    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://repo.maven.apache.org/maven2/&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;||&lt;/span&gt; url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://repo1.maven.org/maven2&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                        project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${central_uri}.&amp;#34;&lt;/span&gt;
+                        repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;central_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://jcenter.bintray.com/&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                        project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${jcenter_uri}.&amp;#34;&lt;/span&gt;
+                        repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;jcenter_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;else&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;url&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;startsWith&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;https://dl.google.com/dl/android/maven2&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                        project&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;logger&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lifecycle&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Repository ${repo.url} replaced by ${google_uri}.&amp;#34;&lt;/span&gt;
+                        repo&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUrl&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;google_uri&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+                &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置-maven-源&#34;&gt;配置 maven 源&lt;/h2&gt;
+&lt;p&gt;找到 Maven Home:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;mvn -v
+Apache Maven 3.6.0
+Maven home: /usr/share/maven
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;复制配置:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;cp /usr/share/maven/conf/settings.xml ~/.m2/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;编辑 &lt;code&gt;~/.m2/settings.xml&lt;/code&gt; 找到 &lt;code&gt;mirrors&lt;/code&gt; 节点，在节点中间添加:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirror&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;central-aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;central&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Central aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://maven.aliyun.com/repository/central&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirror&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;jcenter-aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;jcenter&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;JCenter aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://maven.aliyun.com/repository/jcenter&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirror&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;google-aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;mirrorOf&amp;gt;&lt;/span&gt;google&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirrorOf&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;Google aliyun&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url&amp;gt;&lt;/span&gt;http://maven.aliyun.com/repository/google&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/mirror&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;- https://notfound.cn/posts/gradle-maven-mirror/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Git 使用 GPG 进行签名</title>
+        <link>https://notfound.cn/posts/git-and-gpg/</link>
+        <pubDate>Sat, 16 Feb 2019 22:43:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/git-and-gpg/</guid>
+        <description>NotFound https://notfound.cn/posts/git-and-gpg/ -&lt;p&gt;本文仅介绍 Git 使用 GPG 进行签名，关于 GPG 参考 &lt;a href=&#34;https://notfound.cn/posts/gpg-usage/&#34;&gt;GPG 使用&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;配置-git&#34;&gt;配置 Git&lt;/h2&gt;
+&lt;p&gt;配置 GPG 密钥。密钥 ID 可以为主密钥 ID 或者签名密钥 ID，签名时始终使用签名密钥 ID。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git config --global gpg.program gpg2 &lt;span style=&#34;color:#75715e&#34;&gt;# Ubuntu 16.04 需要配置为 gpg2&lt;/span&gt;
+git config --global user.signingkey E609071A680F01521759F2AD6845FD9F1A3352AF
+git config --global tag.forceSignAnnotated true &lt;span style=&#34;color:#75715e&#34;&gt;# 默认对标签进行签名&lt;/span&gt;
+git config --global commit.gpgSign true &lt;span style=&#34;color:#75715e&#34;&gt;# 默认对提交进行签名&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;签名&#34;&gt;签名&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;签名带注释的标签&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git tag -s &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;tagname&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt;     &lt;span style=&#34;color:#75715e&#34;&gt;# 添加签名&lt;/span&gt;
+git verify-tag &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;tagname&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 验证签名&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;签名提交&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git commit -S            &lt;span style=&#34;color:#75715e&#34;&gt;# 添加签名&lt;/span&gt;
+git verify-commit &lt;span style=&#34;color:#f92672&#34;&gt;[&lt;/span&gt;hash&lt;span style=&#34;color:#f92672&#34;&gt;]&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# 验证提交&lt;/span&gt;
+git log --show-signature &lt;span style=&#34;color:#75715e&#34;&gt;# 显示签名&lt;/span&gt;
+git merge --verify-signatures -S merged-branch &lt;span style=&#34;color:#75715e&#34;&gt;# 合并时强制签名检查并对合并操作进行签名&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Git 签名内容&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;$ git cat-file -p 8ea04ca8d1b471846446b4210a7fc785bdcb9bb2
+tree 5f565fa353070352457b964a28d40c4f18919e97
+parent 524c10cde6645753fe4580d8d73cd625c34bcd5c
+author notfound &amp;lt;notfound@notfound.cn&amp;gt; 1550324641 +0800
+committer notfound &amp;lt;notfound@notfound.cn&amp;gt; 1550324641 +0800
+gpgsig -----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEkc9pJPW9Ezra8LcruFeA+h3S9UsFAlxoE6EACgkQuFeA+h3S
+9UsDcAf9EBKDKmpHidpB39qhsoRIAYtiDvwESrh+n74sSt6HDEGtdbQU6ScABtdJ
+t0gUUcnu2/c6qjqaTXM/MtxJ08KLlQpExuJ9qIwUXEUrzLmVk3Dq7PiDl++Z2N5R
+GRGeOh9FSmeIJvQu2XFrFQHg0dyDrLrZCvpFe7GG3iJazqcAJbpzIvyBOYLKuSQn
+4UBNXlCM3jFsDurwsZpGVyDFPOPXtPoD5L85j7bF9rN1kUr4STlzm5TVeH94rNI5
+l6po3eUcGUguBKt4Ckx8PUlK2mWubv13WDTXOkqXd5u7VVnsgwzytLMhVcloZqs1
+g174BFXuWLFTkb4p0a7X15i86JjN8g==
+=Hie/
+-----END PGP SIGNATURE-----
+
+GPG test
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;其中签名为(gpgsig.txt)：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEkc9pJPW9Ezra8LcruFeA+h3S9UsFAlxoE6EACgkQuFeA+h3S
+9UsDcAf9EBKDKmpHidpB39qhsoRIAYtiDvwESrh+n74sSt6HDEGtdbQU6ScABtdJ
+t0gUUcnu2/c6qjqaTXM/MtxJ08KLlQpExuJ9qIwUXEUrzLmVk3Dq7PiDl++Z2N5R
+GRGeOh9FSmeIJvQu2XFrFQHg0dyDrLrZCvpFe7GG3iJazqcAJbpzIvyBOYLKuSQn
+4UBNXlCM3jFsDurwsZpGVyDFPOPXtPoD5L85j7bF9rN1kUr4STlzm5TVeH94rNI5
+l6po3eUcGUguBKt4Ckx8PUlK2mWubv13WDTXOkqXd5u7VVnsgwzytLMhVcloZqs1
+g174BFXuWLFTkb4p0a7X15i86JjN8g==
+=Hie/
+-----END PGP SIGNATURE-----
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;被签名的文本为(commit.txt)：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;tree 5f565fa353070352457b964a28d40c4f18919e97
+parent 524c10cde6645753fe4580d8d73cd625c34bcd5c
+author notfound &amp;lt;notfound@notfound.cn&amp;gt; 1550324641 +0800
+committer notfound &amp;lt;notfound@notfound.cn&amp;gt; 1550324641 +0800
+
+GPG test
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;验证签名：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;gpg --verify gpgsig.txt commit.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;github-gpg-公钥&#34;&gt;GitHub GPG 公钥&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;GPG 公钥包含的邮箱与用户已激活邮箱一致，GPG 公钥才能验证通过。&lt;/li&gt;
+&lt;li&gt;提交的 committer 邮箱包含在验证通过的 GPG 公钥中，提交才能验证通过。而本地使用 git 命令查看签名时只会验证签名是否有效，不会对邮箱进行验证。&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/git-and-gpg/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>GPG 使用</title>
+        <link>https://notfound.cn/posts/gpg-usage/</link>
+        <pubDate>Sat, 16 Feb 2019 22:19:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/gpg-usage/</guid>
+        <description>NotFound https://notfound.cn/posts/gpg-usage/ -&lt;p&gt;本文仅介绍 GPG 基本的使用。&lt;/p&gt;
+&lt;h2 id=&#34;安装-gpg-2x&#34;&gt;安装 GPG 2.x&lt;/h2&gt;
+&lt;p&gt;需要确保使用 GnuPG v.2&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install gnupg2 &lt;span style=&#34;color:#75715e&#34;&gt;# Ubuntu 16.04&lt;/span&gt;
+sudo apt install gnupg  &lt;span style=&#34;color:#75715e&#34;&gt;# Ubuntu 18.04&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;生成密钥快速&#34;&gt;生成密钥（快速）&lt;/h2&gt;
+&lt;p&gt;一次生成多个密钥：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --full-generate-key
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;生成密钥分步&#34;&gt;生成密钥（分步）&lt;/h2&gt;
+&lt;h3 id=&#34;1-生成主密钥&#34;&gt;1. 生成主密钥&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --quick-generate-key &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;NotFound &amp;lt;notfound@notfound.cn&amp;gt;&amp;#39;&lt;/span&gt; rsa4096 cert
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;pub   rsa4096 2019-02-16 [C] [有效至：2021-02-15]
+      E609071A680F01521759F2AD6845FD9F1A3352AF
+uid                      NotFound &amp;lt;notfound@notfound.cn&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;E609071A680F01521759F2AD6845FD9F1A3352AF&lt;/code&gt; 为密钥 ID，分为三种形态：
+&lt;ul&gt;
+&lt;li&gt;指纹：完整的 40 个字符的密钥标识符&lt;/li&gt;
+&lt;li&gt;长密钥 ID：指纹的最后 16 个字符&lt;/li&gt;
+&lt;li&gt;短密钥 ID：指纹的最后 8 个字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;uid 为身份，可以拥有多个身份，其中第一个为主 UID&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;2-生成子密钥&#34;&gt;2. 生成子密钥&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 encr &lt;span style=&#34;color:#75715e&#34;&gt;# [E]加密子密钥&lt;/span&gt;
+gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 sign &lt;span style=&#34;color:#75715e&#34;&gt;# [S]签名子密钥&lt;/span&gt;
+gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 auth &lt;span style=&#34;color:#75715e&#34;&gt;# [A]验证子密钥&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;查看&#34;&gt;查看&lt;/h2&gt;
+&lt;p&gt;查看 GPG Key 信息：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --list-key E609071A680F01521759F2AD6845FD9F1A3352AF
+gpg --with-keygrip --list-key E609071A680F01521759F2AD6845FD9F1A3352AF
+gpg --with-subkey-fingerprint --list-key E609071A680F01521759F2AD6845FD9F1A3352AF
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;uid身份&#34;&gt;UID(身份)&lt;/h2&gt;
+&lt;p&gt;一个 GPG KEY 可以拥有多个UID。
+添加 UID：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --quick-add-uid E609071A680F01521759F2AD6845FD9F1A3352AF &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;Found &amp;lt;found@notfound.cn&amp;gt;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;选择主 UID：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --quick-set-primary-uid E609071A680F01521759F2AD6845FD9F1A3352AF &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Found &amp;lt;found@notfound.cn&amp;gt;&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;公钥导入与导出&#34;&gt;公钥导入与导出&lt;/h2&gt;
+&lt;h3 id=&#34;1--导出公钥&#34;&gt;1.  导出公钥&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --export --armor --output public-key.txt E609071A680F01521759F2AD6845FD9F1A3352AF
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;可以将导出的公钥添加到 GitHub\GitLab\Gitee 等&lt;/p&gt;
+&lt;h3 id=&#34;2--导入公钥&#34;&gt;2.  导入公钥&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;gpg --import public-key.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://linux.cn/&#34;&gt;Linux 中国&lt;/a&gt;上有关于 PGP(GPG) 详细介绍，强烈推荐：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-9524-1-rel.html&#34;&gt;用 PGP 保护代码完整性（一）：基本概念和工具&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-9529-1-rel.html&#34;&gt;用 PGP 保护代码完整性（二）：生成你的主密钥&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-9607-1.html&#34;&gt;用 PGP 保护代码完整性（三）：生成 PGP 子密钥&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-10402-1.html&#34;&gt;用 PGP 保护代码完整性（四）：将主密钥移到离线存储中&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-10415-1.html&#34;&gt;用 PGP 保护代码完整性（五）：将子密钥移到一个硬件设备中&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-10421-1.html&#34;&gt;用 PGP 保护代码完整性（六）：在 Git 上使用 PGP&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://linux.cn/article-10432-1.html&#34;&gt;用 PGP 保护代码完整性（七）：保护在线帐户&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/gpg-usage/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+  </channel>
+</rss> 

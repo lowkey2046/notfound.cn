@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>git on NotFound</title>
+    <link>https://notfound.cn/tags/git/</link>
+    <description>Recent content in git on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Fri, 23 Apr 2021 20:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/git/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Git Maintenance</title>
+      <link>https://notfound.cn/posts/git-maintenance/</link>
+      <pubDate>Fri, 23 Apr 2021 20:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-maintenance/</guid>
+      <description>git maintenance 通过 git maintenance 命令，可以对 Git 仓库定期维护。该命令包括一系列的子命令。
+在 Linux 环境中，是通过 cron 执行定时任务。
+register 将当前 Git 仓库添加到仓库维护列表中。
+git maintenance register  修改当前仓库配置文件，添加 maintenance.auto 和 maintenance.strategy 修改用户全局配置文件 ~/.gitconfig ，将当前仓库绝对路径添加到 maintenance.repo 节点  run 执行 Git 仓库维护任务。
+git maintenance run  执行维护任务 可以通过参数 --task 指定任务  git maintenance run --task gc task 参数如下：
+ commit-graph 增量更新 commit-graph prefetch 从所有 remote 拉取分支，分支信息保存到 refs/prefetch/&amp;lt;remote&amp;gt;/ ，不会拉取 tag gc 执行 git gc loose-objects 将松散对象 loose objects 打包，文件名以 loose- 开头，不建议和 gc 同时开启 incremental-repack 重新打包文件 pack-refs 将松散的 refs 打包到单个文件  start 添加定时任务，并将当前 Git 仓库添加到仓库维护列表中。</description>
+    </item>
+    
+    <item>
+      <title>使用 Java 实现 Git SSH 服务端</title>
+      <link>https://notfound.cn/posts/java-ssh-git-server-start/</link>
+      <pubDate>Sat, 13 Mar 2021 18:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-ssh-git-server-start/</guid>
+      <description>使用 Java 实现 Git SSH 服务端  OpenJDK 11 Gradle 6.8 Apache MINA SSHD  依赖 修改 build.gradle 文件：
+implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-core&amp;#39;, version: &amp;#39;2.6.0&amp;#39; implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-git&amp;#39;, version: &amp;#39;2.6.0&amp;#39; // SSH KEY ed25519 // implementation group: &amp;#39;net.i2p.crypto&amp;#39;, name: &amp;#39;eddsa&amp;#39;, version: &amp;#39;0.3.0&amp;#39;  如果需要支持 ed25519，需要引入单独的包  代码 服务端主要使用包内自带的处理方式：
+public static void main(String[] args) throws IOException, InterruptedException { SshServer sshd = SshServer.setUpDefaultServer(); sshd.setPort(8082); sshd.setHost(&amp;#34;127.0.0.1&amp;#34;); // 设置服务端私钥  sshd.setKeyPairProvider(new FileKeyPairProvider(Path.</description>
+    </item>
+    
+    <item>
+      <title>Git 服务端 Hooks</title>
+      <link>https://notfound.cn/posts/git-server-hooks/</link>
+      <pubDate>Sat, 20 Jun 2020 08:30:56 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-server-hooks/</guid>
+      <description>调用过程：
+ pre-receive 可阻止所有 ref 更新 update 可阻止单个 ref 更新 post-receive 无法阻止 ref 更新  pre-receive 特点  无参数调用 标准输入传递引用信息 以非零值退出，所有的推送内容都不会被接受  用途  钩子阻止对引用进行非快进（non-fast-forward）的更新 对该推送所修改的所有引用和文件进行访问控制  示例 #!/usr/bin/env ruby LINE = &amp;#39;-&amp;#39; * 80 puts LINE ENV.each do |k, v| puts &amp;#34;#{k}=#{v}&amp;#34; if k.start_with?(&amp;#39;GIT&amp;#39;) end puts LINE # sha1-old SP sha1-new SP refname LF while line = STDIN.gets puts line end puts LINE exit(1) 推送两个分支
+git push origin master:master master:dev 枚举对象: 3, 完成.</description>
+    </item>
+    
+    <item>
+      <title>Git 如何识别二进制文件</title>
+      <link>https://notfound.cn/posts/how-to-git-known-binary/</link>
+      <pubDate>Sat, 16 May 2020 16:17:29 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/how-to-git-known-binary/</guid>
+      <description>Git 区分二进制和文本文件？
+源码 Git 是通过函数 buffer_is_binary 识别二进制：
+#define FIRST_FEW_BYTES 8000 int buffer_is_binary(const char *ptr, unsigned long size) { if (FIRST_FEW_BYTES &amp;lt; size) size = FIRST_FEW_BYTES; return !!memchr(ptr, 0, size); }  文件前 8000 个字节与 \0 进行比较，非文件末尾出现 \0 就认为是二进制  C 语言中，字符串一定是以 \0 结束，简单的想一想，感觉没毛病。
+问题   Q: 多字节文件编码中，难道其中的某个字节不会出现 \0？
+文件内容1，保存为 utf16：
+$ file utf16.txt utf16.txt: Little-endian UTF-16 Unicode text, with no line terminators $ hexdump -C utf16.txt 00000000 ff fe 31 00 0a 00 |.</description>
+    </item>
+    
+    <item>
+      <title>SSH 配置</title>
+      <link>https://notfound.cn/posts/ssh-config/</link>
+      <pubDate>Fri, 01 May 2020 14:45:05 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ssh-config/</guid>
+      <description>系统环境 Ubuntu
+客户端配置 KEY 可以实现：
+ 同一主机使用不同 KEY。 不同主机使用不同 KEY。  编辑文件 ~/.ssh/config：
+Host gh1 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ecdsa Host gh2 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ed25519 SSH 客户端通过 Host 即可使用对应的配置。
+git clone gh1:owner/repo.git git clone gh2:owner/repo.git  git 调用了 ssh 命令  服务器免密登录 在服务器编辑文件 ~/.ssh/authorized_keys，添加客户端的 SSH 公钥(如 ~/.ssh/id_ed25519.pub)：
+ssh-ed25519 AAAA***************************************************************7 notfound@ubuntu  ~/.ssh/authorized_keys 文件或者 ~/.ssh 目录权限过大或者不正确时不会生效。  在客户端上编辑文件 ~/.ssh/config：
+Host notfound User notfound Hostname notfound.</description>
+    </item>
+    
+    <item>
+      <title>Git 使用 GPG 进行签名</title>
+      <link>https://notfound.cn/posts/git-and-gpg/</link>
+      <pubDate>Sat, 16 Feb 2019 22:43:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-and-gpg/</guid>
+      <description>本文仅介绍 Git 使用 GPG 进行签名，关于 GPG 参考 GPG 使用。
+配置 Git 配置 GPG 密钥。密钥 ID 可以为主密钥 ID 或者签名密钥 ID，签名时始终使用签名密钥 ID。
+git config --global gpg.program gpg2 # Ubuntu 16.04 需要配置为 gpg2 git config --global user.signingkey E609071A680F01521759F2AD6845FD9F1A3352AF git config --global tag.forceSignAnnotated true # 默认对标签进行签名 git config --global commit.gpgSign true # 默认对提交进行签名 签名   签名带注释的标签
+git tag -s [tagname] # 添加签名 git verify-tag [tagname] # 验证签名   签名提交
+git commit -S # 添加签名 git verify-commit [hash] # 验证提交 git log --show-signature # 显示签名 git merge --verify-signatures -S merged-branch # 合并时强制签名检查并对合并操作进行签名   Git 签名内容</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装配置 Git</title>
+      <link>https://notfound.cn/posts/ubuntu-install-git/</link>
+      <pubDate>Tue, 20 Mar 2018 23:30:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-git/</guid>
+      <description>系统环境：Ubuntu 16.04
+安装 sudo apt install git 配置 ssh key ssh-keygen -t rsa -b 4096 -C &amp;#34;username@example.com&amp;#34;  密钥类型 rsa 密钥长度 4096 注释字段为邮箱地址，可随意填写或不填  配置用户名、邮箱 git config --global user.name $USERNAME git config --global user.email $EMAIL 配置编辑器 git config --global core.editor vim  将默认编辑器设置为 vim  配置 diff 工具 git config --global diff.tool vimdiff git config --global difftool.prompt no  设置 diff 工具为 vimdiff 启动 diff 工具时不提示工具信息 在查看差异时，使用 git difftool 命令调用 diff 工具进行双栏对比，可以看到每行变更的字符  设置 https 密码保存 git config --global credential.</description>
+    </item>
+    
+  </channel>
+</rss>

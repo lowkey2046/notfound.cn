@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gradle on NotFound</title>
+    <link>https://notfound.cn/tags/gradle/</link>
+    <description>Recent content in gradle on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Tue, 16 Feb 2021 15:11:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/gradle/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Gradle 入门</title>
+      <link>https://notfound.cn/posts/java-gradle-start/</link>
+      <pubDate>Tue, 16 Feb 2021 15:11:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-gradle-start/</guid>
+      <description>Gradle 入门  Gradle 6.8  初始化项目 gradle init 可初始化项目：
+gradle init --type=basic --dsl=groovy --project-name=example 生成的目录结构如下：
+. ├── build.gradle ├── .gitattributes ├── .gitignore ├── .gradle ├── gradle/wrapper/ ├── gradlew ├── gradlew.bat └── settings.gradle 包含 Main 方法的 jar   新建文件 src/main/java/example/Main.java
+package example; public class Main { public static void main(String[] args) { System.out.println(&amp;#34;Hello World!&amp;#34;); } }   修改 build.gradle ，把所有依赖一起打包：
+plugins { id &amp;#39;java&amp;#39; } jar { manifest { attributes &amp;#34;Main-Class&amp;#34;: &amp;#34;example.</description>
+    </item>
+    
+    <item>
+      <title>配置 gradle 和 maven 源</title>
+      <link>https://notfound.cn/posts/gradle-maven-mirror/</link>
+      <pubDate>Fri, 03 May 2019 13:05:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/gradle-maven-mirror/</guid>
+      <description>配置 gradle 和 maven 源，环境为 Ubuntu 18.04。
+配置 gradle 源 编辑文件 ~/.gradle/init.gradle :
+allprojects { def google_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/google&amp;#39;) def central_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/central&amp;#39;) def jcenter_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/jcenter&amp;#39;) repositories { all { ArtifactRepository repo -&amp;gt; if (repo instanceof MavenArtifactRepository) { def url = repo.url.toString() if (url.startsWith(&amp;#39;https://repo.maven.apache.org/maven2/&amp;#39;) || url.startsWith(&amp;#39;https://repo1.maven.org/maven2&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${central_uri}.&amp;#34; repo.setUrl(central_uri) } else if (url.startsWith(&amp;#39;https://jcenter.bintray.com/&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${jcenter_uri}.&amp;#34; repo.setUrl(jcenter_uri) } else if (url.</description>
+    </item>
+    
+  </channel>
+</rss>

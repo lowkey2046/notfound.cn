@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>systemd on NotFound</title>
+    <link>https://notfound.cn/tags/systemd/</link>
+    <description>Recent content in systemd on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Mon, 31 Dec 2018 16:31:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/systemd/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>使用 Systemd 定时同步 git 仓库</title>
+      <link>https://notfound.cn/posts/systemd-org-push/</link>
+      <pubDate>Mon, 31 Dec 2018 16:31:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/systemd-org-push/</guid>
+      <description>系统环境：Ubuntu 18.04
+Org 文档保存在 ~/Documents/org/ 目录下，包含了 TODOs 和一些笔记，是一个 git 仓库，希望每天下班前自动推送到服务器。
+Systemd 定时器教程可参考：
+ Systemd 定时器教程  Systemd timer 简介 Systemd timer 配置文件在 /lib/systemd/system/ 目录下，以 .timer 结尾。
+常用命令如下：
+systemctl status org-push.timer # 查看 org-push 定时器状态 sudo systemctl start org-push.timer # 启动 org-push 定时器 sudo systemctl stop org-push.timer # 停止 org-push 定时器 sudo systemctl enable org-push.timer # 开机启动 sudo systemctl disable org-push.timer # 取消开机启动 man systemd.timer # 帮助 配置 需要先添加一个 Service Unit，然后在 Timer 中使用这个 Unit。</description>
+    </item>
+    
+    <item>
+      <title>使用 Systemd 设置 frp 开机启动</title>
+      <link>https://notfound.cn/posts/systemd-frp/</link>
+      <pubDate>Mon, 31 Dec 2018 15:36:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/systemd-frp/</guid>
+      <description>系统环境：Ubuntu 18.04
+frp 可以实现内网穿透，通过 Systemd 设置客户端 fprc 和服务端 frps 开机启动。
+Systemd 有几篇不错的入门文章：
+ Systemd 入门教程：命令篇 Systemd 入门教程：实战篇  Systemd 简介 Systemd 配置文件在 /lib/systemd/system/ 目录下，不同类型的文件使用不同的后缀，如： .service .socket .timer 。
+常用命令如下：
+systemctl status frps.service # 查看 frps 服务状态 systemctl cat frps.service # 查看 frps 服务配置 sudo systemctl start frps.service # 启动 frps 服务 sudo systemctl stop frps.service # 停止 frps 服务 sudo systemctl daemon-reload # 重新加载配置，修改 systemd 配置执行 sudo systemctl enable frps.service # 设置开机启动，根据 install 建立软链 sudo systemctl disable frps.</description>
+    </item>
+    
+  </channel>
+</rss>

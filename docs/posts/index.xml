@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on NotFound</title>
+    <link>https://notfound.cn/posts/</link>
+    <description>Recent content in Posts on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 15 May 2021 16:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Postgresql 树形结构查询</title>
+      <link>https://notfound.cn/posts/postgresql-tree-query/</link>
+      <pubDate>Sat, 15 May 2021 16:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/postgresql-tree-query/</guid>
+      <description>Postgresql 树形结构查询  PostgreSQL 13.2  创建表 CREATE TABLE tree ( id INTEGER, parent_id INTEGER, name TEXT ); 添加数据 INSERT INTO tree VALUES(1, NULL, &amp;#39;中国&amp;#39;); INSERT INTO tree VALUES(2, 1, &amp;#39;四川&amp;#39;); INSERT INTO tree VALUES(3, 1, &amp;#39;云南&amp;#39;); INSERT INTO tree VALUES(4, 2, &amp;#39;成都&amp;#39;); INSERT INTO tree VALUES(5, 2, &amp;#39;绵阳&amp;#39;); INSERT INTO tree VALUES(6, 3, &amp;#39;昆明&amp;#39;); INSERT INTO tree VALUES(7, 4, &amp;#39;武侯区&amp;#39;); 查询字节点 WITH RECURSIVE cte(id, name, traversal_ids, traversal_names, cycle) AS ( VALUES(2, &amp;#39;四川&amp;#39;, ARRAY[2], ARRAY[&amp;#39;四川&amp;#39;], false) UNION ALL SELECT tree.</description>
+    </item>
+    
+    <item>
+      <title>Ruby Process.spawn 缓冲区满导致阻塞</title>
+      <link>https://notfound.cn/posts/ruby-process-spawn/</link>
+      <pubDate>Thu, 13 May 2021 21:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-process-spawn/</guid>
+      <description>Ruby Process.spawn 缓冲区满导致阻塞 Ruby Process.spawn 阻塞 Ruby 中使用 Process.spawn 和 pipe 时，pipe 缓冲区为 64 KB，如果不及时读取数据，将会发生阻塞。
+# 未超出缓冲区容量 # cmd = &amp;#34;bash -c &amp;#39;for i in {1..6500}; do echo &amp;#39;123456789&amp;#39;; done&amp;#39;&amp;#34; # 超出缓冲区容量 cmd = &amp;#34;bash -c &amp;#39;for i in {1..6600}; do echo &amp;#39;123456789&amp;#39;; done&amp;#39;&amp;#34; out_r, out_w = IO.pipe cmd_pid = Process.spawn(cmd, :out =&amp;gt; out_w, :err =&amp;gt; out_w) out_w.close Process.wait(cmd_pid) exitstatus = $?.exitstatus out = out_r.read puts &amp;#34;child: cmd out length = #{out.</description>
+    </item>
+    
+    <item>
+      <title>Git Maintenance</title>
+      <link>https://notfound.cn/posts/git-maintenance/</link>
+      <pubDate>Fri, 23 Apr 2021 20:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-maintenance/</guid>
+      <description>git maintenance 通过 git maintenance 命令，可以对 Git 仓库定期维护。该命令包括一系列的子命令。
+在 Linux 环境中，是通过 cron 执行定时任务。
+register 将当前 Git 仓库添加到仓库维护列表中。
+git maintenance register  修改当前仓库配置文件，添加 maintenance.auto 和 maintenance.strategy 修改用户全局配置文件 ~/.gitconfig ，将当前仓库绝对路径添加到 maintenance.repo 节点  run 执行 Git 仓库维护任务。
+git maintenance run  执行维护任务 可以通过参数 --task 指定任务  git maintenance run --task gc task 参数如下：
+ commit-graph 增量更新 commit-graph prefetch 从所有 remote 拉取分支，分支信息保存到 refs/prefetch/&amp;lt;remote&amp;gt;/ ，不会拉取 tag gc 执行 git gc loose-objects 将松散对象 loose objects 打包，文件名以 loose- 开头，不建议和 gc 同时开启 incremental-repack 重新打包文件 pack-refs 将松散的 refs 打包到单个文件  start 添加定时任务，并将当前 Git 仓库添加到仓库维护列表中。</description>
+    </item>
+    
+    <item>
+      <title>Spring Boot 添加 servlet 以及 filter</title>
+      <link>https://notfound.cn/posts/java-spring-servlet-filter/</link>
+      <pubDate>Wed, 14 Apr 2021 19:50:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-spring-servlet-filter/</guid>
+      <description>Spring Boot 添加 servlet 以及 filter  OpenJDK 11 Gradle 6.8  依赖 implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; servlet ServletWrappingController @Bean public ServletWrappingController wrappingController() { ServletWrappingController controller = new ServletWrappingController(); controller.setServletClass(WrappingServlet.class); controller.setServletName(&amp;#34;wrapping-servlet&amp;#34;); return controller; } @Bean public SimpleUrlHandlerMapping urlHandlerMapping() { SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping(); mapping.setUrlMap(Map.of(&amp;#34;/wrapping/*&amp;#34;, &amp;#34;wrappingController&amp;#34;)); mapping.setOrder(Ordered.LOWEST_PRECEDENCE - 2); return mapping; }  req.getPathInfo() 为 null  ServletRegistrationBean @Bean public ServletRegistrationBean&amp;lt;HelloServlet&amp;gt; helloServletServletRegistrationBean() { ServletRegistrationBean&amp;lt;HelloServlet&amp;gt; registration = new ServletRegistrationBean&amp;lt;&amp;gt;(); registration.setServlet(new HelloServlet()); registration.setUrlMappings(List.of(&amp;#34;/hello/*&amp;#34;)); return registration; }  req.</description>
+    </item>
+    
+    <item>
+      <title>《gRPC 与云原生应用开发》开发环境</title>
+      <link>https://notfound.cn/posts/go-grpc-up-and-running-start/</link>
+      <pubDate>Wed, 31 Mar 2021 19:41:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/go-grpc-up-and-running-start/</guid>
+      <description>《gRPC 与云原生应用开发》开发环境  go 1.16.2 protoc 3.15.6  《gRPC 与云原生应用开发》示例代码与当前版本有些许变化。
+安装 # manjaro sudo pacman -S protobuf go get -u google.golang.org/protobuf/cmd/protoc-gen-go go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc 目录结构 ch02/productinfo/proto/product_info.proto ch02/productinfo/go/go.sum ch02/productinfo/go/go.mod ch02/productinfo/go/ecommerce/product_info_grpc.pb.go ch02/productinfo/go/ecommerce/product_info.pb.go ch02/productinfo/go/client/main.go ch02/productinfo/go/server/main.go 依赖 在 ch02/productinfo/go 目录下执行：
+go mod init productinfo go get google.golang.org/grpc@latest go get github.com/gofrs/uuid@latest go get google.golang.org/protobuf@latest Protocol Buffers 新建文件 ch02/productinfo/proto/product_info.proto ：
+syntax = &amp;#34;proto3&amp;#34;;package ecommerce;// NOTE 需要添加 go_package option go_package = &amp;#34;productinfo/ecommerce&amp;#34;;service ProductInfo { rpc addProduct(Product) returns (ProductID); rpc getProduct(ProductID) returns (Product);}message Product { string id = 1; string name = 2; string description = 3;}message ProductID { string value = 1;} 需要添加 go_package  生成代码 在 ch02/productinfo/go 目录下执行</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Context</title>
+      <link>https://notfound.cn/posts/graphql-java-context/</link>
+      <pubDate>Sat, 27 Mar 2021 17:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-context/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Context  OpenJDK 11 Gradle 6.8  DataFetchingEnvironment 中存在一个 Context ，在整个查询生命周期中不变。
+修改了示例 [https://notfound.cn/posts/graphql-java-getting-started/] 在 context 中传递 user 信息。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-security&amp;#39; implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; testImplementation &amp;#39;org.springframework.security:spring-security-test&amp;#39; Spring Security 配置 @Configuration @EnableWebSecurity public class WebSecurityConfig extends WebSecurityConfigurerAdapter { @Override protected void configure(HttpSecurity http) throws Exception { http.csrf().disable() .authorizeRequests().anyRequest().permitAll() .and() .httpBasic(); } @Bean @Override public UserDetailsService userDetailsService() { UserDetails user = User.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Batching</title>
+      <link>https://notfound.cn/posts/graphql-java-batching/</link>
+      <pubDate>Sat, 27 Mar 2021 09:40:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-batching/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Batching  OpenJDK 11 Gradle 6.8  通过 java-dataloader 处理 N+1 问题。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39;  graphql-java 中已将添加 java-dataloader 依赖，不需要额外添加。  源码 @Component public class StarWarsWiring { private final DataLoaderRegistry dataLoaderRegistry; public StarWarsWiring() { this.dataLoaderRegistry = new DataLoaderRegistry(); dataLoaderRegistry.register(&amp;#34;characters&amp;#34;, newCharacterDataLoader()); } //提供 DataLoaderRegistry 给 graphql-java-spring-webmvc 使用  @Bean public DataLoaderRegistry dataLoaderRegistry() { // DataLoaderRegistry 是全局的，在它之上注册的 DataLoader 也是全局的  // 所有请求都会共用相同的缓存  return dataLoaderRegistry; } private DataLoader&amp;lt;String,Character&amp;gt; newCharacterDataLoader() { return new DataLoader&amp;lt;&amp;gt;(characterBatchLoader); } private BatchLoader&amp;lt;String, Character&amp;gt; characterBatchLoader = keys -&amp;gt; { // BatchLoader 中存在缓存，多次请求相同数据时也会使用缓存  return CompletableFuture.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Schema</title>
+      <link>https://notfound.cn/posts/graphql-java-schema/</link>
+      <pubDate>Fri, 26 Mar 2021 21:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-schema/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Schema  OpenJDK 11 Gradle 6.8  依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; graphql dsl 创建 src/main/resources/starWarsSchema.graphqls :
+schema { query: Query } type Query { hero(episode: Episode) : Character human(id: String) : Human droid(id: ID!): Droid } enum Episode { NEWHOPE EMPIRE JEDI } interface Character { id: ID! name: String! friends: [Character] appearsIn: [Episode]!</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot 入门</title>
+      <link>https://notfound.cn/posts/graphql-java-getting-started/</link>
+      <pubDate>Wed, 24 Mar 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-getting-started/</guid>
+      <description>GraphQL Java 以及 Spring Boot 入门  OpenJDK 11 Gradle 6.8  Spring Initializr Spring Initializr 生成 Spring Boot 项目，只需要选择 Spring Web 一项
+依赖 添加 graphql-java 以及 graphql-java-spring-boot-starter-webmvc ，所有依赖如下：
+implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; Schema 新建文件 src/main/resources/schema.graphqls
+type Query{ hello: String } GraphQLProvider 需要提供 GraphQL bean 给 graphql-java-spring-boot-starter-webmvc 使用。
+新建文件 src/main/java/cn/notfound/GraphQLProvider.java
+@Component public class GraphQLProvider { private GraphQL graphQL; private GraphQLDataFetchers dataFetchers; @Autowired public GraphQLProvider(GraphQLDataFetchers dataFetchers) { this.</description>
+    </item>
+    
+    <item>
+      <title>Manjaro 安装记录</title>
+      <link>https://notfound.cn/posts/linux-manjaro-install/</link>
+      <pubDate>Sat, 20 Mar 2021 13:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/linux-manjaro-install/</guid>
+      <description>安装 manjaro 添加源 编辑文件 /etc/pacman.d/mirrorlist ：
+Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch Arch Linux 中文社区仓库是由 Arch Linux 中文社区驱动的非官方用户仓库，包含中文用户常用软件、工具、字体/美化包等。编辑文件 /etc/pacman.conf ：
+[archlinuxcn] Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch 手动安装 AUR 包 如 安装 dingtalk
+git clone https://aur.archlinux.org/dingtalk-linux.git cd dingtalk-linux makepkg -si 使用 yay 安装 aur 包 安装 yay
+sudo pacman -Sy yay 之后可以通过 yay 安装 aur 中的软件，如:
+# 安装软件 yay -S packagename # 移除包 yay -R packagename # 移除包以及不需要的依赖 yay -Rns packagename # 移除不需要的软件包 yay -Yc 版本回退 安装包保存在 /var/cache/pacman/pkg 目录中，通过如下命令安装老版本：</description>
+    </item>
+    
+    <item>
+      <title>Linux 编译安装 Ruby</title>
+      <link>https://notfound.cn/posts/ruby-compile/</link>
+      <pubDate>Thu, 18 Mar 2021 20:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-compile/</guid>
+      <description>Linux 编译安装 Ruby  Ubuntu 20.04 Ruby 3.0.0  直接编译安装 wget http://cache.ruby-china.com/pub/ruby/3.0/ruby-3.0.0.tar.gz tar -zxvf ruby-3.0.0.tar.gz cd ruby-3.0.0 ./configure --prefix=/opt/ruby-3.0.0 make -j8 make install 集成 jemalloc jemalloc 可以大幅度减少 sidekiq 内存碎片。
+sudo apt install libjemalloc-dev 编译方式 编译时添加 --with-jemalloc 参数即可：
+./configure --prefix=/opt/ruby-3.0.0 --with-jemalloc 检查 jemalloc:
+/opt/ruby-3.0.0/bin/ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;MAINLIBS&amp;#39;]&amp;#34; # 低版本 # ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;LIBS&amp;#39;]&amp;#34; 输出：
+-lz -lpthread - lrt -lrt -ljemalloc -lgmp -ldl -lcrypt -lm 环境变量方式 设置环境变量 LD_PRELOAD 即可</description>
+    </item>
+    
+    <item>
+      <title>Java cli 以及配置文件路径处理</title>
+      <link>https://notfound.cn/posts/java-cli-and-config-path/</link>
+      <pubDate>Sun, 14 Mar 2021 16:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-cli-and-config-path/</guid>
+      <description>Java cli 以及配置文件路径处理  OpenJDK 11 Gradle 6.8 Apache Commons CLI  命令参数处理 依赖 修改 build.gradle ：
+implementation group: &amp;#39;commons-cli&amp;#39;, name: &amp;#39;commons-cli&amp;#39;, version: &amp;#39;1.4&amp;#39; 源码 大致执行步骤：
+CommandLineParser parser = new DefaultParser(); Options options = new Options(); options.addOption(&amp;#34;a&amp;#34;, &amp;#34;all&amp;#34;, false, &amp;#34;do not hide entries starting with .&amp;#34;); options.addOption(&amp;#34;A&amp;#34;, &amp;#34;almost-all&amp;#34;, false, &amp;#34;do not list implied . and ..&amp;#34;); options.addOption(Option.builder() .longOpt(&amp;#34;block-size&amp;#34;) .desc(&amp;#34;use SIZE-byte blocks&amp;#34;) .hasArg() .argName(&amp;#34;SIZE&amp;#34;) .build()); if (args.length == 0) { HelpFormatter formatter = new HelpFormatter(); formatter.</description>
+    </item>
+    
+    <item>
+      <title>使用 Java 实现 Git SSH 服务端</title>
+      <link>https://notfound.cn/posts/java-ssh-git-server-start/</link>
+      <pubDate>Sat, 13 Mar 2021 18:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-ssh-git-server-start/</guid>
+      <description>使用 Java 实现 Git SSH 服务端  OpenJDK 11 Gradle 6.8 Apache MINA SSHD  依赖 修改 build.gradle 文件：
+implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-core&amp;#39;, version: &amp;#39;2.6.0&amp;#39; implementation group: &amp;#39;org.apache.sshd&amp;#39;, name: &amp;#39;sshd-git&amp;#39;, version: &amp;#39;2.6.0&amp;#39; // SSH KEY ed25519 // implementation group: &amp;#39;net.i2p.crypto&amp;#39;, name: &amp;#39;eddsa&amp;#39;, version: &amp;#39;0.3.0&amp;#39;  如果需要支持 ed25519，需要引入单独的包  代码 服务端主要使用包内自带的处理方式：
+public static void main(String[] args) throws IOException, InterruptedException { SshServer sshd = SshServer.setUpDefaultServer(); sshd.setPort(8082); sshd.setHost(&amp;#34;127.0.0.1&amp;#34;); // 设置服务端私钥  sshd.setKeyPairProvider(new FileKeyPairProvider(Path.</description>
+    </item>
+    
+    <item>
+      <title>ActiveMQ Artemis 安装和使用</title>
+      <link>https://notfound.cn/posts/java-artemis-start/</link>
+      <pubDate>Wed, 03 Mar 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-artemis-start/</guid>
+      <description>ActiveMQ Artemis 安装和使用 安装 wget https://mirrors.tuna.tsinghua.edu.cn/apache/activemq/activemq-artemis/2.17.0/apache-artemis-2.17.0-bin.tar.gz tar -zxvf apache-artemis-2.17.0-bin.tar.gz sudo mv apache-artemis-2.17.0 /opt/artemis sudo chown -R root:root /opt/artemis export ARTEMIS_HOME=/opt/artemis 命令 启动、停止等命令：
+# 创建 broker 实例 $ARTEMIS_HOME/bin/artemis create /srv/example # 启动服务 /srv/example/bin/artemis run # 启动服务，后台运行 /srv/example/bin/artemis-service start # 查看服务状态 /srv/example/bin/artemis-service status # 停止服务 /srv/example/bin/artemis-service stop 服务启动后，可进入页面管理 http://localhost:8161/console
+基本使用 添加依赖
+implementation group: &amp;#39;org.apache.activemq&amp;#39;, name: &amp;#39;artemis-jms-client-all&amp;#39;, version: &amp;#39;2.17.0&amp;#39; 生产者 Connection connection = null; try { ConnectionFactory cf = new ActiveMQConnectionFactory(&amp;#34;tcp://localhost:61616&amp;#34;); // 创建 JMS 连接  connection = cf.</description>
+    </item>
+    
+    <item>
+      <title>Servlet 中使用 Freemarker</title>
+      <link>https://notfound.cn/posts/java-servlet-freemarker-start/</link>
+      <pubDate>Sat, 27 Feb 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-servlet-freemarker-start/</guid>
+      <description>Servlet 使用 freemarker  OpenJDK 11 Gradle Freemarker  依赖 新建 build.gradle ：
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;org.freemarker&amp;#39;, name: &amp;#39;freemarker&amp;#39;, version: &amp;#39;2.3.31&amp;#39; } 添加模板 添加 src/main/webapp/template/hello.ftlh ：
+Hello, ${name}!   需要禁止直接访问 .*ftlh 文件，可在 web.xml 中配置。
+  新版本(2.3.24+)的 freemarker 文件后缀为 .ftlh ：
+ templates whose source name ends with &amp;ldquo;.ftlh&amp;rdquo; gets &amp;ldquo;HTML&amp;rdquo; output format, and those with &amp;ldquo;.</description>
+    </item>
+    
+    <item>
+      <title>Java Mail 发送邮件</title>
+      <link>https://notfound.cn/posts/java-mail-send-start/</link>
+      <pubDate>Wed, 24 Feb 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-mail-send-start/</guid>
+      <description>Java Mail 发送邮件  OpenJDK 11 Tomcat9 Gradle  使用本地测试邮件服务器 mailcatcher
+依赖 新建文件 build.gradle
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;javax.mail&amp;#39;, name: &amp;#39;javax.mail-api&amp;#39;, version: &amp;#39;1.6.2&amp;#39; implementation group: &amp;#39;com.sun.mail&amp;#39;, name: &amp;#39;javax.mail&amp;#39;, version: &amp;#39;1.6.2&amp;#39; implementation group: &amp;#39;javax.activation&amp;#39;, name: &amp;#39;javax.activation-api&amp;#39;, version: &amp;#39;1.2.0&amp;#39; implementation group: &amp;#39;com.sun.activation&amp;#39;, name: &amp;#39;javax.activation&amp;#39;, version: &amp;#39;1.2.0&amp;#39; } Servlet 新建文件 src/main/java/MailServlet.java
+@MultipartConfig @WebServlet( urlPatterns = {&amp;#34;/mail.do&amp;#34;}, initParams = { @WebInitParam(name = &amp;#34;mailHost&amp;#34;, value = &amp;#34;127.</description>
+    </item>
+    
+    <item>
+      <title>JGit HTTP Server 使用</title>
+      <link>https://notfound.cn/posts/java-jgit-http-server-start/</link>
+      <pubDate>Sun, 21 Feb 2021 18:11:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-jgit-http-server-start/</guid>
+      <description>Gradle Tomcat JGit  JGit HTTP Server 使用 使用 JGit 实现 git HTTP server。
+实现 依赖 新建文件 build.gradle ：
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;org.eclipse.jgit&amp;#39;, name: &amp;#39;org.eclipse.jgit.http.server&amp;#39;, version: &amp;#39;5.10.0.202012080955-r&amp;#39; } 配置 新建文件 src/main/webapp/WEB-INF/web.xml ：
+&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;web-app xmlns=&amp;#34;http://xmlns.jcp.org/xml/ns/javaee&amp;#34; xmlns:xsi=&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34; xsi:schemaLocation=&amp;#34;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&amp;#34; version=&amp;#34;4.0&amp;#34; metadata-complete=&amp;#34;true&amp;#34;&amp;gt; &amp;lt;display-name&amp;gt;JGit HTTP Server&amp;lt;/display-name&amp;gt; &amp;lt;description&amp;gt;Welcome to JGit HTTP Server&amp;lt;/description&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;GitServlet&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.</description>
+    </item>
+    
+    <item>
+      <title>Tomcat embed 使用</title>
+      <link>https://notfound.cn/posts/java-tomcat-embed-start/</link>
+      <pubDate>Tue, 16 Feb 2021 17:41:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-tomcat-embed-start/</guid>
+      <description>Tomcat embed 使用  gradle tomcat9  仅为了方便 IDEA 调试，用于开发环境
+修改 build.gradle plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { providedCompile group: &amp;#39;org.apache.tomcat.embed&amp;#39;, name: &amp;#39;tomcat-embed-core&amp;#39;, version: &amp;#39;9.0.43&amp;#39; providedCompile group: &amp;#39;org.apache.tomcat.embed&amp;#39;, name: &amp;#39;tomcat-embed-jasper&amp;#39;, version: &amp;#39;9.0.43&amp;#39; providedCompile group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; } war { rootSpec.exclude(&amp;#39;example/Main.class&amp;#39;) } 添加 src/main/java/example/HelloServlet.java package example; import javax.servlet.ServletException; import javax.servlet.annotation.WebServlet; import javax.servlet.http.HttpServlet; import javax.servlet.http.HttpServletRequest; import javax.servlet.http.HttpServletResponse; import java.io.IOException; import java.io.PrintWriter; @WebServlet(&amp;#34;/hello&amp;#34;) public class HelloServlet extends HttpServlet { @Override protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException { PrintWriter out = resp.</description>
+    </item>
+    
+    <item>
+      <title>HTTP 认证过程</title>
+      <link>https://notfound.cn/posts/http-authentication/</link>
+      <pubDate>Tue, 16 Feb 2021 16:28:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/http-authentication/</guid>
+      <description>HTTP 认证过程 访问 Tomcat 管理页 http://localhost:8080/manager/html 时，大致过程如下：
+  密码编码问题 主流浏览器基本都是使用 UTF-8
+特殊符号问题冒号 用户名中不能包含冒号 :
+参考  WWW-Authenticate Authorization HTTP 身份验证 HTTP/HTTPS basic authentication: colon in username  </description>
+    </item>
+    
+    <item>
+      <title>Linux 安装配置 Tomcat 9</title>
+      <link>https://notfound.cn/posts/java-tomcat-install/</link>
+      <pubDate>Tue, 16 Feb 2021 15:22:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-tomcat-install/</guid>
+      <description>Linux 安装配置 Tomcat 9 Manjaro Linux 安装 tomcat9 tomcat-native 执行 pacman 直接安装：
+sudo pacman -S tomcat9 tomcat-native 通过 systemd 控制 Tomcat systemctl 可启动、重启、停止、查看日志：
+# 启动 tomcat9 sudo systemctl start tomcat9.service # 停止 tomcat9 sudo systemctl stop tomcat9.service # 重启 tomcat9 sudo systemctl restart tomcat9.service # 开机启动 tomcat9 sudo systemctl enable tomcat9.service # 查看 tomcat9 启动状态 systemctl status tomcat9.service # 查看日志 journalctl -f --unit=tomcat9.service 访问 http://localhost:8080/
+查看环境变量 export 环境变量，方便操作：
+# 查看环境变量 systemctl show tomcat9.</description>
+    </item>
+    
+    <item>
+      <title>Gradle 入门</title>
+      <link>https://notfound.cn/posts/java-gradle-start/</link>
+      <pubDate>Tue, 16 Feb 2021 15:11:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-gradle-start/</guid>
+      <description>Gradle 入门  Gradle 6.8  初始化项目 gradle init 可初始化项目：
+gradle init --type=basic --dsl=groovy --project-name=example 生成的目录结构如下：
+. ├── build.gradle ├── .gitattributes ├── .gitignore ├── .gradle ├── gradle/wrapper/ ├── gradlew ├── gradlew.bat └── settings.gradle 包含 Main 方法的 jar   新建文件 src/main/java/example/Main.java
+package example; public class Main { public static void main(String[] args) { System.out.println(&amp;#34;Hello World!&amp;#34;); } }   修改 build.gradle ，把所有依赖一起打包：
+plugins { id &amp;#39;java&amp;#39; } jar { manifest { attributes &amp;#34;Main-Class&amp;#34;: &amp;#34;example.</description>
+    </item>
+    
+    <item>
+      <title>Git 服务端 Hooks</title>
+      <link>https://notfound.cn/posts/git-server-hooks/</link>
+      <pubDate>Sat, 20 Jun 2020 08:30:56 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-server-hooks/</guid>
+      <description>调用过程：
+ pre-receive 可阻止所有 ref 更新 update 可阻止单个 ref 更新 post-receive 无法阻止 ref 更新  pre-receive 特点  无参数调用 标准输入传递引用信息 以非零值退出，所有的推送内容都不会被接受  用途  钩子阻止对引用进行非快进（non-fast-forward）的更新 对该推送所修改的所有引用和文件进行访问控制  示例 #!/usr/bin/env ruby LINE = &amp;#39;-&amp;#39; * 80 puts LINE ENV.each do |k, v| puts &amp;#34;#{k}=#{v}&amp;#34; if k.start_with?(&amp;#39;GIT&amp;#39;) end puts LINE # sha1-old SP sha1-new SP refname LF while line = STDIN.gets puts line end puts LINE exit(1) 推送两个分支
+git push origin master:master master:dev 枚举对象: 3, 完成.</description>
+    </item>
+    
+    <item>
+      <title>使用 strace 查看 Ruby 线程系统调用</title>
+      <link>https://notfound.cn/posts/process-strace/</link>
+      <pubDate>Fri, 29 May 2020 21:07:45 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/process-strace/</guid>
+      <description>Ubuntu 18.04 通过 strace 查看 Unicorn 中开启的监控线程是否运行正常     查看进程 ID
+$ ps -ef | grep unicorn notfound 20178 6419 2 11:22 ? 00:00:17 unicorn master -E production -c config/unicorn.rb -D notfound 20192 20178 0 11:22 ? 00:00:00 unicorn worker[0] -E production -c config/unicorn.rb -D notfound 20195 20178 0 11:22 ? 00:00:00 unicorn worker[1] -E production -c config/unicorn.rb -D notfound 20198 20178 0 11:22 ? 00:00:00 unicorn worker[2] -E production -c config/unicorn.</description>
+    </item>
+    
+    <item>
+      <title>PostgreSQL 安装与使用</title>
+      <link>https://notfound.cn/posts/postgre-sql-start/</link>
+      <pubDate>Tue, 26 May 2020 19:17:49 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/postgre-sql-start/</guid>
+      <description>Ubuntu 18.04  安装 编辑 /etc/apt/sources.list.d/pgdg.list，添加：
+deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 执行：
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - sudo apt-get update sudo apt install postgresql-12 pgadmin4  pgadmin4 图形客户端  常用命令   通过用户 postgres 启动客户端
+sudo su - postgres psql   \?
+\? -- 帮助 \l -- 列出所有数据库 \du -- 列出角色   以指定角色（用户）登录指定数据库
+psql -h 127.0.0.1 -U example -d example_db   创建具备登录权限的角色</description>
+    </item>
+    
+    <item>
+      <title>Ruby Rack</title>
+      <link>https://notfound.cn/posts/ruby-rack/</link>
+      <pubDate>Thu, 21 May 2020 20:24:53 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-rack/</guid>
+      <description>模块化的 Ruby Web 服务接口
+rackup 创建 config.ru，添加：
+# config.ru run lambda {|env| [200, {&amp;#39;Content-Type&amp;#39; =&amp;gt; &amp;#39;text/plain&amp;#39;}, [&amp;#39;OK&amp;#39;] ]} 执行 rackup，启动 HTTP 服务器。
+过程 rackup 文件内容如下：
+#!/usr/bin/env ruby # frozen_string_literal: true require &amp;#34;rack&amp;#34; Rack::Server.start  Rack::Server#options  Rack::Server#default_options 这里决定了查找的默认文件名 options[:config]= &#39;config.ru&#39;   Rack::Server#start  Rack::Server#server 尝试 require puma thin falcon webrick 中的一个服务，假设为 webrick，则返回 Rack::Handler::WEBrick 类  Rack::Server#wrapped_app 解析 config.ru 获取 wrapped_app  Rack::Server#app  Rack::Server#build_app_and_options_from_config  Rack::Builder.parse_file Rack::Builder.load_file Rack::Builder.new_from_string 在 Rack::Builder 类上下文中执行 config.</description>
+    </item>
+    
+    <item>
+      <title>Maven 基本使用</title>
+      <link>https://notfound.cn/posts/maven-basic/</link>
+      <pubDate>Tue, 19 May 2020 21:08:56 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/maven-basic/</guid>
+      <description>Apache Maven 3.6.3  生成 maven 工程 mvn archetype:generate \  -DarchetypeGroupId=org.apache.maven.archetypes \  -DarchetypeArtifactId=maven-archetype-quickstart \  -DarchetypeVersion=1.4 \  -DarchetypeCatalog=internal \  -DgroupId=com.example \  -DartifactId=demo \  -Dversion=0.0.1-SNAPSHOT \  -Dpackage=com.example.demo pom.xml 修改编译目标版本：
+&amp;lt;properties&amp;gt; &amp;lt;project.build.sourceEncoding&amp;gt;UTF-8&amp;lt;/project.build.sourceEncoding&amp;gt; &amp;lt;maven.compiler.source&amp;gt;1.8&amp;lt;/maven.compiler.source&amp;gt; &amp;lt;maven.compiler.target&amp;gt;1.8&amp;lt;/maven.compiler.target&amp;gt; &amp;lt;/properties&amp;gt; 编译、测试、打包等 # 移除 target 目录 mvn clean # 编译 mvn compile # 测试 mvn test # 打包 mvn package # 安装 mvn install 可执行 jar 默认情况 jar 找不到 Main 方法：</description>
+    </item>
+    
+    <item>
+      <title>Webrick 工作过程</title>
+      <link>https://notfound.cn/posts/ruby-webrick/</link>
+      <pubDate>Tue, 19 May 2020 20:23:43 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-webrick/</guid>
+      <description>Webrick 是用 Ruby 语言实现的 HTTP 服务。
+运行过程 创建监听 socket require &amp;#39;webrick&amp;#39; server = WEBrick::HTTPServer.new :Port =&amp;gt; 8000 trap &amp;#39;INT&amp;#39; do server.shutdown end # SIGINT  创建监听套接字，创建 mount table。mount table 将路由和 servlet 关联在一起 注册 SIGINT 信号处理函数，接收到该信号时停止服务。CTRL + C 可产生该信号  挂载 proc server.mount_proc &amp;#39;/&amp;#39; do |req, res| res.body = &amp;#34;object_id: #{object_id}\n&amp;#34; end  mount 的路由为 / 实际 mount 的 servlet 是一个 HTTPServlet::ProcHandler 实例，该实例包裹了 proc 这里不同请求使用同一个实例， 由 HTTPServlet::ProcHandler#get_instance 决定 mount table 路由为 key，servlet 为 value 这里的 object_id 是哪个实例的？ 可处理 GET 和 POST 请求  挂载 class class Simple &amp;lt; WEBrick::HTTPServlet::AbstractServlet def do_GET(request, response) status, content_type, body = do_stuff_with(request) response.</description>
+    </item>
+    
+    <item>
+      <title>监控 socket 连接数</title>
+      <link>https://notfound.cn/posts/monitoring-socket/</link>
+      <pubDate>Mon, 18 May 2020 20:20:37 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-socket/</guid>
+      <description>系统环境 Ubuntu 18.04  通过 gem raindrops 可以获取连接数量，包括正在建立的连接数和已完成的连接数。
+连接数 包括两种连接: UNIX domain socket 和 TCP socket。
+UNIX domain socket 用法 require &amp;#39;raindrops&amp;#39; paths = [&amp;#39;/run/containerd/containerd.sock&amp;#39;] Raindrops::Linux.unix_listener_stats(paths) # {&amp;#34;/run/containerd/containerd.sock&amp;#34;=&amp;gt;#&amp;lt;struct Raindrops::ListenStats active=2, queued=0&amp;gt;} active=2, queued=0
+原理 UNIX domain sockets 连接信息保存在 /proc/net/unix 中，需要解析该文件。
+如：
+$ cat /proc/net/unix | grep &amp;#34;containerd.sock&amp;#34; Num RefCount Protocol Flags Type St Inode Path 0000000000000000: 00000002 00000000 00010000 0001 01 26912 /run/containerd/containerd.sock 0000000000000000: 00000003 00000000 00000000 0001 03 31496 /run/containerd/containerd.</description>
+    </item>
+    
+    <item>
+      <title>Git 如何识别二进制文件</title>
+      <link>https://notfound.cn/posts/how-to-git-known-binary/</link>
+      <pubDate>Sat, 16 May 2020 16:17:29 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/how-to-git-known-binary/</guid>
+      <description>Git 区分二进制和文本文件？
+源码 Git 是通过函数 buffer_is_binary 识别二进制：
+#define FIRST_FEW_BYTES 8000 int buffer_is_binary(const char *ptr, unsigned long size) { if (FIRST_FEW_BYTES &amp;lt; size) size = FIRST_FEW_BYTES; return !!memchr(ptr, 0, size); }  文件前 8000 个字节与 \0 进行比较，非文件末尾出现 \0 就认为是二进制  C 语言中，字符串一定是以 \0 结束，简单的想一想，感觉没毛病。
+问题   Q: 多字节文件编码中，难道其中的某个字节不会出现 \0？
+文件内容1，保存为 utf16：
+$ file utf16.txt utf16.txt: Little-endian UTF-16 Unicode text, with no line terminators $ hexdump -C utf16.txt 00000000 ff fe 31 00 0a 00 |.</description>
+    </item>
+    
+    <item>
+      <title>JNI 基本使用</title>
+      <link>https://notfound.cn/posts/java-native-interface-start/</link>
+      <pubDate>Sat, 16 May 2020 11:48:23 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-native-interface-start/</guid>
+      <description>系统环境 Ubuntu 18.04 cmake 编译 c 源码 maven 打包  基本用法 静态方法，不涉及参数和返回值传递。
+项目目录结构如下：
+. ├── pom.xml └── src └── main ├── java │ └── com │ └── example │ ├── App.java │ └── HelloNative.java # 加载 .so 和调用 c 方法的 class ├── jni │ ├── CMakeLists.txt │ ├── com_example_HelloNative.c # c 函数文件 │ └── com_example_HelloNative.h # javah 生成的头文件 └── resources └── native └── linux └── libHelloNative.so # 编译生成的 so 文件目录   添加 HelloNative.</description>
+    </item>
+    
+    <item>
+      <title>Unicorn 启动、重启和终止</title>
+      <link>https://notfound.cn/posts/unicorn-progress/</link>
+      <pubDate>Fri, 15 May 2020 20:43:44 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/unicorn-progress/</guid>
+      <description>起因，需要在 unicorn master 上开启一个线程定时收集 Ruby 进程运行数据。
+Unicorn 生命周期中设置了多个回调： after_fork、before_fork、before_exec、after_worker_exit 和 after_worker_ready，需要在合适的时间点创建线程。
+启动、重启和终止 在 unicorn 配置文件代码中打上日志，就可以知道大致的工作过程：
+# local variable to guard against running a hook multiple times run_once = true before_fork do |server, worker| server.logger.info &amp;#34;before_fork&amp;#34; if run_once server.logger.info &amp;#34;before_fork run_once&amp;#34; # do_something_once_here ... run_once = false # prevent from firing again end old_pid = &amp;#34;#{server.config[:pid]}.oldbin&amp;#34; if old_pid != server.pid begin sig = (worker.nr + 1) &amp;gt;= server.worker_processes ? :QUIT : :TTOU server.</description>
+    </item>
+    
+    <item>
+      <title>监控 Ruby 进程</title>
+      <link>https://notfound.cn/posts/monitoring-process-ruby/</link>
+      <pubDate>Thu, 14 May 2020 20:12:27 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-process-ruby/</guid>
+      <description>系统环境 Ubuntu 18.04  指标   当前进程占用的内存：
+cat /proc/self/status | grep VmRSS VmRSS: 740 kB match = File.read(&amp;#39;/proc/self/status&amp;#39;).match(/VmRSS:\s+(\d+)/) match &amp;amp;&amp;amp; match[1].to_f * 1024   当前进程打开的文件描述符总数：
+ls /proc/self/fd | wc -l Dir.glob(&amp;#39;/proc/self/fd/*&amp;#39;).length   当前进程可打开的最大文件描述符数量：
+cat /proc/self/limits | grep &amp;#34;Max open files&amp;#34; match = File.read(&amp;#39;/proc/self/limits&amp;#39;).match(/Max open files\s*(\d+)/) match &amp;amp;&amp;amp; match[1]   进程 CPU 时钟：
+Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID, :float_second)   墙上时钟，受系统时间影响，调整系统时间时会发生变化：
+Process.clock_gettime(Process::CLOCK_REALTIME, :float_second)   系统启动时一直计数，不会受到系统时间的影响：
+Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)   线程 CPU 时钟：</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装 Grafana</title>
+      <link>https://notfound.cn/posts/monitoring-grafana/</link>
+      <pubDate>Thu, 14 May 2020 18:39:26 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-grafana/</guid>
+      <description> 系统环境 Ubuntu 18.04  安装 下载 https://prometheus.io/download/
+# 下载 wget https://dl.grafana.com/oss/release/grafana-6.7.3.linux-amd64.tar.gz # 解压 tar -zxvf grafana-6.7.3.linux-amd64.tar.gz # 启动 ./bin/grafana-server web 访问 http://localhost:9090 ，用户名: admin，密码: admin。
+配置  添加数据源 Prometheus 添加 Dashboard  忘记密码 grafana-cli admin reset-admin-password &amp;lt;new password&amp;gt; 参考  Install on Debian or Ubuntu  </description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 搭建 Prometheus</title>
+      <link>https://notfound.cn/posts/monitoring-prometheus/</link>
+      <pubDate>Thu, 14 May 2020 18:38:20 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-prometheus/</guid>
+      <description>系统环境 Ubuntu 18.04  安装 下载 https://prometheus.io/download/
+# 下载 wget https://github.com/prometheus/prometheus/releases/download/v2.18.1/prometheus-2.18.1.linux-amd64.tar.gz # 解压　 tar -zxvf prometheus-2.18.1.linux-amd64.tar.gz # 启动 ./prometheus --config.file=prometheus.yml 访问 http://localhost:9090 即可。
+目录结构如下：
+.... ├── data # 数据目录 ├── prometheus # 执行文件 ├── prometheus.yml # 配置文件 ├── promtool # 工具（没用过 ... 配置 global: scrape_interval: 15s # 收集数据的时间间隔 scrape_configs: - job_name: &amp;#39;prometheus&amp;#39; # 作业名称 # metrics_path defaults to &amp;#39;/metrics&amp;#39; # scheme defaults to &amp;#39;http&amp;#39;. static_configs: - targets: [&amp;#39;localhost:9090&amp;#39;] Metric 类型 Counter 累加 metric。累加，如 prometheus_http_requests_total。</description>
+    </item>
+    
+    <item>
+      <title>SSH 配置</title>
+      <link>https://notfound.cn/posts/ssh-config/</link>
+      <pubDate>Fri, 01 May 2020 14:45:05 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ssh-config/</guid>
+      <description>系统环境 Ubuntu
+客户端配置 KEY 可以实现：
+ 同一主机使用不同 KEY。 不同主机使用不同 KEY。  编辑文件 ~/.ssh/config：
+Host gh1 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ecdsa Host gh2 User git Hostname github.com Port 22 IdentityFile ~/.ssh/id_ed25519 SSH 客户端通过 Host 即可使用对应的配置。
+git clone gh1:owner/repo.git git clone gh2:owner/repo.git  git 调用了 ssh 命令  服务器免密登录 在服务器编辑文件 ~/.ssh/authorized_keys，添加客户端的 SSH 公钥(如 ~/.ssh/id_ed25519.pub)：
+ssh-ed25519 AAAA***************************************************************7 notfound@ubuntu  ~/.ssh/authorized_keys 文件或者 ~/.ssh 目录权限过大或者不正确时不会生效。  在客户端上编辑文件 ~/.ssh/config：
+Host notfound User notfound Hostname notfound.</description>
+    </item>
+    
+    <item>
+      <title>读取 Java Resource 中的文件</title>
+      <link>https://notfound.cn/posts/java-resource/</link>
+      <pubDate>Fri, 01 May 2020 13:10:22 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-resource/</guid>
+      <description>读取 Java Resource 中的文件
+源码 package com.example; import java.io.IOException; public class App { public static void main( String[] args ) throws IOException { from(); fromClassLoader(); App app = new App(); app.fromInstance(); app.fromInstanceClassLoader(); } public static void from() throws IOException { System.out.println(App.class.getResource(&amp;#34;/data.txt&amp;#34;).toString()); // App.class.getResourceAsStream(&amp;#34;/data.txt&amp;#34;);  } public static void fromClassLoader() throws IOException { System.out.println(App.class.getClassLoader().getResource(&amp;#34;data.txt&amp;#34;).toString()); // App.class.getClassLoader().getResourceAsStream(&amp;#34;data.txt&amp;#34;);  } public void fromInstance() { System.out.println(getClass().getResource(&amp;#34;/data.txt&amp;#34;)); // getClass().getResourceAsStream(&amp;#34;/data.txt&amp;#34;);  } public void fromInstanceClassLoader() { System.</description>
+    </item>
+    
+    <item>
+      <title>Nginx CORS 配置</title>
+      <link>https://notfound.cn/posts/nginx-cors-conf/</link>
+      <pubDate>Fri, 01 May 2020 12:23:24 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/nginx-cors-conf/</guid>
+      <description>Nginx CORS 配置
+配置 add_header &amp;#39;Access-Control-Allow-Origin&amp;#39; &amp;#39;*&amp;#39;; add_header &amp;#39;Access-Control-Allow-Methods&amp;#39; &amp;#39;GET,POST,OPTIONS&amp;#39;; add_header &amp;#39;Access-Control-Allow-Headers&amp;#39; &amp;#39;Authorization,Content-Type,Accept,Origin,User-Agent,Cache-Control&amp;#39;; if ($request_method = &amp;#39;OPTIONS&amp;#39;) { return 204; }  Access-Control-Allow-Origin: * 表示允许所有站点。也可以设置为具体的站点，如 http://example.com。 Access-Control-Allow-Methods: 允许客户端发起 GET、POST 和 OPTIONS 请求。 Access-Control-Allow-Headers: 允许携带的头部。  Q 添加后无效 Access-Control-Allow-Origin 依旧无效 add_header ‘Access-Control-Allow-Origin’ &amp;#39;*&amp;#39; always;  无论何时都生效。  携带认证信息  一般而言，对于跨域 XMLHttpRequest 或 Fetch 请求，浏览器不会发送身份凭证信息。如果要发送凭证信息，需要设置 XMLHttpRequest 的某个特殊标志位。 对于附带身份凭证的请求，服务器不得设置 Access-Control-Allow-Origin 的值为“*”。  参考  跨域资源共享 CORS 详解 HTTP访问控制（CORS） nginx 配置add_header &amp;lsquo;Access-Control-Allow-Origin&amp;rsquo; &amp;lsquo;*&amp;rsquo; 依然存在跨域问题 CORS on Nginx  </description>
+    </item>
+    
+    <item>
+      <title>配置 gradle 和 maven 源</title>
+      <link>https://notfound.cn/posts/gradle-maven-mirror/</link>
+      <pubDate>Fri, 03 May 2019 13:05:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/gradle-maven-mirror/</guid>
+      <description>配置 gradle 和 maven 源，环境为 Ubuntu 18.04。
+配置 gradle 源 编辑文件 ~/.gradle/init.gradle :
+allprojects { def google_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/google&amp;#39;) def central_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/central&amp;#39;) def jcenter_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/jcenter&amp;#39;) repositories { all { ArtifactRepository repo -&amp;gt; if (repo instanceof MavenArtifactRepository) { def url = repo.url.toString() if (url.startsWith(&amp;#39;https://repo.maven.apache.org/maven2/&amp;#39;) || url.startsWith(&amp;#39;https://repo1.maven.org/maven2&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${central_uri}.&amp;#34; repo.setUrl(central_uri) } else if (url.startsWith(&amp;#39;https://jcenter.bintray.com/&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${jcenter_uri}.&amp;#34; repo.setUrl(jcenter_uri) } else if (url.</description>
+    </item>
+    
+    <item>
+      <title>Git 使用 GPG 进行签名</title>
+      <link>https://notfound.cn/posts/git-and-gpg/</link>
+      <pubDate>Sat, 16 Feb 2019 22:43:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/git-and-gpg/</guid>
+      <description>本文仅介绍 Git 使用 GPG 进行签名，关于 GPG 参考 GPG 使用。
+配置 Git 配置 GPG 密钥。密钥 ID 可以为主密钥 ID 或者签名密钥 ID，签名时始终使用签名密钥 ID。
+git config --global gpg.program gpg2 # Ubuntu 16.04 需要配置为 gpg2 git config --global user.signingkey E609071A680F01521759F2AD6845FD9F1A3352AF git config --global tag.forceSignAnnotated true # 默认对标签进行签名 git config --global commit.gpgSign true # 默认对提交进行签名 签名   签名带注释的标签
+git tag -s [tagname] # 添加签名 git verify-tag [tagname] # 验证签名   签名提交
+git commit -S # 添加签名 git verify-commit [hash] # 验证提交 git log --show-signature # 显示签名 git merge --verify-signatures -S merged-branch # 合并时强制签名检查并对合并操作进行签名   Git 签名内容</description>
+    </item>
+    
+    <item>
+      <title>GPG 使用</title>
+      <link>https://notfound.cn/posts/gpg-usage/</link>
+      <pubDate>Sat, 16 Feb 2019 22:19:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/gpg-usage/</guid>
+      <description>本文仅介绍 GPG 基本的使用。
+安装 GPG 2.x 需要确保使用 GnuPG v.2
+sudo apt install gnupg2 # Ubuntu 16.04 sudo apt install gnupg # Ubuntu 18.04 生成密钥（快速） 一次生成多个密钥：
+gpg --full-generate-key 生成密钥（分步） 1. 生成主密钥 gpg --quick-generate-key &amp;#39;NotFound &amp;lt;notfound@notfound.cn&amp;gt;&amp;#39; rsa4096 cert 输出：
+pub rsa4096 2019-02-16 [C] [有效至：2021-02-15] E609071A680F01521759F2AD6845FD9F1A3352AF uid NotFound &amp;lt;notfound@notfound.cn&amp;gt;  E609071A680F01521759F2AD6845FD9F1A3352AF 为密钥 ID，分为三种形态：  指纹：完整的 40 个字符的密钥标识符 长密钥 ID：指纹的最后 16 个字符 短密钥 ID：指纹的最后 8 个字符   uid 为身份，可以拥有多个身份，其中第一个为主 UID  2. 生成子密钥 gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 encr # [E]加密子密钥 gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 sign # [S]签名子密钥 gpg --quick-add-key E609071A680F01521759F2AD6845FD9F1A3352AF rsa2048 auth # [A]验证子密钥 查看 查看 GPG Key 信息：</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu Budgie 18.04 系统安装记录</title>
+      <link>https://notfound.cn/posts/install-ubuntu-18-04/</link>
+      <pubDate>Tue, 01 Jan 2019 10:01:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/install-ubuntu-18-04/</guid>
+      <description>记录 Ubuntu Budgie 18.04 安装过程，方便查阅。
+选择最小安装，语言为英文。
+卸载 avahi-daemon 服务 avahi-daemon 造成过网络异常，用处也不大，卸载该服务：
+sudo apt purge avahi-daemon Privoxy Privoxy 为 HTTP(S) 代理工具：
+sudo apt install privoxy 编辑 /etc/privoxy/config ，配置需要代理的网站如 GitHub，默认端口为 8118。
+通过设置环境变量 http(s)_proxy 可启用代理：
+export http_proxy=&amp;#34;http://127.0.0.1:8118&amp;#34; export https_proxy=&amp;#34;http://127.0.0.1:8118&amp;#34; Git &amp;amp; Vim 安装：
+sudo apt install git vim 配置 Git：
+git config --global user.name $NAME git config --global user.email $EMAIL git config --global credential.helper cache git config --global core.editor vim git config --global core.</description>
+    </item>
+    
+    <item>
+      <title>使用 Systemd 定时同步 git 仓库</title>
+      <link>https://notfound.cn/posts/systemd-org-push/</link>
+      <pubDate>Mon, 31 Dec 2018 16:31:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/systemd-org-push/</guid>
+      <description>系统环境：Ubuntu 18.04
+Org 文档保存在 ~/Documents/org/ 目录下，包含了 TODOs 和一些笔记，是一个 git 仓库，希望每天下班前自动推送到服务器。
+Systemd 定时器教程可参考：
+ Systemd 定时器教程  Systemd timer 简介 Systemd timer 配置文件在 /lib/systemd/system/ 目录下，以 .timer 结尾。
+常用命令如下：
+systemctl status org-push.timer # 查看 org-push 定时器状态 sudo systemctl start org-push.timer # 启动 org-push 定时器 sudo systemctl stop org-push.timer # 停止 org-push 定时器 sudo systemctl enable org-push.timer # 开机启动 sudo systemctl disable org-push.timer # 取消开机启动 man systemd.timer # 帮助 配置 需要先添加一个 Service Unit，然后在 Timer 中使用这个 Unit。</description>
+    </item>
+    
+    <item>
+      <title>使用 Systemd 设置 frp 开机启动</title>
+      <link>https://notfound.cn/posts/systemd-frp/</link>
+      <pubDate>Mon, 31 Dec 2018 15:36:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/systemd-frp/</guid>
+      <description>系统环境：Ubuntu 18.04
+frp 可以实现内网穿透，通过 Systemd 设置客户端 fprc 和服务端 frps 开机启动。
+Systemd 有几篇不错的入门文章：
+ Systemd 入门教程：命令篇 Systemd 入门教程：实战篇  Systemd 简介 Systemd 配置文件在 /lib/systemd/system/ 目录下，不同类型的文件使用不同的后缀，如： .service .socket .timer 。
+常用命令如下：
+systemctl status frps.service # 查看 frps 服务状态 systemctl cat frps.service # 查看 frps 服务配置 sudo systemctl start frps.service # 启动 frps 服务 sudo systemctl stop frps.service # 停止 frps 服务 sudo systemctl daemon-reload # 重新加载配置，修改 systemd 配置执行 sudo systemctl enable frps.service # 设置开机启动，根据 install 建立软链 sudo systemctl disable frps.</description>
+    </item>
+    
+    <item>
+      <title>使用 spacemacs 和 hugo 写博客</title>
+      <link>https://notfound.cn/posts/ubuntu-emacs-and-hugo/</link>
+      <pubDate>Sun, 23 Dec 2018 10:18:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-emacs-and-hugo/</guid>
+      <description>Spacemacs org layer 提供了对 Hugo 的支持。
+工作过程：ox-hugo 把 org 文档转换为 Hugo markdown，Hugo 再将 markdown 转换为 html。
+Hugo 安装 sudo snap install hugo sudo apt install python-pygments 搭建 使用 Hyde 主题
+hugo new site notfound.cn cd notfound.cn git init git add . git submodule add https://github.com/spf13/hyde.git themes/hyde 配置  语法高亮 Configure Syntax Highlighter  PygmentsCodeFences = true # Enable syntax highlighting with GitHub flavoured code fences PygmentsUseClasses = true # Use CSS classes to format highlighted code 编译 hugo -s notfound.</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装配置 Spacemacs</title>
+      <link>https://notfound.cn/posts/ubuntu-install-spacemacs/</link>
+      <pubDate>Sat, 08 Dec 2018 13:31:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-spacemacs/</guid>
+      <description>安装 Emacs 26 Ubuntu 16.04 和 18.04 Emacs 版本都低于 26，可通过 ppa 安装最新的 Emacs 26.x：
+sudo add-apt-repository ppa:kelleyk/emacs sudo apt-get update sudo apt-get install emacs26 安装 Spacemacs spacemacs master 更新太慢，使用 develop 分支。
+git clone -b develop https://github.com/syl20bnr/spacemacs ~/.emacs.d 启动 emacs，首次启动会有两个选项，直接回车选择默认值即可，之后会下载依赖，并自动生成配置文件 ~/.spacemacs 。
+创建目录 .spacemacs.d 用来存放自定义配置，可使用 git 等工具进行同步和版本控制。 文件加载顺序说明
+mkdir ~/.spacemacs.d mv ~/.spacemacs ~/.spacemacs.d/init.el 配置 可通过 SPC f e d 快速打开配置文件。
+图标 编辑 /usr/share/applications/emacs26.desktop 参考 ：
+StartupWMClass=Emacs26 Icon=/home/notfound/.emacs.d/core/banners/img/spacemacs.png 源 国外源下载速度慢，添加 国内的源 。在 dotspacemacs/user-init 中添加：</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装配置 microk8s</title>
+      <link>https://notfound.cn/posts/ubuntu-install-microk8s/</link>
+      <pubDate>Sat, 10 Nov 2018 15:31:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-microk8s/</guid>
+      <description>系统环境：Ubuntu 18.04
+为方便本地开发 Kubernete，Ubuntu 提供了 microk8s。
+安装 sudo snap install microk8s --classic 查看 microk8s 服务状态 systemctl status snap.microk8s.daemon-docker.service 设置 http 代理 由于众所周知的原因，Kubernetes 无法拉去镜像，可通过设置 http 代理来解决。
+在 Linux 中可通过环境变量 http_proxy 或 https_proxy 设置 http(s) 代理。microk8s 是通过 systemd 管理的，因此可在 systemd 配置文件传入环境变量。
+http 转发服务可使用 privoxy 。
+编辑 /etc/systemd/system/snap.microk8s.daemon-docker.service ，添加环境变量：
+[Service] Environment=http_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot; Environment=https_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot; 重启服务 sudo systemctl daemon-reload sudo systemctl restart snap.microk8s.daemon-docker.service 参考  microk8s https://microk8s.io/ 命令行配置代理服务器 https://yevon-cn.github.io/2017/05/05/set-proxy-of-cmd.html  </description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装配置 oh-my-zsh</title>
+      <link>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</link>
+      <pubDate>Sat, 21 Apr 2018 17:30:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</guid>
+      <description>安装 安装 zsh
+sudo apt install zsh 将 zsh 设置为默认 shell
+chsh -s $(which zsh) 安装 oh-my-zsh
+sh -c &amp;#34;$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&amp;#34; 配置 配置 zsh plugins
+编辑 ~/.zshrc
+plugins=(rails git ruby) agnoster 主题乱码
+sudo apt-get install fonts-powerline 设置 powerline 字体即可
+配置 emacs plugins
+ e 或 emacs 启动 emacs 客户端窗口，ssh 或容器终端会闪退 te 启动 emacs 客户端终端模式  </description>
+    </item>
+    
+    <item>
+      <title>使用 frp 实现内网穿透</title>
+      <link>https://notfound.cn/posts/ubuntu-install-frp/</link>
+      <pubDate>Thu, 05 Apr 2018 13:30:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-frp/</guid>
+      <description>简介 frp 是一个可用于内网穿透的高性能的反向代理应用，支持 tcp, udp, http, https 协议。本文主要介绍如何使用 frp 搭建 http 和 ssh 服务。
+工作过程 用户 -&amp;gt; 外网服务器(frps) -&amp;gt; 内网服务器(frpc)
+搭建 下载地址为: https://github.com/fatedier/frp/releases ，作者提供了不同平台的编译版本。
+当前最新版本为 v0.16.1，本人环境为 Ubuntu 16.04，下载的版本为 frp_0.16.1_linux_amd64.tar.gz。
+目录结构如下：
+. ├── frpc # 内网服务器可执行程序 ├── frpc.ini # 内网服务器配置文件 ├── frpc_full.ini # 内网服务器完整配置文件 ├── frps # 外网服务器可执行程序 ├── frps.ini # 外网服务器配置文件 ├── frps_full.ini # 外网服务器完整配置文件 └── LICENSE 内网服务器 文件 内网服务器只需要如下三个文件:
+. ├── frpc ├── frpc_full.ini └── frpc.ini 配置 frpc.ini 配置如下：</description>
+    </item>
+    
+    <item>
+      <title>SonarQube 环境搭建</title>
+      <link>https://notfound.cn/posts/ubuntu-install-sonarqube/</link>
+      <pubDate>Sat, 31 Mar 2018 19:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-sonarqube/</guid>
+      <description>系统环境: Ubuntu 16.04
+SonarQube 简介 SonarQube 是一个开源平台，用于管理源代码的质量。SonarQube 不只是一个质量数据报告工具，更是代码质量管理平台。
+SonarQube 环境搭建 下载 SonarQube 官方下载页面 https://www.sonarqube.org/downloads/ 下载当前最新版：
+wget https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-7.0.zip 解压到当前文件夹，并重命名：
+unzip sonarqube-7.0.zip mv sonarqube-7.0 sonarqube 配置 SonarQube 的配置文件为 conf/sonar.properties ，可以直接使用默认配置启动，不需要进行任何更改。默认配置使用的内嵌的数据库保存数据。
+SonarQube 支持内嵌数据库（默认）、MySQL、PostgreSQL 等数据库。
+下面以 MySQL 为例：
+CREATE DATABASE sonar DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER &amp;#39;sonar&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; GRANT ALL ON sonar.* TO &amp;#39;sonar&amp;#39;@&amp;#39;%&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; GRANT ALL ON sonar.* TO &amp;#39;sonar&amp;#39;@&amp;#39;localhost&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; FLUSH PRIVILEGES; 修改 sonar 配置文件 conf/sonar.</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装配置 Git</title>
+      <link>https://notfound.cn/posts/ubuntu-install-git/</link>
+      <pubDate>Tue, 20 Mar 2018 23:30:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-git/</guid>
+      <description>系统环境：Ubuntu 16.04
+安装 sudo apt install git 配置 ssh key ssh-keygen -t rsa -b 4096 -C &amp;#34;username@example.com&amp;#34;  密钥类型 rsa 密钥长度 4096 注释字段为邮箱地址，可随意填写或不填  配置用户名、邮箱 git config --global user.name $USERNAME git config --global user.email $EMAIL 配置编辑器 git config --global core.editor vim  将默认编辑器设置为 vim  配置 diff 工具 git config --global diff.tool vimdiff git config --global difftool.prompt no  设置 diff 工具为 vimdiff 启动 diff 工具时不提示工具信息 在查看差异时，使用 git difftool 命令调用 diff 工具进行双栏对比，可以看到每行变更的字符  设置 https 密码保存 git config --global credential.</description>
+    </item>
+    
+  </channel>
+</rss>

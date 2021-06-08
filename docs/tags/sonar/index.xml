@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>sonar on NotFound</title>
+    <link>https://notfound.cn/tags/sonar/</link>
+    <description>Recent content in sonar on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 31 Mar 2018 19:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/sonar/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SonarQube 环境搭建</title>
+      <link>https://notfound.cn/posts/ubuntu-install-sonarqube/</link>
+      <pubDate>Sat, 31 Mar 2018 19:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-sonarqube/</guid>
+      <description>系统环境: Ubuntu 16.04
+SonarQube 简介 SonarQube 是一个开源平台，用于管理源代码的质量。SonarQube 不只是一个质量数据报告工具，更是代码质量管理平台。
+SonarQube 环境搭建 下载 SonarQube 官方下载页面 https://www.sonarqube.org/downloads/ 下载当前最新版：
+wget https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-7.0.zip 解压到当前文件夹，并重命名：
+unzip sonarqube-7.0.zip mv sonarqube-7.0 sonarqube 配置 SonarQube 的配置文件为 conf/sonar.properties ，可以直接使用默认配置启动，不需要进行任何更改。默认配置使用的内嵌的数据库保存数据。
+SonarQube 支持内嵌数据库（默认）、MySQL、PostgreSQL 等数据库。
+下面以 MySQL 为例：
+CREATE DATABASE sonar DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER &amp;#39;sonar&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; GRANT ALL ON sonar.* TO &amp;#39;sonar&amp;#39;@&amp;#39;%&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; GRANT ALL ON sonar.* TO &amp;#39;sonar&amp;#39;@&amp;#39;localhost&amp;#39; IDENTIFIED BY &amp;#39;sonar&amp;#39;; FLUSH PRIVILEGES; 修改 sonar 配置文件 conf/sonar.</description>
+    </item>
+    
+  </channel>
+</rss>

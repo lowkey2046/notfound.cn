@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tomcat on NotFound</title>
+    <link>https://notfound.cn/tags/tomcat/</link>
+    <description>Recent content in tomcat on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Tue, 16 Feb 2021 15:22:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/tomcat/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux 安装配置 Tomcat 9</title>
+      <link>https://notfound.cn/posts/java-tomcat-install/</link>
+      <pubDate>Tue, 16 Feb 2021 15:22:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-tomcat-install/</guid>
+      <description>Linux 安装配置 Tomcat 9 Manjaro Linux 安装 tomcat9 tomcat-native 执行 pacman 直接安装：
+sudo pacman -S tomcat9 tomcat-native 通过 systemd 控制 Tomcat systemctl 可启动、重启、停止、查看日志：
+# 启动 tomcat9 sudo systemctl start tomcat9.service # 停止 tomcat9 sudo systemctl stop tomcat9.service # 重启 tomcat9 sudo systemctl restart tomcat9.service # 开机启动 tomcat9 sudo systemctl enable tomcat9.service # 查看 tomcat9 启动状态 systemctl status tomcat9.service # 查看日志 journalctl -f --unit=tomcat9.service 访问 http://localhost:8080/
+查看环境变量 export 环境变量，方便操作：
+# 查看环境变量 systemctl show tomcat9.</description>
+    </item>
+    
+  </channel>
+</rss>

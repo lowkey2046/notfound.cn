@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kubernetes on NotFound</title>
+    <link>https://notfound.cn/tags/kubernetes/</link>
+    <description>Recent content in kubernetes on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 10 Nov 2018 15:31:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ubuntu 安装配置 microk8s</title>
+      <link>https://notfound.cn/posts/ubuntu-install-microk8s/</link>
+      <pubDate>Sat, 10 Nov 2018 15:31:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-microk8s/</guid>
+      <description>系统环境：Ubuntu 18.04
+为方便本地开发 Kubernete，Ubuntu 提供了 microk8s。
+安装 sudo snap install microk8s --classic 查看 microk8s 服务状态 systemctl status snap.microk8s.daemon-docker.service 设置 http 代理 由于众所周知的原因，Kubernetes 无法拉去镜像，可通过设置 http 代理来解决。
+在 Linux 中可通过环境变量 http_proxy 或 https_proxy 设置 http(s) 代理。microk8s 是通过 systemd 管理的，因此可在 systemd 配置文件传入环境变量。
+http 转发服务可使用 privoxy 。
+编辑 /etc/systemd/system/snap.microk8s.daemon-docker.service ，添加环境变量：
+[Service] Environment=http_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot; Environment=https_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot; 重启服务 sudo systemctl daemon-reload sudo systemctl restart snap.microk8s.daemon-docker.service 参考  microk8s https://microk8s.io/ 命令行配置代理服务器 https://yevon-cn.github.io/2017/05/05/set-proxy-of-cmd.html  </description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linux on NotFound</title>
+    <link>https://notfound.cn/tags/linux/</link>
+    <description>Recent content in linux on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 20 Mar 2021 13:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Manjaro 安装记录</title>
+      <link>https://notfound.cn/posts/linux-manjaro-install/</link>
+      <pubDate>Sat, 20 Mar 2021 13:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/linux-manjaro-install/</guid>
+      <description>安装 manjaro 添加源 编辑文件 /etc/pacman.d/mirrorlist ：
+Server = https://mirrors.tuna.tsinghua.edu.cn/manjaro/stable/$repo/$arch Arch Linux 中文社区仓库是由 Arch Linux 中文社区驱动的非官方用户仓库，包含中文用户常用软件、工具、字体/美化包等。编辑文件 /etc/pacman.conf ：
+[archlinuxcn] Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch 手动安装 AUR 包 如 安装 dingtalk
+git clone https://aur.archlinux.org/dingtalk-linux.git cd dingtalk-linux makepkg -si 使用 yay 安装 aur 包 安装 yay
+sudo pacman -Sy yay 之后可以通过 yay 安装 aur 中的软件，如:
+# 安装软件 yay -S packagename # 移除包 yay -R packagename # 移除包以及不需要的依赖 yay -Rns packagename # 移除不需要的软件包 yay -Yc 版本回退 安装包保存在 /var/cache/pacman/pkg 目录中，通过如下命令安装老版本：</description>
+    </item>
+    
+    <item>
+      <title>Linux 编译安装 Ruby</title>
+      <link>https://notfound.cn/posts/ruby-compile/</link>
+      <pubDate>Thu, 18 Mar 2021 20:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-compile/</guid>
+      <description>Linux 编译安装 Ruby  Ubuntu 20.04 Ruby 3.0.0  直接编译安装 wget http://cache.ruby-china.com/pub/ruby/3.0/ruby-3.0.0.tar.gz tar -zxvf ruby-3.0.0.tar.gz cd ruby-3.0.0 ./configure --prefix=/opt/ruby-3.0.0 make -j8 make install 集成 jemalloc jemalloc 可以大幅度减少 sidekiq 内存碎片。
+sudo apt install libjemalloc-dev 编译方式 编译时添加 --with-jemalloc 参数即可：
+./configure --prefix=/opt/ruby-3.0.0 --with-jemalloc 检查 jemalloc:
+/opt/ruby-3.0.0/bin/ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;MAINLIBS&amp;#39;]&amp;#34; # 低版本 # ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;LIBS&amp;#39;]&amp;#34; 输出：
+-lz -lpthread - lrt -lrt -ljemalloc -lgmp -ldl -lcrypt -lm 环境变量方式 设置环境变量 LD_PRELOAD 即可</description>
+    </item>
+    
+    <item>
+      <title>使用 strace 查看 Ruby 线程系统调用</title>
+      <link>https://notfound.cn/posts/process-strace/</link>
+      <pubDate>Fri, 29 May 2020 21:07:45 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/process-strace/</guid>
+      <description>Ubuntu 18.04 通过 strace 查看 Unicorn 中开启的监控线程是否运行正常     查看进程 ID
+$ ps -ef | grep unicorn notfound 20178 6419 2 11:22 ? 00:00:17 unicorn master -E production -c config/unicorn.rb -D notfound 20192 20178 0 11:22 ? 00:00:00 unicorn worker[0] -E production -c config/unicorn.rb -D notfound 20195 20178 0 11:22 ? 00:00:00 unicorn worker[1] -E production -c config/unicorn.rb -D notfound 20198 20178 0 11:22 ? 00:00:00 unicorn worker[2] -E production -c config/unicorn.</description>
+    </item>
+    
+  </channel>
+</rss>

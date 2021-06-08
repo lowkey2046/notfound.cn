@@ -1,0 +1,807 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NotFound</title>
+    <link>https://notfound.cn/</link>
+    <description>Recent content on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 15 May 2021 16:00:00 +0800</lastBuildDate>
+    
+        <atom:link href="https://notfound.cn/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+        <item>
+        <title>Ubuntu Budgie 18.04 系统安装记录</title>
+        <link>https://notfound.cn/posts/install-ubuntu-18-04/</link>
+        <pubDate>Tue, 01 Jan 2019 10:01:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/install-ubuntu-18-04/</guid>
+        <description>NotFound https://notfound.cn/posts/install-ubuntu-18-04/ -&lt;p&gt;记录 &lt;a href=&#34;https://ubuntubudgie.org/&#34;&gt;Ubuntu Budgie 18.04&lt;/a&gt; 安装过程，方便查阅。&lt;/p&gt;
+&lt;p&gt;选择最小安装，语言为英文。&lt;/p&gt;
+&lt;h2 id=&#34;卸载-avahi-daemon-服务&#34;&gt;卸载 avahi-daemon 服务&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;avahi-daemon&lt;/code&gt; 造成过网络异常，用处也不大，卸载该服务：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt purge avahi-daemon
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;privoxy&#34;&gt;Privoxy&lt;/h2&gt;
+&lt;p&gt;Privoxy 为 HTTP(S) 代理工具：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install privoxy
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;编辑 &lt;code&gt;/etc/privoxy/config&lt;/code&gt; ，配置需要代理的网站如 GitHub，默认端口为 8118。&lt;/p&gt;
+&lt;p&gt;通过设置环境变量 &lt;code&gt;http(s)_proxy&lt;/code&gt; 可启用代理：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;export http_proxy&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:8118&amp;#34;&lt;/span&gt;
+export https_proxy&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:8118&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;git-and-vim&#34;&gt;Git &amp;amp; Vim&lt;/h2&gt;
+&lt;p&gt;安装：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install git vim
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;配置 Git：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git config --global user.name $NAME
+git config --global user.email $EMAIL
+
+git config --global credential.helper cache
+git config --global core.editor vim
+git config --global core.quotepath false
+git config --global diff.tool vimdiff
+git config --global difftool.prompt no
+git config --global grep.lineNumber true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;使用 vim 自定义配置：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone https://github.com/$USER/vim-rc ~/.vim
+git submodule init
+git submodule update
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;打开 vim 执行 &lt;code&gt;:BundleInstall&lt;/code&gt; 安装依赖。&lt;/p&gt;
+&lt;h2 id=&#34;oh-my-zsh&#34;&gt;oh-my-zsh&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install zsh
+sh -c &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;编辑 &lt;code&gt;~/.zshrc&lt;/code&gt; ，添加 &lt;code&gt;git&lt;/code&gt; &lt;code&gt;emacs&lt;/code&gt; &lt;code&gt;docker&lt;/code&gt; &lt;code&gt;kubectl&lt;/code&gt; 等。&lt;/p&gt;
+&lt;h2 id=&#34;emacs--spacemacs&#34;&gt;Emacs &amp;amp; Spacemacs&lt;/h2&gt;
+&lt;h3 id=&#34;安装-emacs&#34;&gt;安装 Emacs&lt;/h3&gt;
+&lt;p&gt;通过 ppa 下载 Emacs 最新版，下载速度太慢，所以启用代理：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo add-apt-repository ppa:kelleyk/emacs
+sudo http_proxy&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://127.0.0.1:8118&amp;#34;&lt;/span&gt; apt install emacs26
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;安装配置-spacemacs&#34;&gt;安装配置 Spacemacs&lt;/h3&gt;
+&lt;p&gt;使用 Spacemacs develop 分支：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone -b develop https://github.com/syl20bnr/spacemacs ~/.emacs.d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;使用 spacemacs 自定义配置，然后拉取 org 文档：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone https://github.com/$USER/spacemacs.d ~/.spacemacs.d
+git clone notfound@notfound.cn:/home/notfound/Documents/org ~/Documents/org
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;设置图标和环境变量(解决输入法切换)：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo vim /usr/share/applications/emacs26.desktop
+StartupWMClass&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;Emacs26
+Icon&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/home/notfound/.emacs.d/core/banners/img/spacemacs.png
+Exec&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;env LC_ALL&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;zh_CN.UTF-8 emacs26 %F
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;gtags 跳转：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install global
+sudo apt install exuberant-ctags python-pygments
+gunzip /usr/share/doc/global/examples/gtags.conf.gz -c &amp;gt; ~/.globalrc
+echo &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;export GTAGSLABEL=ctags&amp;#34;&lt;/span&gt; &amp;gt;&amp;gt; ~/.zshrc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;ag 搜索：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install silversearcher-ag
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Hugo 博客：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo snap install hugo
+
+git clone notfound@notfound.cn:/home/notfound/Documents/notfound.cn ~/Documents/notfound.cn
+git submodule init
+git submodule update
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;语言&#34;&gt;语言&lt;/h2&gt;
+&lt;p&gt;通过图形界面设置语言为中文。&lt;/p&gt;
+&lt;p&gt;中文字体：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install fonts-wqy-microhei fonts-wqy-zenhei
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;emoji：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install fonts-noto-color-emoji
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;搜狗拼音输入法&#34;&gt;搜狗拼音输入法&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://pinyin.sogou.com/linux/?r=pinyin&#34;&gt;https://pinyin.sogou.com/linux/?r=pinyin&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;网易云音乐&#34;&gt;网易云音乐&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://music.163.com/#/download&#34;&gt;https://music.163.com/#/download&lt;/a&gt;
+安装后发现下拉菜单有点问题。&lt;/p&gt;
+&lt;h2 id=&#34;安装驱动&#34;&gt;安装驱动&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://linuxconfig.org/how-to-install-the-nvidia-drivers-on-ubuntu-18-04-bionic-beaver-linux&#34;&gt;参考&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo ubuntu-drivers autoinstall
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;修改-dns&#34;&gt;修改 DNS&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo vim /etc/systemd/resolved.conf
+sudo service systemd-resolved restart
+systemd-resolve --status
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;a href=&#34;https://askubuntu.com/questions/973017/wrong-nameserver-set-by-resolvconf-and-networkmanager&#34;&gt;参考&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;其他&#34;&gt;其他&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;eog&lt;/code&gt; 图片查看工具&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;evince&lt;/code&gt; PDF 阅读器&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;gedit&lt;/code&gt; 文本编辑器&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;gnome-system-monitor/bionic-updates&lt;/code&gt; 系统监视器（任务管理器）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;google-chrome&lt;/code&gt; &lt;a href=&#34;https://dl.google.com/linux/direct/google-chrome-stable%5Fcurrent%5Famd64.deb&#34;&gt;下载&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;htop&lt;/code&gt; 升级版 top&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nginx&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;openssh-server&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;tree&lt;/code&gt; 遍历目录下所有文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;nodejs&lt;/code&gt; 参考&lt;a href=&#34;https://github.com/nodesource/distributions/blob/master/README.md&#34;&gt;安装 NodeJS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;docker&lt;/code&gt; 参考&lt;a href=&#34;https://docs.docker.com/install/linux/docker-ce/ubuntu/&#34;&gt;安装 Docker&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/install-ubuntu-18-04/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>使用 Systemd 定时同步 git 仓库</title>
+        <link>https://notfound.cn/posts/systemd-org-push/</link>
+        <pubDate>Mon, 31 Dec 2018 16:31:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/systemd-org-push/</guid>
+        <description>NotFound https://notfound.cn/posts/systemd-org-push/ -&lt;p&gt;系统环境：Ubuntu 18.04&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Org&lt;/code&gt; 文档保存在 &lt;code&gt;~/Documents/org/&lt;/code&gt; 目录下，包含了 TODOs 和一些笔记，是一个 git 仓库，希望每天下班前自动推送到服务器。&lt;/p&gt;
+&lt;p&gt;Systemd 定时器教程可参考：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.ruanyifeng.com/blog/2018/03/systemd-timer.html&#34;&gt;Systemd 定时器教程&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;systemd-timer-简介&#34;&gt;Systemd timer 简介&lt;/h2&gt;
+&lt;p&gt;Systemd timer 配置文件在 &lt;code&gt;/lib/systemd/system/&lt;/code&gt; 目录下，以 &lt;code&gt;.timer&lt;/code&gt; 结尾。&lt;/p&gt;
+&lt;p&gt;常用命令如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;systemctl status org-push.timer        &lt;span style=&#34;color:#75715e&#34;&gt;# 查看 org-push 定时器状态&lt;/span&gt;
+sudo systemctl start org-push.timer    &lt;span style=&#34;color:#75715e&#34;&gt;# 启动 org-push 定时器&lt;/span&gt;
+sudo systemctl stop org-push.timer     &lt;span style=&#34;color:#75715e&#34;&gt;# 停止 org-push 定时器&lt;/span&gt;
+sudo systemctl enable org-push.timer   &lt;span style=&#34;color:#75715e&#34;&gt;# 开机启动&lt;/span&gt;
+sudo systemctl disable org-push.timer  &lt;span style=&#34;color:#75715e&#34;&gt;# 取消开机启动&lt;/span&gt;
+
+man systemd.timer                      &lt;span style=&#34;color:#75715e&#34;&gt;# 帮助&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置&#34;&gt;配置&lt;/h2&gt;
+&lt;p&gt;需要先添加一个 Service Unit，然后在 Timer 中使用这个 Unit。&lt;/p&gt;
+&lt;h3 id=&#34;添加-service&#34;&gt;添加 service&lt;/h3&gt;
+&lt;p&gt;创建 &lt;code&gt;/lib/systemd/system/org-push.service&lt;/code&gt; 文件，配置如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-systemd&#34; data-lang=&#34;systemd&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;[Unit]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Description&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;Org push service&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Service]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;ExecStart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/home/notfound/Documents/org/push.sh&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WorkingDirectory&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/home/notfound/Documents/org&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;User&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;notfound&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Group&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;notfound&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[Service]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ExecStart&lt;/code&gt; push.sh 是包含提交和推送命令的脚本&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WorkingDirectory&lt;/code&gt; 工作目录为 org 文档目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User&lt;/code&gt; 执行命令的用户&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Group&lt;/code&gt; 执行命令的组&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;执行 &lt;code&gt;sudo systemctl daemon-reload&lt;/code&gt; 重新加载配置。&lt;/p&gt;
+&lt;h3 id=&#34;添加-timer&#34;&gt;添加 timer&lt;/h3&gt;
+&lt;p&gt;创建 &lt;code&gt;/lib/systemd/system/org-push.timer&lt;/code&gt; 文件，配置如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-systemd&#34; data-lang=&#34;systemd&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;[Unit]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Description&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;Org push timer&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Timer]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;OnCalendar&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;*-*-* 18:00&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Unit&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;org-push.service&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Install]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WantedBy&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;timers.target&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[Timer]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;OnCalendar&lt;/code&gt; Timer 执行时间为每天 18:00&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Unit&lt;/code&gt; Timer 使用 org-push.service&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[Install]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;WantedBy&lt;/code&gt; 执行 &lt;code&gt;sudo systemctl enable org-push.timer&lt;/code&gt; 会在 &lt;code&gt;/etc/systemd/system/timers.target.wants&lt;/code&gt; 目录下创建一个软链&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;执行 &lt;code&gt;sudo systemctl daemon-reload&lt;/code&gt; 重新加载配置。&lt;/p&gt;
+&lt;p&gt;开启定时任务 &lt;code&gt;sudo systemctl enable org-push.timer&lt;/code&gt; 。&lt;/p&gt;
+- https://notfound.cn/posts/systemd-org-push/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>使用 Systemd 设置 frp 开机启动</title>
+        <link>https://notfound.cn/posts/systemd-frp/</link>
+        <pubDate>Mon, 31 Dec 2018 15:36:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/systemd-frp/</guid>
+        <description>NotFound https://notfound.cn/posts/systemd-frp/ -&lt;p&gt;系统环境：Ubuntu 18.04&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/fatedier/frp&#34;&gt;frp&lt;/a&gt; 可以实现内网穿透，通过 Systemd 设置客户端 fprc 和服务端 frps 开机启动。&lt;/p&gt;
+&lt;p&gt;Systemd 有几篇不错的入门文章：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-commands.html&#34;&gt;Systemd 入门教程：命令篇&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.ruanyifeng.com/blog/2016/03/systemd-tutorial-part-two.html&#34;&gt;Systemd 入门教程：实战篇&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;systemd-简介&#34;&gt;Systemd 简介&lt;/h2&gt;
+&lt;p&gt;Systemd 配置文件在 &lt;code&gt;/lib/systemd/system/&lt;/code&gt; 目录下，不同类型的文件使用不同的后缀，如： &lt;code&gt;.service&lt;/code&gt; &lt;code&gt;.socket&lt;/code&gt;  &lt;code&gt;.timer&lt;/code&gt; 。&lt;/p&gt;
+&lt;p&gt;常用命令如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;systemctl status frps.service       &lt;span style=&#34;color:#75715e&#34;&gt;# 查看 frps 服务状态&lt;/span&gt;
+systemctl cat frps.service          &lt;span style=&#34;color:#75715e&#34;&gt;# 查看 frps 服务配置&lt;/span&gt;
+sudo systemctl start frps.service   &lt;span style=&#34;color:#75715e&#34;&gt;# 启动 frps 服务&lt;/span&gt;
+sudo systemctl stop frps.service    &lt;span style=&#34;color:#75715e&#34;&gt;# 停止 frps 服务&lt;/span&gt;
+sudo systemctl daemon-reload        &lt;span style=&#34;color:#75715e&#34;&gt;# 重新加载配置，修改 systemd 配置执行&lt;/span&gt;
+sudo systemctl enable frps.service  &lt;span style=&#34;color:#75715e&#34;&gt;# 设置开机启动，根据 install 建立软链&lt;/span&gt;
+sudo systemctl disable frps.service &lt;span style=&#34;color:#75715e&#34;&gt;# 取消开机启动，根据 install 移除软链&lt;/span&gt;
+
+man systemd.directives              &lt;span style=&#34;color:#75715e&#34;&gt;# 查看帮助&lt;/span&gt;
+man systemd.service
+man systemd.unit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;frps-systemd-配置文件&#34;&gt;frps Systemd 配置文件&lt;/h2&gt;
+&lt;p&gt;创建 &lt;code&gt;/lib/systemd/system/frpc.service&lt;/code&gt; 文件，配置如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-systemd&#34; data-lang=&#34;systemd&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;[Unit]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Description&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;frps server daemon&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Documentation&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;https://github.com/fatedier/frp&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;After&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;network-online.target&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Service]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;ExecStart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/usr/local/bin/frps -c /usr/local/etc/frps.ini&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;simple&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;User&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;nobody&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Group&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;nogroup&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WorkingDirectory&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/tmp&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Restart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;on-failure&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;RestartSec&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;60s&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Install]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WantedBy&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;multi-user.target&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;[Unit]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;After&lt;/code&gt; 在网络就绪后启动服务，关于网络就绪 &lt;a href=&#34;https://www.freedesktop.org/wiki/Software/systemd/NetworkTarget&#34;&gt;NetworkTarget&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[Service]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ExecStart&lt;/code&gt; 启动时执行的命令&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Type&lt;/code&gt; simple 执行 ExecStart 指定的命令，启动主进程，还有很多其他类别&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;User&lt;/code&gt; 执行命令的用户为 nobody&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Group&lt;/code&gt; 执行命令的组为 nogroup&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;WorkingDirectory&lt;/code&gt; 命令的工作目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Restart&lt;/code&gt; 失败后尝试重启，失败是根据退出状态码进行判断的&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;RestartSec&lt;/code&gt; 失败 60s 后尝试重启&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;[Install]&lt;/code&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;WantedBy&lt;/code&gt; 执行 &lt;code&gt;systemctl enable frps&lt;/code&gt; 命令，会在 &lt;code&gt;/etc/systemd/system/multi-user.target.wants/frps.service&lt;/code&gt; 目录下创建一个软链&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;添加或修改配置后需要执行 &lt;code&gt;sudo systemctl daemon-reload&lt;/code&gt; 重新加载，执行 &lt;code&gt;sudo systemctl enable frps.service&lt;/code&gt; 之后会开机启动。&lt;/p&gt;
+&lt;h2 id=&#34;fprc-配置文件&#34;&gt;fprc 配置文件&lt;/h2&gt;
+&lt;p&gt;创建 &lt;code&gt;/lib/systemd/system/frpc.service&lt;/code&gt; 文件，配置和 frps 类似：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-systemd&#34; data-lang=&#34;systemd&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;[Unit]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Description&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;frpc server daemon&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Documentation&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;https://github.com/fatedier/frp&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;After&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;network-online.target&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Service]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;ExecStart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/usr/local/bin/frpc -c /usr/local/etc/frpc.ini&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;simple&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;User&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;nobody&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Group&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;nogroup&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WorkingDirectory&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;/tmp&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;Restart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;on-failure&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;RestartSec&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;60s&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[Install]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;WantedBy&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;multi-user.target&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;添加或修改配置后需要执行 &lt;code&gt;sudo systemctl daemon-reload&lt;/code&gt; 重新加载，执行 &lt;code&gt;sudo systemctl enable frpc.service&lt;/code&gt; 之后会开机启动。&lt;/p&gt;
+- https://notfound.cn/posts/systemd-frp/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>使用 spacemacs 和 hugo 写博客</title>
+        <link>https://notfound.cn/posts/ubuntu-emacs-and-hugo/</link>
+        <pubDate>Sun, 23 Dec 2018 10:18:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-emacs-and-hugo/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-emacs-and-hugo/ -&lt;p&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/+emacs/org#hugo-support&#34;&gt;Spacemacs org layer&lt;/a&gt; 提供了对 &lt;a href=&#34;https://gohugo.io&#34;&gt;Hugo&lt;/a&gt; 的支持。&lt;/p&gt;
+&lt;p&gt;工作过程：&lt;a href=&#34;https://ox-hugo.scripter.co/&#34;&gt;ox-hugo&lt;/a&gt; 把 org 文档转换为 Hugo markdown，Hugo 再将 markdown 转换为 html。&lt;/p&gt;
+&lt;h2 id=&#34;hugo&#34;&gt;Hugo&lt;/h2&gt;
+&lt;h3 id=&#34;安装&#34;&gt;安装&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo snap install hugo
+sudo apt install python-pygments
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;搭建&#34;&gt;搭建&lt;/h3&gt;
+&lt;p&gt;使用 &lt;a href=&#34;https://github.com/spf13/hyde&#34;&gt;Hyde&lt;/a&gt; 主题&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo new site notfound.cn
+cd notfound.cn
+git init
+git add .
+git submodule add https://github.com/spf13/hyde.git themes/hyde
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;配置&#34;&gt;配置&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;语法高亮 &lt;a href=&#34;https://gohugo.io/content-management/syntax-highlighting/#configure-syntax-highlighter&#34;&gt;Configure Syntax Highlighter&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-toml&#34; data-lang=&#34;toml&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;PygmentsCodeFences&lt;/span&gt; = &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Enable syntax highlighting with GitHub flavoured code fences&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;PygmentsUseClasses&lt;/span&gt; = &lt;span style=&#34;color:#66d9ef&#34;&gt;true&lt;/span&gt; &lt;span style=&#34;color:#75715e&#34;&gt;# Use CSS classes to format highlighted code&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;编译&#34;&gt;编译&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo -s notfound.cn -d /var/www/notfound.cn
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;-s&lt;/code&gt; 指定源目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;-d&lt;/code&gt; 指定目标目录&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;本地实时预览：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;hugo server -D
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;远程编译：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;ssh -T notfound.cn hugo -s work/notfound.cn -d /var/www/notfound.cn
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;需要配置 ssh key&lt;/li&gt;
+&lt;li&gt;直接在服务上执行命令，省掉了登录的步骤&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;emacs-hugo-配置&#34;&gt;Emacs hugo 配置&lt;/h2&gt;
+&lt;p&gt;修改 spacemacs 配置，开启 org hugo 支持 &lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/+emacs/org#hugo-support&#34;&gt;Hugo support&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-emacs-lisp&#34; data-lang=&#34;emacs-lisp&#34;&gt;(setq-default dotspacemacs-configuration-layers &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#39;&lt;/span&gt;(
+  (org :variables
+       org-enable-hugo-support &lt;span style=&#34;color:#66d9ef&#34;&gt;t&lt;/span&gt;)))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;org-文件配置&#34;&gt;Org 文件配置&lt;/h3&gt;
+&lt;p&gt;ox-hugo 支持两种导出方式。&lt;/p&gt;
+&lt;h4 id=&#34;子节点树作为博客内容-推荐&#34;&gt;子节点树作为博客内容（推荐）&lt;/h4&gt;
+&lt;p&gt;将一个子节点树作为一篇博客，可参考 &lt;a href=&#34;https://ox-hugo.scripter.co/#screenshot-one-post-per-subtree&#34;&gt;One post per Org subtree (preferred)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;博客文件目录结构：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;.
+├── content
+├── content-org
+│   └── posts.org
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;所有博客内容都保存在 &lt;code&gt;posts.org&lt;/code&gt; 文件中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在 &lt;code&gt;posts.org&lt;/code&gt; 头部添加：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;#+HUGO_BASE_DIR: ../
+#+HUGO_BASESECTION: ./
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;#+HUGO_BASE_DIR:&lt;/code&gt; Hugo 博客根目录设置为上级目录&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;#+HUGO_BASESECTION:&lt;/code&gt; Hugo section&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在 &lt;code&gt;posts.org&lt;/code&gt; 子节点添加：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;:PROPERTIES:
+:EXPORT_FILE_NAME: ubuntu-emacs-and-hugo
+:END:
+
+#+HUGO: more
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;EXPORT_FILE_NAME&lt;/code&gt; 指定导出的文件名&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;HUGO: more&lt;/code&gt; 文件预览截断点，可参考 &lt;a href=&#34;https://ox-hugo.scripter.co/doc/hugo-summary-splitter/&#34;&gt;Hugo Summary Splitter&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;生成的文件会保存到 &lt;code&gt;HUGO_BASE_DIR/content/posts/ubuntu-emacs-and-hugo.md&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ox-hugo 导出时会使用 org 文件的部分信息，可参考 &lt;a href=&#34;https://ox-hugo.scripter.co/doc/org-meta-data-to-hugo-front-matter/#for-subtree-based-exports&#34;&gt;For subtree-based exports&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-org&#34; data-lang=&#34;org&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;**&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt; DONE&lt;/span&gt; 使用 spacemacs 和 hugo 写博客        :emacs:hugo:
+&lt;span style=&#34;color:#75715e&#34;&gt;   CLOSED: &lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;[2018-12-23 Sun 10:18]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;TODO&lt;/code&gt; 为草稿， &lt;code&gt;DONE&lt;/code&gt; 才会正式发布，没有状态的子节点不会自动转换&lt;/li&gt;
+&lt;li&gt;org tags 会转换为 Hugo markdown 的 tags&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CLOSED&lt;/code&gt; 的时间点会转换为 Hugo markdown 的 date&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;org-文件作为博客内容&#34;&gt;Org 文件作为博客内容&lt;/h4&gt;
+&lt;p&gt;可参考 &lt;a href=&#34;https://ox-hugo.scripter.co/#screenshot-one-post-per-file&#34;&gt;One post per Org file&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;保存后自动导出-auto-export-on-saving&#34;&gt;保存后自动导出 &lt;a href=&#34;https://ox-hugo.scripter.co/doc/auto-export-on-saving&#34;&gt;Auto-export on Saving&lt;/a&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;目录下所有文件导出。在目录下创建文件 &lt;code&gt;.dir-locals.el&lt;/code&gt; 并添加如下内容， &lt;code&gt;content-org&lt;/code&gt; 目录下的文件都会被自动导出为 hugo markdown：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-emacs-lisp&#34; data-lang=&#34;emacs-lisp&#34;&gt;((&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;content-org/&amp;#34;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; ((org-mode &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; ((&lt;span style=&#34;color:#a6e22e&#34;&gt;eval&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; (org-hugo-auto-export-mode)))))))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;单个文件自动导出&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-org&#34; data-lang=&#34;org&#34;&gt;​* Footnotes
+​* COMMENT Local Variables                          :ARCHIVE:
+&lt;span style=&#34;color:#75715e&#34;&gt;# Local Variables:&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# eval: (org-hugo-auto-export-mode)&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# End:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可配置单个文件不导出&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-org&#34; data-lang=&#34;org&#34;&gt;​* Footnotes
+​* COMMENT Local Variables                          :ARCHIVE:
+&lt;span style=&#34;color:#75715e&#34;&gt;# Local Variables:&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# eval: (org-hugo-auto-export-mode -1)&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# End:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-emacs-and-hugo/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 安装配置 Spacemacs</title>
+        <link>https://notfound.cn/posts/ubuntu-install-spacemacs/</link>
+        <pubDate>Sat, 08 Dec 2018 13:31:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-spacemacs/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-spacemacs/ -&lt;h2 id=&#34;安装-emacs-26&#34;&gt;安装 Emacs 26&lt;/h2&gt;
+&lt;p&gt;Ubuntu 16.04 和 18.04 Emacs 版本都低于 26，可通过 ppa 安装最新的 Emacs 26.x：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo add-apt-repository ppa:kelleyk/emacs
+sudo apt-get update
+sudo apt-get install emacs26
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;安装-spacemacs&#34;&gt;安装 Spacemacs&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs&#34;&gt;spacemacs&lt;/a&gt; master 更新太慢，使用 develop 分支。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone -b develop https://github.com/syl20bnr/spacemacs ~/.emacs.d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;启动 emacs，首次启动会有两个选项，直接回车选择默认值即可，之后会下载依赖，并自动生成配置文件 &lt;code&gt;~/.spacemacs&lt;/code&gt; 。&lt;/p&gt;
+&lt;p&gt;创建目录 &lt;code&gt;.spacemacs.d&lt;/code&gt; 用来存放自定义配置，可使用 git 等工具进行同步和版本控制。 &lt;a href=&#34;https://github.com/syl20bnr/spacemacs/blob/develop/doc/QUICK%5FSTART.org#dotdirectory-spacemacsd&#34;&gt;文件加载顺序说明&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;mkdir ~/.spacemacs.d
+mv ~/.spacemacs ~/.spacemacs.d/init.el
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置&#34;&gt;配置&lt;/h2&gt;
+&lt;p&gt;可通过 &lt;code&gt;SPC f e d&lt;/code&gt; 快速打开配置文件。&lt;/p&gt;
+&lt;h3 id=&#34;图标&#34;&gt;图标&lt;/h3&gt;
+&lt;p&gt;编辑 &lt;code&gt;/usr/share/applications/emacs26.desktop&lt;/code&gt; &lt;a href=&#34;https://askubuntu.com/questions/726351/use-desktop-icon-for-running-application&#34;&gt;参考&lt;/a&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;StartupWMClass&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;Emacs26
+Icon&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/home/notfound/.emacs.d/core/banners/img/spacemacs.png
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;源&#34;&gt;源&lt;/h3&gt;
+&lt;p&gt;国外源下载速度慢，添加 &lt;a href=&#34;https://mirrors.cloud.tencent.com/help/elpa.html&#34;&gt;国内的源&lt;/a&gt; 。在 &lt;code&gt;dotspacemacs/user-init&lt;/code&gt; 中添加：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-emacs-lisp&#34; data-lang=&#34;emacs-lisp&#34;&gt;(setq configuration-layer-elpa-archives
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;#39;&lt;/span&gt;((&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;melpa-cn&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://mirrors.cloud.tencent.com/elpa/melpa/&amp;#34;&lt;/span&gt;)
+        (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;org-cn&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://mirrors.cloud.tencent.com/elpa/org/&amp;#34;&lt;/span&gt;)
+        (&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;gnu-cn&amp;#34;&lt;/span&gt;   &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://mirrors.cloud.tencent.com/elpa/gnu/&amp;#34;&lt;/span&gt;)))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;复制粘贴&#34;&gt;复制粘贴&lt;/h3&gt;
+&lt;p&gt;emacs 会拦截鼠标事件，点击鼠标右键没菜单， &lt;code&gt;Ctrl+c&lt;/code&gt; 也无法使用。&lt;/p&gt;
+&lt;p&gt;layer &lt;code&gt;xclipboard&lt;/code&gt; 可以通过 &lt;code&gt;SPC x p&lt;/code&gt; 粘贴， &lt;code&gt;SPC x y&lt;/code&gt; 复制。 &lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/+tools/xclipboard&#34;&gt;参考&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;在终端模式复制粘贴，在 &lt;code&gt;dotspacemacs/user-config&lt;/code&gt; 中添加：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-emacs-lisp&#34; data-lang=&#34;emacs-lisp&#34;&gt;(xterm-mouse-mode &lt;span style=&#34;color:#ae81ff&#34;&gt;-1&lt;/span&gt;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;终端中，可通过 &lt;code&gt;Ctrl Shift c&lt;/code&gt; 复制， &lt;code&gt;Ctrl Shift v&lt;/code&gt; 粘贴，但在复制时行末尾的空白会变成多余的空格。 &lt;a href=&#34;https://www.reddit.com/r/spacemacs/comments/7ax52t/how%5Fto%5Fcopypaste%5Ffrom%5Fthe%5Fhost%5Fclipboard%5Fin&#34;&gt;参考&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;搜索&#34;&gt;搜索&lt;/h3&gt;
+&lt;p&gt;传说 &lt;code&gt;ag&lt;/code&gt; 比 &lt;code&gt;grep&lt;/code&gt; 快，所以安装 &lt;code&gt;ag&lt;/code&gt; 。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install silversearcher-ag
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;默认搜索工具使用顺序为 &lt;code&gt;rg&lt;/code&gt; &amp;gt; &lt;code&gt;ag&lt;/code&gt; &amp;gt; &lt;code&gt;pt&lt;/code&gt; &amp;gt; &lt;code&gt;ack&lt;/code&gt; &amp;gt; &lt;code&gt;grep&lt;/code&gt; ，所以安装 &lt;code&gt;ag&lt;/code&gt; 后就不会使用 &lt;code&gt;grep&lt;/code&gt; 。&lt;/p&gt;
+&lt;h4 id=&#34;文件过滤&#34;&gt;文件过滤&lt;/h4&gt;
+&lt;p&gt;搜索时可能需要过滤掉某些文件，默认情况下会使用 &lt;code&gt;.gitignore&lt;/code&gt; 和 &lt;code&gt;.hgignore&lt;/code&gt; 。&lt;/p&gt;
+&lt;p&gt;可在项目或者 home 目录下添加文件 &lt;code&gt;.agignore&lt;/code&gt; （或 &lt;code&gt;.ignore&lt;/code&gt; 2.0.0+ ）。 &lt;a href=&#34;https://github.com/ggreer/the%5Fsilver%5Fsearcher/wiki/Advanced-Usage&#34;&gt;参考&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;按键&#34;&gt;按键&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;SPC *&lt;/code&gt; 或 &lt;code&gt;SPC s P&lt;/code&gt; 搜索当前光标位置的值&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SPC /&lt;/code&gt; 或 &lt;code&gt;SPC s p&lt;/code&gt; 搜索&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SPC s a p&lt;/code&gt; 使用 &lt;code&gt;ag&lt;/code&gt; 搜索当前项目下的文件&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SPC r s&lt;/code&gt; 唤醒上次搜索 buffer&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;跳转&#34;&gt;跳转&lt;/h3&gt;
+&lt;p&gt;添加 &lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Btags/gtags&#34;&gt;gtags&lt;/a&gt; layer。&lt;/p&gt;
+&lt;h4 id=&#34;安装&#34;&gt;安装&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install global
+sudo apt install exuberant-ctags python-pygments
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;配置-1&#34;&gt;配置&lt;/h4&gt;
+&lt;p&gt;使用 ctags 生成标签，可添加环境变量：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;export GTAGSLABEL&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;ctags
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;如果需要自定义忽略的文件和目录，可通过 &lt;code&gt;~/.globalrc&lt;/code&gt; 进行配置（文件内搜索 &lt;code&gt;skip&lt;/code&gt; ）:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Ubuntu 16.04: &lt;code&gt;vim /usr/share/doc/global/examples/gtags.conf.gz&lt;/code&gt; 然后 &lt;code&gt;:w ~/.globalrc&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Ubuntu 18.04: &lt;code&gt;cp /usr/share/doc/global/examples/gtags.conf ~/.globalrc&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;gtags.conf&lt;/code&gt; 跨版本的配置可能不兼容，会出现错误&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;按键-1&#34;&gt;按键&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;SPC p g&lt;/code&gt; 或 &lt;code&gt;SPC m g C&lt;/code&gt; 生成 tag&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SPC p g&lt;/code&gt; 查找 tag&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;tags 信息保存在 &lt;code&gt;GPATH&lt;/code&gt; 、 &lt;code&gt;GRTAGS&lt;/code&gt; 、 &lt;code&gt;GTAGS&lt;/code&gt; 三个文件中，需要在版本控制中忽略这三个文件。&lt;/p&gt;
+&lt;h3 id=&#34;其他常用-layers&#34;&gt;其他常用 layers&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Bsource-control/git&#34;&gt;git&lt;/a&gt; 使用了 &lt;a href=&#34;https://magit.vc/&#34;&gt;magit&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Bsource-control/version-control&#34;&gt;version-control&lt;/a&gt; 可用来显示文件变更&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Btools/restclient&#34;&gt;restclient&lt;/a&gt; 可用来发送 http 请求&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Bcompletion/auto-completion&#34;&gt;auto-completion&lt;/a&gt; 自动补全&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Bemacs/org&#34;&gt;org&lt;/a&gt; org-mode 功能强大&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/asciidoc&#34;&gt;asciidoc&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/markdown&#34;&gt;markdown&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/yaml&#34;&gt;yaml&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/sql&#34;&gt;sql&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/html&#34;&gt;html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/javascript&#34;&gt;javascript&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/json&#34;&gt;json&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Blang/ruby&#34;&gt;ruby&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/syl20bnr/spacemacs/tree/develop/layers/%2Bframeworks/ruby-on-rails&#34;&gt;ruby-on-rails&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;其他&#34;&gt;其他&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/bbatsov/projectile&#34;&gt;projectile&lt;/a&gt; 项目管理&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-spacemacs/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 安装配置 microk8s</title>
+        <link>https://notfound.cn/posts/ubuntu-install-microk8s/</link>
+        <pubDate>Sat, 10 Nov 2018 15:31:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-microk8s/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-microk8s/ -&lt;p&gt;系统环境：Ubuntu 18.04&lt;/p&gt;
+&lt;p&gt;为方便本地开发 Kubernete，Ubuntu 提供了 &lt;a href=&#34;https://microk8s.io/&#34;&gt;microk8s&lt;/a&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo snap install microk8s --classic
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;查看-microk8s-服务状态&#34;&gt;查看 microk8s 服务状态&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;systemctl status snap.microk8s.daemon-docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;设置-http-代理&#34;&gt;设置 http 代理&lt;/h2&gt;
+&lt;p&gt;由于众所周知的原因，Kubernetes 无法拉去镜像，可通过设置 http 代理来解决。&lt;/p&gt;
+&lt;p&gt;在 Linux 中可通过环境变量 &lt;code&gt;http_proxy&lt;/code&gt; 或 &lt;code&gt;https_proxy&lt;/code&gt; 设置 http(s) 代理。microk8s 是通过 systemd 管理的，因此可在 systemd 配置文件传入环境变量。&lt;/p&gt;
+&lt;p&gt;http 转发服务可使用 &lt;code&gt;privoxy&lt;/code&gt; 。&lt;/p&gt;
+&lt;p&gt;编辑 &lt;code&gt;/etc/systemd/system/snap.microk8s.daemon-docker.service&lt;/code&gt; ，添加环境变量：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-conf&#34; data-lang=&#34;conf&#34;&gt;[Service]
+Environment=http_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot;
+Environment=https_proxy=&amp;quot;http://127.0.0.1:8118&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;h2 id=&#34;重启服务&#34;&gt;重启服务&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo systemctl daemon-reload
+sudo systemctl restart snap.microk8s.daemon-docker.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;microk8s &lt;a href=&#34;https://microk8s.io/&#34;&gt;https://microk8s.io/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;命令行配置代理服务器 &lt;a href=&#34;https://yevon-cn.github.io/2017/05/05/set-proxy-of-cmd.html&#34;&gt;https://yevon-cn.github.io/2017/05/05/set-proxy-of-cmd.html&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-microk8s/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 安装配置 oh-my-zsh</title>
+        <link>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</link>
+        <pubDate>Sat, 21 Apr 2018 17:30:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-oh-my-zsh/ -&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;安装 zsh&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt install zsh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;将 zsh 设置为默认 shell&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;chsh -s &lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;which zsh&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;安装 &lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh&#34;&gt;oh-my-zsh&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sh -c &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;$(&lt;/span&gt;wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -&lt;span style=&#34;color:#66d9ef&#34;&gt;)&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置&#34;&gt;配置&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;配置 zsh plugins&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;编辑 &lt;code&gt;~/.zshrc&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;plugins&lt;span style=&#34;color:#f92672&#34;&gt;=(&lt;/span&gt;rails git ruby&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;&lt;strong&gt;agnoster 主题乱码&lt;/strong&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo apt-get install fonts-powerline
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;设置 &lt;code&gt;powerline&lt;/code&gt; 字体即可&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;配置 &lt;a href=&#34;https://github.com/robbyrussell/oh-my-zsh/tree/master/plugins/emacs&#34;&gt;emacs&lt;/a&gt; plugins&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;e&lt;/code&gt; 或 &lt;code&gt;emacs&lt;/code&gt; 启动 emacs 客户端窗口，ssh 或容器终端会闪退&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;te&lt;/code&gt; 启动 emacs 客户端终端模式&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-oh-my-zsh/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>使用 frp 实现内网穿透</title>
+        <link>https://notfound.cn/posts/ubuntu-install-frp/</link>
+        <pubDate>Thu, 05 Apr 2018 13:30:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-frp/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-frp/ -&lt;h2 id=&#34;简介&#34;&gt;简介&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://github.com/fatedier/frp&#34;&gt;frp&lt;/a&gt; 是一个可用于内网穿透的高性能的反向代理应用，支持 tcp, udp, http, https 协议。本文主要介绍如何使用 frp 搭建 http 和 ssh 服务。&lt;/p&gt;
+&lt;h2 id=&#34;工作过程&#34;&gt;工作过程&lt;/h2&gt;
+&lt;p&gt;用户 -&amp;gt; 外网服务器(frps) -&amp;gt; 内网服务器(frpc)&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://notfound.cn/images/ubuntu-install-frp-architecture.png&#34; alt=&#34;frp&#34;&gt;&lt;/p&gt;
+&lt;h2 id=&#34;搭建&#34;&gt;搭建&lt;/h2&gt;
+&lt;p&gt;下载地址为: &lt;a href=&#34;https://github.com/fatedier/frp/releases&#34;&gt;https://github.com/fatedier/frp/releases&lt;/a&gt; ，作者提供了不同平台的编译版本。&lt;/p&gt;
+&lt;p&gt;当前最新版本为 v0.16.1，本人环境为 Ubuntu 16.04，下载的版本为 &lt;a href=&#34;https://github.com/fatedier/frp/releases/download/v0.16.1/frp%5F0.16.1%5Flinux%5Famd64.tar.gz&#34;&gt;frp_0.16.1_linux_amd64.tar.gz&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;目录结构如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;.
+├── frpc            # 内网服务器可执行程序
+├── frpc.ini        # 内网服务器配置文件
+├── frpc_full.ini   # 内网服务器完整配置文件
+├── frps            # 外网服务器可执行程序
+├── frps.ini        # 外网服务器配置文件
+├── frps_full.ini   # 外网服务器完整配置文件
+└── LICENSE
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;内网服务器&#34;&gt;内网服务器&lt;/h3&gt;
+&lt;h4 id=&#34;文件&#34;&gt;文件&lt;/h4&gt;
+&lt;p&gt;内网服务器只需要如下三个文件:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;.
+├── frpc
+├── frpc_full.ini
+└── frpc.ini
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;配置&#34;&gt;配置&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;frpc.ini&lt;/code&gt; 配置如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-ini&#34; data-lang=&#34;ini&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;[common]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;server_addr&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;x.x.x.x&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;server_port&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;7000&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# 第一个 web 服务，访问地址为: http://app1.example.com&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[web01]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;http&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_ip&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;127.0.0.1&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_port&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;3000&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;subdomain&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;app1&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# 第二个 web 服务，访问地址为：http://app2.example.com&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[web02]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;http&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_ip&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;127.0.0.1&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_port&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;4000&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;subdomain&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;app2&lt;/span&gt;
+
+&lt;span style=&#34;color:#75715e&#34;&gt;# ssh 服务，访问方式为 ssh -oPort=6000 $USER@x.x.x.x&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;[ssh]&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;tcp&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_ip&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;127.0.0.1&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;local_port&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;22&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;remote_port&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;6000&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;frpc 通过 &lt;code&gt;server_addr&lt;/code&gt; (IP) 和 &lt;code&gt;server_port&lt;/code&gt; (端口号) 与外网服务器(frps)建立网络连接&lt;/li&gt;
+&lt;li&gt;web 配置可以通过 &lt;code&gt;subdomain&lt;/code&gt; 指定子域名&lt;/li&gt;
+&lt;li&gt;ssh 配置中 &lt;code&gt;remote_port&lt;/code&gt; 是外网服务器(frps)监听端口号，用来提供 ssh 服务使用的端口。用户通过该端口与外网服务器(frps)建立网络连接，再由外网服务器(frps)将数据转发到内网服务器(frpc)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;启动&#34;&gt;启动&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;./frpc -c ./frpc.ini
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;外网服务器&#34;&gt;外网服务器&lt;/h3&gt;
+&lt;h4 id=&#34;文件-1&#34;&gt;文件&lt;/h4&gt;
+&lt;p&gt;外网服务器只需要如下三个文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;.
+├── frps
+├── frps_full.ini
+└── frps.ini
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;配置-1&#34;&gt;配置&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;frps.ini&lt;/code&gt; 配置如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;[common]
+bind_port =7000
+vhost_http_port = 8000
+
+subdomain_host = example.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;bind_port&lt;/code&gt; frps 监听端口号，用来与内网服务器（frpc）建立网络连接&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;vhost_http_port&lt;/code&gt; frps 监听端口，用来与客户端（浏览器）建立网络连接&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;subdomain_host&lt;/code&gt; 指定域名&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过域名和端口号 &lt;a href=&#34;http://example.com:8000&#34;&gt;http://example.com:8000&lt;/a&gt; 可以访问该服务。&lt;/p&gt;
+&lt;h4 id=&#34;启动-1&#34;&gt;启动&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;./frps -c ./frps.ini
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;使用-nginx-转发&#34;&gt;使用 nginx 转发&lt;/h4&gt;
+&lt;p&gt;客户端（浏览器） -&amp;gt; 外网服务器（nginx[80 端口] -&amp;gt; frps[8000 端口]） -&amp;gt; 内网服务器(frpc)&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-nginx&#34; data-lang=&#34;nginx&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;server&lt;/span&gt; {
+    &lt;span style=&#34;color:#f92672&#34;&gt;server_name&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;app1.example.com&lt;/span&gt;;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;listen&lt;/span&gt; &lt;span style=&#34;color:#ae81ff&#34;&gt;80&lt;/span&gt;;
+    &lt;span style=&#34;color:#f92672&#34;&gt;listen&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;[::]:80&lt;/span&gt;;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;root&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;/var/www/html&lt;/span&gt;;
+    &lt;span style=&#34;color:#f92672&#34;&gt;index&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;index.html&lt;/span&gt;;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;location&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;/&lt;/span&gt; {
+        &lt;span style=&#34;color:#f92672&#34;&gt;proxy_set_header&lt;/span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;Host&lt;/span&gt; $host:80;
+        &lt;span style=&#34;color:#f92672&#34;&gt;proxy_set_header&lt;/span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;X-Real-IP&lt;/span&gt; $remote_addr;
+        &lt;span style=&#34;color:#f92672&#34;&gt;proxy_set_header&lt;/span&gt;  &lt;span style=&#34;color:#e6db74&#34;&gt;X-Forwarded-For&lt;/span&gt; $proxy_add_x_forwarded_for;
+        &lt;span style=&#34;color:#f92672&#34;&gt;proxy_hide_header&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;X-Powered-By&lt;/span&gt;;
+
+        &lt;span style=&#34;color:#f92672&#34;&gt;proxy_pass&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;http://127.0.0.1:8000&lt;/span&gt;;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;效果&#34;&gt;效果&lt;/h3&gt;
+&lt;p&gt;可用通过 &lt;a href=&#34;http://app1.example.com&#34;&gt;http://app1.example.com&lt;/a&gt; 访问内网服务。&lt;/p&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/fatedier/frp/blob/master/README%5Fzh.md&#34;&gt;https://github.com/fatedier/frp/blob/master/README%5Fzh.md&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-frp/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>SonarQube 环境搭建</title>
+        <link>https://notfound.cn/posts/ubuntu-install-sonarqube/</link>
+        <pubDate>Sat, 31 Mar 2018 19:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-sonarqube/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-sonarqube/ -&lt;p&gt;系统环境: Ubuntu 16.04&lt;/p&gt;
+&lt;h2 id=&#34;sonarqube-简介&#34;&gt;SonarQube 简介&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.sonarqube.org/&#34;&gt;SonarQube&lt;/a&gt; 是一个开源平台，用于管理源代码的质量。SonarQube 不只是一个质量数据报告工具，更是代码质量管理平台。&lt;/p&gt;
+&lt;h2 id=&#34;sonarqube-环境搭建&#34;&gt;SonarQube 环境搭建&lt;/h2&gt;
+&lt;h3 id=&#34;下载&#34;&gt;下载&lt;/h3&gt;
+&lt;p&gt;SonarQube 官方下载页面 &lt;a href=&#34;https://www.sonarqube.org/downloads/&#34;&gt;https://www.sonarqube.org/downloads/&lt;/a&gt; 下载当前最新版：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;wget https://sonarsource.bintray.com/Distribution/sonarqube/sonarqube-7.0.zip
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;解压到当前文件夹，并重命名：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;unzip sonarqube-7.0.zip
+mv sonarqube-7.0 sonarqube
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;配置&#34;&gt;配置&lt;/h3&gt;
+&lt;p&gt;SonarQube 的配置文件为 &lt;code&gt;conf/sonar.properties&lt;/code&gt; ，可以直接使用默认配置启动，不需要进行任何更改。默认配置使用的内嵌的数据库保存数据。&lt;/p&gt;
+&lt;p&gt;SonarQube 支持内嵌数据库（默认）、MySQL、PostgreSQL 等数据库。&lt;/p&gt;
+&lt;p&gt;下面以 MySQL 为例：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-sql&#34; data-lang=&#34;sql&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;DATABASE&lt;/span&gt; sonar &lt;span style=&#34;color:#66d9ef&#34;&gt;DEFAULT&lt;/span&gt; CHARACTER &lt;span style=&#34;color:#66d9ef&#34;&gt;SET&lt;/span&gt; utf8 &lt;span style=&#34;color:#66d9ef&#34;&gt;COLLATE&lt;/span&gt; utf8_general_ci;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;CREATE&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;USER&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt; IDENTIFIED &lt;span style=&#34;color:#66d9ef&#34;&gt;BY&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;GRANT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ALL&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ON&lt;/span&gt; sonar.&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TO&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;%&amp;#39;&lt;/span&gt; IDENTIFIED &lt;span style=&#34;color:#66d9ef&#34;&gt;BY&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt;;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;GRANT&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ALL&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;ON&lt;/span&gt; sonar.&lt;span style=&#34;color:#f92672&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;TO&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;@&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;localhost&amp;#39;&lt;/span&gt; IDENTIFIED &lt;span style=&#34;color:#66d9ef&#34;&gt;BY&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sonar&amp;#39;&lt;/span&gt;;
+FLUSH &lt;span style=&#34;color:#66d9ef&#34;&gt;PRIVILEGES&lt;/span&gt;;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;修改 sonar 配置文件 &lt;code&gt;conf/sonar.properties&lt;/code&gt;，在配置文件中删除对应项的注释符号，并添加相应的值即可:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-conf&#34; data-lang=&#34;conf&#34;&gt;sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
+sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;amp;characterEncoding=utf8&amp;amp;rewriteBatchedStatements=true&amp;amp;useConfigs=maxPerformance&amp;amp;useSSL=false
+&lt;/code&gt;&lt;/pre&gt;&lt;h3 id=&#34;启动&#34;&gt;启动&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;./bin/linux-x86-64/sonar.sh start
+./bin/linux-x86-64/sonar.sh status
+./bin/linux-x86-64/sonar.sh stop
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;访问 &lt;a href=&#34;http://localhost:9000/&#34;&gt;http://localhost:9000/&lt;/a&gt; 可以看到 SonarQube 的页面。&lt;/p&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.linuxidc.com/Linux/2017-05/143860.htm&#34;&gt;https://www.linuxidc.com/Linux/2017-05/143860.htm&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-sonarqube/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Ubuntu 安装配置 Git</title>
+        <link>https://notfound.cn/posts/ubuntu-install-git/</link>
+        <pubDate>Tue, 20 Mar 2018 23:30:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ubuntu-install-git/</guid>
+        <description>NotFound https://notfound.cn/posts/ubuntu-install-git/ -&lt;p&gt;系统环境：Ubuntu 16.04&lt;/p&gt;
+&lt;h2 id=&#34;安装&#34;&gt;安装&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;sudo apt install git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置-ssh-key&#34;&gt;配置 ssh key&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;ssh-keygen -t rsa -b &lt;span style=&#34;color:#ae81ff&#34;&gt;4096&lt;/span&gt; -C &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;username@example.com&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;密钥类型 rsa&lt;/li&gt;
+&lt;li&gt;密钥长度 4096&lt;/li&gt;
+&lt;li&gt;注释字段为邮箱地址，可随意填写或不填&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;配置用户名邮箱&#34;&gt;配置用户名、邮箱&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global user.name $USERNAME
+git config --global user.email $EMAIL
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;配置编辑器&#34;&gt;配置编辑器&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global core.editor vim
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;将默认编辑器设置为 vim&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;配置-diff-工具&#34;&gt;配置 diff 工具&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global diff.tool vimdiff
+git config --global difftool.prompt no
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;设置 diff 工具为 vimdiff&lt;/li&gt;
+&lt;li&gt;启动 diff 工具时不提示工具信息&lt;/li&gt;
+&lt;li&gt;在查看差异时，使用 &lt;code&gt;git difftool&lt;/code&gt; 命令调用 diff 工具进行双栏对比，可以看到每行变更的字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;设置-https-密码保存&#34;&gt;设置 https 密码保存&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global credential.helper cache
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;cache&lt;/code&gt; 将密码保存到内存中，15分钟后删除&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;store&lt;/code&gt; 将密码用 &lt;strong&gt;明文&lt;/strong&gt; 的形式存放在磁盘中，Linux 环境默认位置为 &lt;code&gt;~/.git-credentials&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;配置-grep&#34;&gt;配置 grep&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global grep.lineNumber true
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;执行 &lt;code&gt;git grep&lt;/code&gt; 命令时显示行号&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;git-status-中文编码&#34;&gt;git status 中文编码&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global core.quotepath false
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;允许普通仓库推送代码&#34;&gt;允许普通仓库推送代码&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --local receive.denyCurrentBranch updateInstead
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;设置-http-代理&#34;&gt;设置 HTTP 代理&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git config --global http.&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;https://github.com/&amp;#34;&lt;/span&gt;.proxy http://127.0.0.1:8118
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;linguist-语言分析&#34;&gt;linguist 语言分析&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;gem install github-linguist
+git linguist stats --commit&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;98164e9585e02e31dcf1377a553efe076c15f8c6
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;git linguist&lt;/code&gt; 命令实际会执行 &lt;code&gt;git-linguist&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;删除所有-remote-分支&#34;&gt;删除所有 remote 分支&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;git &lt;span style=&#34;color:#66d9ef&#34;&gt;for&lt;/span&gt;-each-ref &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;refs/remotes/**&amp;#34;&lt;/span&gt; --format&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;%(refname:lstrip=2)&amp;#34;&lt;/span&gt; | xargs git branch -d -r
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;调试&#34;&gt;调试&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;GIT_TRACE&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#ae81ff&#34;&gt;1&lt;/span&gt; git log
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;man git&lt;/code&gt; 可看其他环境变量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;其他&#34;&gt;其他&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;全局配置文件位置 &lt;code&gt;~/.gitconfig&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;项目配置 &lt;code&gt;.git/config&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ubuntu-install-git/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+  </channel>
+</rss> 

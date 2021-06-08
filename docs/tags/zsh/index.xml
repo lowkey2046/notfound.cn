@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>zsh on NotFound</title>
+    <link>https://notfound.cn/tags/zsh/</link>
+    <description>Recent content in zsh on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 21 Apr 2018 17:30:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/zsh/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ubuntu 安装配置 oh-my-zsh</title>
+      <link>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</link>
+      <pubDate>Sat, 21 Apr 2018 17:30:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ubuntu-install-oh-my-zsh/</guid>
+      <description>安装 安装 zsh
+sudo apt install zsh 将 zsh 设置为默认 shell
+chsh -s $(which zsh) 安装 oh-my-zsh
+sh -c &amp;#34;$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)&amp;#34; 配置 配置 zsh plugins
+编辑 ~/.zshrc
+plugins=(rails git ruby) agnoster 主题乱码
+sudo apt-get install fonts-powerline 设置 powerline 字体即可
+配置 emacs plugins
+ e 或 emacs 启动 emacs 客户端窗口，ssh 或容器终端会闪退 te 启动 emacs 客户端终端模式  </description>
+    </item>
+    
+  </channel>
+</rss>

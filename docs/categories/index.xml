@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on NotFound</title>
+    <link>https://notfound.cn/categories/</link>
+    <description>Recent content in Categories on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 27 Mar 2021 17:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/categories/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>graphql</title>
+      <link>https://notfound.cn/categories/graphql/</link>
+      <pubDate>Sat, 27 Mar 2021 17:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/categories/graphql/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>monitoring</title>
+      <link>https://notfound.cn/categories/monitoring/</link>
+      <pubDate>Mon, 18 May 2020 20:20:37 +0800</pubDate>
+      
+      <guid>https://notfound.cn/categories/monitoring/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

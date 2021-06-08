@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>web on NotFound</title>
+    <link>https://notfound.cn/tags/web/</link>
+    <description>Recent content in web on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Tue, 19 May 2020 20:23:43 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/web/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Webrick 工作过程</title>
+      <link>https://notfound.cn/posts/ruby-webrick/</link>
+      <pubDate>Tue, 19 May 2020 20:23:43 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-webrick/</guid>
+      <description>Webrick 是用 Ruby 语言实现的 HTTP 服务。
+运行过程 创建监听 socket require &amp;#39;webrick&amp;#39; server = WEBrick::HTTPServer.new :Port =&amp;gt; 8000 trap &amp;#39;INT&amp;#39; do server.shutdown end # SIGINT  创建监听套接字，创建 mount table。mount table 将路由和 servlet 关联在一起 注册 SIGINT 信号处理函数，接收到该信号时停止服务。CTRL + C 可产生该信号  挂载 proc server.mount_proc &amp;#39;/&amp;#39; do |req, res| res.body = &amp;#34;object_id: #{object_id}\n&amp;#34; end  mount 的路由为 / 实际 mount 的 servlet 是一个 HTTPServlet::ProcHandler 实例，该实例包裹了 proc 这里不同请求使用同一个实例， 由 HTTPServlet::ProcHandler#get_instance 决定 mount table 路由为 key，servlet 为 value 这里的 object_id 是哪个实例的？ 可处理 GET 和 POST 请求  挂载 class class Simple &amp;lt; WEBrick::HTTPServlet::AbstractServlet def do_GET(request, response) status, content_type, body = do_stuff_with(request) response.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>database on NotFound</title>
+    <link>https://notfound.cn/tags/database/</link>
+    <description>Recent content in database on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 15 May 2021 16:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/database/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Postgresql 树形结构查询</title>
+      <link>https://notfound.cn/posts/postgresql-tree-query/</link>
+      <pubDate>Sat, 15 May 2021 16:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/postgresql-tree-query/</guid>
+      <description>Postgresql 树形结构查询  PostgreSQL 13.2  创建表 CREATE TABLE tree ( id INTEGER, parent_id INTEGER, name TEXT ); 添加数据 INSERT INTO tree VALUES(1, NULL, &amp;#39;中国&amp;#39;); INSERT INTO tree VALUES(2, 1, &amp;#39;四川&amp;#39;); INSERT INTO tree VALUES(3, 1, &amp;#39;云南&amp;#39;); INSERT INTO tree VALUES(4, 2, &amp;#39;成都&amp;#39;); INSERT INTO tree VALUES(5, 2, &amp;#39;绵阳&amp;#39;); INSERT INTO tree VALUES(6, 3, &amp;#39;昆明&amp;#39;); INSERT INTO tree VALUES(7, 4, &amp;#39;武侯区&amp;#39;); 查询字节点 WITH RECURSIVE cte(id, name, traversal_ids, traversal_names, cycle) AS ( VALUES(2, &amp;#39;四川&amp;#39;, ARRAY[2], ARRAY[&amp;#39;四川&amp;#39;], false) UNION ALL SELECT tree.</description>
+    </item>
+    
+    <item>
+      <title>PostgreSQL 安装与使用</title>
+      <link>https://notfound.cn/posts/postgre-sql-start/</link>
+      <pubDate>Tue, 26 May 2020 19:17:49 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/postgre-sql-start/</guid>
+      <description>Ubuntu 18.04  安装 编辑 /etc/apt/sources.list.d/pgdg.list，添加：
+deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main 执行：
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - sudo apt-get update sudo apt install postgresql-12 pgadmin4  pgadmin4 图形客户端  常用命令   通过用户 postgres 启动客户端
+sudo su - postgres psql   \?
+\? -- 帮助 \l -- 列出所有数据库 \du -- 列出角色   以指定角色（用户）登录指定数据库
+psql -h 127.0.0.1 -U example -d example_db   创建具备登录权限的角色</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>jgit on NotFound</title>
+    <link>https://notfound.cn/tags/jgit/</link>
+    <description>Recent content in jgit on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sun, 21 Feb 2021 18:11:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/jgit/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>JGit HTTP Server 使用</title>
+      <link>https://notfound.cn/posts/java-jgit-http-server-start/</link>
+      <pubDate>Sun, 21 Feb 2021 18:11:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/java-jgit-http-server-start/</guid>
+      <description>Gradle Tomcat JGit  JGit HTTP Server 使用 使用 JGit 实现 git HTTP server。
+实现 依赖 新建文件 build.gradle ：
+plugins { id &amp;#39;war&amp;#39; } repositories { mavenCentral() } dependencies { compileOnly group: &amp;#39;javax.servlet&amp;#39;, name: &amp;#39;javax.servlet-api&amp;#39;, version: &amp;#39;4.0.1&amp;#39; implementation group: &amp;#39;org.eclipse.jgit&amp;#39;, name: &amp;#39;org.eclipse.jgit.http.server&amp;#39;, version: &amp;#39;5.10.0.202012080955-r&amp;#39; } 配置 新建文件 src/main/webapp/WEB-INF/web.xml ：
+&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;web-app xmlns=&amp;#34;http://xmlns.jcp.org/xml/ns/javaee&amp;#34; xmlns:xsi=&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34; xsi:schemaLocation=&amp;#34;http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&amp;#34; version=&amp;#34;4.0&amp;#34; metadata-complete=&amp;#34;true&amp;#34;&amp;gt; &amp;lt;display-name&amp;gt;JGit HTTP Server&amp;lt;/display-name&amp;gt; &amp;lt;description&amp;gt;Welcome to JGit HTTP Server&amp;lt;/description&amp;gt; &amp;lt;servlet&amp;gt; &amp;lt;servlet-name&amp;gt;GitServlet&amp;lt;/servlet-name&amp;gt; &amp;lt;servlet-class&amp;gt;org.</description>
+    </item>
+    
+  </channel>
+</rss>

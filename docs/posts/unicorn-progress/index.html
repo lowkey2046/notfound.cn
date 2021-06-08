@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html><head>
+<title>Unicorn 启动、重启和终止</title>
+
+
+
+
+<meta charset="utf-8">
+<meta name="X-UA-Compatible" content="IE=edge">
+<meta name="google-site-verification" content="">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+<meta content="telephone=no" name="format-detection">
+<meta name="description" content="">
+<meta name="renderer" content="webkit">
+<meta name="theme-color" content="#ffffff">
+
+
+
+
+
+
+
+
+
+
+
+<script src="/vendor/js/jquery.min.js" ></script>
+<script src="/vendor/js/popper.min.js" ></script>
+<script src="/vendor/js/bootstrap.min.js" ></script>
+<script src="/vendor/js/smooth-scroll.polyfills.min.js" ></script>
+<link type="text/css" rel="stylesheet" href="/vendor/css/bootstrap.min.css">
+<script src="/vendor/js/vue.min.js" ></script>
+
+
+
+
+
+
+<link rel="stylesheet" href="https://notfound.cn/scss/journal.min.c116bc90d171283f099f173854157ec8f183f9073b93443b2c8ad82899ee9025.css" integrity="sha256-wRa8kNFxKD8Jnxc4VBV&#43;yPGD&#43;Qc7k0Q7LIrYKJnukCU=" media="screen">
+
+
+
+<link rel="stylesheet" href="https://notfound.cn/scss/dark-mode.min.552aae4638a84aa57cf0b195750a49ea9131d3bb621d1ed3ebc9b14b18166536.css" integrity="sha256-VSquRjioSqV88LGVdQpJ6pEx07tiHR7T68mxSxgWZTY=" media="screen">
+
+
+<script src="https://notfound.cn/js/loadCSS.js"></script>
+<script>
+  loadCSS("https://fonts.googleapis.com/css?family=Lora|Montserrat|Fira+Mono|Noto+Serif+SC|Material+Icons");
+</script>
+
+
+
+
+  
+    <script src="https://notfound.cn/js/toc-collapse.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+</head>
+<body>
+    	<div id="app"><div ref="sideContainer" class="side-container">
+    
+    <a class="a-block nav-head false" href="https://notfound.cn">
+    
+        <div class="nav-title">
+            NotFound
+        </div>
+        
+        <div class="nav-subtitle">
+            千里之行始于足下
+        </div>
+        
+    </a>
+
+    <div class="nav-link-list">
+        
+        
+            
+            
+            
+                
+            
+            
+            
+            <a class="a-block nav-link-item active" href="/posts">
+                Archive
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/categories">
+                Categories
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/tags">
+                Tags
+            </a>
+            
+        
+            
+            
+            
+            
+            
+            <a class="a-block nav-link-item false" href="/index.xml">
+                RSS Feed
+            </a>
+            
+        
+    </div>
+
+    
+
+    <div class="nav-footer">
+        
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://amazingrise.net">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	2021<br><a href="http://www.beian.miit.gov.cn">粤ICP备17092723号</a>
+
+	
+
+<script>
+	var _hmt = _hmt || [];
+	(function () {
+		var hm = document.createElement("script");
+		hm.src = "https://hm.baidu.com/hm.js?f949ca6d9df034921c6c97be6180abb1";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+
+    </div>
+    
+</div><div ref="extraContainer" class="extra-container">
+    
+    
+    <div class="toc animated-visibility" :class="{ invisible: scrollY <= 140 }">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								<ul class="collapse" data-toggle="collapse">
+							
+						
+						
+							<li>
+								<a href="#%e5%90%af%e5%8a%a8%e9%87%8d%e5%90%af%e5%92%8c%e7%bb%88%e6%ad%a2" onclick="onNavClick(`#启动重启和终止-nav`)" id="启动重启和终止-nav">
+									启动、重启和终止
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								<ul class="collapse" data-toggle="collapse">
+							
+						
+						
+							<li>
+								<a href="#%e5%90%af%e5%8a%a8" onclick="onNavClick(`#启动-nav`)" id="启动-nav">
+									启动
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%87%8d%e5%90%af" onclick="onNavClick(`#重启-nav`)" id="重启-nav">
+									重启
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%88%e6%ad%a2" onclick="onNavClick(`#终止-nav`)" id="终止-nav">
+									终止
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#master-%e4%b8%bb%e8%a6%81%e5%b7%a5%e4%bd%9c" onclick="onNavClick(`#master-主要工作-nav`)" id="master-主要工作-nav">
+									master 主要工作
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%97%ae%e9%a2%98%e7%ba%bf%e7%a8%8b%e4%b8%8e%e8%bf%9b%e7%a8%8b" onclick="onNavClick(`#问题线程与进程-nav`)" id="问题线程与进程-nav">
+									问题：线程与进程
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e8%ae%ba" onclick="onNavClick(`#结论-nav`)" id="结论-nav">
+									结论
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" onclick="onNavClick(`#参考-nav`)" id="参考-nav">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+    
+    <div class="pagination">
+        <a id="globalBackToTop" class="pagination-action animated-visibility" href="#top" :class="{ invisible: scrollY == 0 }">
+            <i class="material-icons pagination-action-icon">
+                keyboard_arrow_up
+            </i>
+        </a>
+        
+        <a class="pagination-action" v-on:click="toggleDarkMode">
+            <i class="material-icons pagination-action-icon" v-if="isDarkMode">
+                brightness_4
+            </i>
+            <i class="material-icons pagination-action-icon" v-else="isDarkMode">
+                brightness_7
+            </i>
+        </a>
+        
+        
+    </div>
+</div>
+<div class="single-column-drawer-container" ref="drawer"
+     v-bind:class="{ 'single-column-drawer-container-active': isDrawerOpen }">
+    <div class="drawer-content">
+        <div class="drawer-menu">
+            
+            
+            
+                
+                
+                
+                    
+                
+                
+                
+                <a class="a-block drawer-menu-item active" href="/posts">
+                    Archive
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/categories">
+                    Categories
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/tags">
+                    Tags
+                </a>
+                
+            
+                
+                
+                
+                
+                
+                <a class="a-block drawer-menu-item false" href="/index.xml">
+                    RSS Feed
+                </a>
+                
+            
+            
+            <div class="toc">
+
+
+	<div class="toc-content">
+	
+		
+		
+		
+		<center>- CATALOG -</center>
+		
+		
+		<ul>
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								<ul class="collapse" data-toggle="collapse">
+							
+						
+						
+							<li>
+								<a href="#%e5%90%af%e5%8a%a8%e9%87%8d%e5%90%af%e5%92%8c%e7%bb%88%e6%ad%a2" onclick="onNavClick(`#启动重启和终止-nav`)" id="启动重启和终止-nav">
+									启动、重启和终止
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+							
+								<ul class="collapse" data-toggle="collapse">
+							
+						
+						
+							<li>
+								<a href="#%e5%90%af%e5%8a%a8" onclick="onNavClick(`#启动-nav`)" id="启动-nav">
+									启动
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%87%8d%e5%90%af" onclick="onNavClick(`#重启-nav`)" id="重启-nav">
+									重启
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%88%e6%ad%a2" onclick="onNavClick(`#终止-nav`)" id="终止-nav">
+									终止
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+							
+								</ul>
+							
+						
+						
+						
+							<li>
+								<a href="#master-%e4%b8%bb%e8%a6%81%e5%b7%a5%e4%bd%9c" onclick="onNavClick(`#master-主要工作-nav`)" id="master-主要工作-nav">
+									master 主要工作
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e9%97%ae%e9%a2%98%e7%ba%bf%e7%a8%8b%e4%b8%8e%e8%bf%9b%e7%a8%8b" onclick="onNavClick(`#问题线程与进程-nav`)" id="问题线程与进程-nav">
+									问题：线程与进程
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e7%bb%93%e8%ae%ba" onclick="onNavClick(`#结论-nav`)" id="结论-nav">
+									结论
+								</a>
+							</li>
+						
+						
+					
+				
+			
+				
+				
+					
+						
+						
+						
+						
+						
+							<li>
+								<a href="#%e5%8f%82%e8%80%83" onclick="onNavClick(`#参考-nav`)" id="参考-nav">
+									参考
+								</a>
+							</li>
+						
+						
+					
+				
+			
+		</ul>
+	</div>
+
+</div>
+            
+        </div>
+    </div>
+</div>
+<transition name="fade">
+    <div v-bind:class="{ 'single-column-drawer-mask': mounted }" v-if="isDrawerOpen" v-on:click="toggleDrawer"></div>
+</transition>
+<nav ref="navBar" class="navbar sticky-top navbar-light single-column-nav-container">
+    <div ref="navBackground" class="nav-background"></div>
+    <div class="container container-narrow nav-content">
+        <button id="nav_dropdown_btn" class="nav-dropdown-toggle" type="button" v-on:click="toggleDrawer">
+            <i class="material-icons">
+                menu
+            </i>
+        </button>
+        <a ref="navTitle" class="navbar-brand" href="https://notfound.cn">
+            NotFound
+        </a>
+        
+        <button type="button" class="nav-darkmode-toggle" v-on:click="toggleDarkMode">
+            <i class="material-icons" v-if="isDarkMode">
+                brightness_4
+            </i>
+            <i class="material-icons" v-else="isDarkMode">
+                brightness_7
+            </i>
+        </button>
+        
+    </div>
+</nav>
+<div class="single-column-header-container" ref="pageHead"
+     v-bind:style="{ transform: 'translateZ(0px) translateY('+.3*scrollY+'px)', opacity: 1-navOpacity }">
+    <a href="https://notfound.cn">
+        <div class="single-column-header-title">NotFound</div>
+        
+        <div class="single-column-header-subtitle">千里之行始于足下</div>
+        
+
+    </a>
+</div>
+
+            <div id="content">
+<div ref="streamContainer" class="stream-container">
+    <div class="post-list-container post-list-container-shadow">
+        <div class="post">
+            
+            
+            
+
+            <div class="post-head-wrapper-text-only"
+                
+            >
+                <div class="post-title">
+                    Unicorn 启动、重启和终止
+                    
+                    <div class="post-meta">
+                        
+                        <time itemprop="datePublished">
+                            2020-05-15 20:43
+                        </time>
+                        
+
+                        
+
+                        
+                            <i class="material-icons" style="">label</i>
+                            
+                                <a href="/tags/ruby">ruby</a>
+                                &nbsp;
+                            
+                        
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="post-body-wrapper">
+                
+                <div class="post-body" v-pre>
+                
+                    <p>起因，需要在 unicorn master 上开启一个线程定时收集 Ruby 进程运行数据。</p>
+<p>Unicorn 生命周期中设置了多个回调： <code>after_fork</code>、<code>before_fork</code>、<code>before_exec</code>、<code>after_worker_exit</code> 和 <code>after_worker_ready</code>，需要在合适的时间点创建线程。</p>
+<h2 id="启动重启和终止">启动、重启和终止</h2>
+<p>在 unicorn 配置文件代码中打上日志，就可以知道大致的工作过程：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#75715e"># local variable to guard against running a hook multiple times</span>
+run_once <span style="color:#f92672">=</span> <span style="color:#66d9ef">true</span>
+
+before_fork <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>server, worker<span style="color:#f92672">|</span>
+  server<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info <span style="color:#e6db74">&#34;before_fork&#34;</span>
+
+  <span style="color:#66d9ef">if</span> run_once
+    server<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info <span style="color:#e6db74">&#34;before_fork run_once&#34;</span>
+    <span style="color:#75715e"># do_something_once_here ...</span>
+    run_once <span style="color:#f92672">=</span> <span style="color:#66d9ef">false</span> <span style="color:#75715e"># prevent from firing again</span>
+  <span style="color:#66d9ef">end</span>
+
+  old_pid <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#e6db74">#{</span>server<span style="color:#f92672">.</span>config<span style="color:#f92672">[</span><span style="color:#e6db74">:pid</span><span style="color:#f92672">]</span><span style="color:#e6db74">}</span><span style="color:#e6db74">.oldbin&#34;</span>
+  <span style="color:#66d9ef">if</span> old_pid <span style="color:#f92672">!=</span> server<span style="color:#f92672">.</span>pid
+    <span style="color:#66d9ef">begin</span>
+      sig <span style="color:#f92672">=</span> (worker<span style="color:#f92672">.</span>nr <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">&gt;=</span> server<span style="color:#f92672">.</span>worker_processes ? <span style="color:#e6db74">:QUIT</span> : <span style="color:#e6db74">:TTOU</span>
+      server<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info <span style="color:#e6db74">&#34;kill </span><span style="color:#e6db74">#{</span><span style="color:#66d9ef">File</span><span style="color:#f92672">.</span>read(old_pid)<span style="color:#f92672">.</span>strip<span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">#{</span>sig<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+      <span style="color:#66d9ef">Process</span><span style="color:#f92672">.</span>kill(sig, <span style="color:#66d9ef">File</span><span style="color:#f92672">.</span>read(old_pid)<span style="color:#f92672">.</span>to_i)
+    <span style="color:#66d9ef">rescue</span> <span style="color:#66d9ef">Errno</span><span style="color:#f92672">::</span><span style="color:#66d9ef">ENOENT</span>, <span style="color:#66d9ef">Errno</span><span style="color:#f92672">::</span><span style="color:#66d9ef">ESRCH</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+<span style="color:#66d9ef">end</span>
+
+before_exec <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>server<span style="color:#f92672">|</span>
+  server<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info <span style="color:#e6db74">&#34;before_exec&#34;</span>
+<span style="color:#66d9ef">end</span>
+
+after_fork <span style="color:#66d9ef">do</span> <span style="color:#f92672">|</span>server, worker<span style="color:#f92672">|</span>
+  server<span style="color:#f92672">.</span>logger<span style="color:#f92672">.</span>info <span style="color:#e6db74">&#34;after_fork&#34;</span>
+<span style="color:#66d9ef">end</span>
+</code></pre></div><h3 id="启动">启动</h3>
+<ol>
+<li>启动 master</li>
+<li>执行 before_fork，每个 worker 都会执行一次</li>
+<li>启动 worker</li>
+<li>执行 after_fork，每一个 woker 进程都会执行一次</li>
+</ol>
+<pre><code class="language-log" data-lang="log">[#25404 master-n] : Refreshing Gem list
+[#25404 master-n] : listening on addr=0.0.0.0:8080 fd=20
+[#25404 master-n] : before_fork
+[#25404 master-n] : before_fork run_once   # 执行一次
+[#25404 master-n] : before_fork
+[#25407 worker-0] : after_fork
+[#25404 master-n] : before_fork
+[#25407 worker-0] : worker=0 ready
+[#25410 worker-1] : after_fork
+[#25410 worker-1] : worker=1 ready
+[#25404 master-n] : master process ready
+[#25413 worker-2] : after_fork
+[#25413 worker-2] : worker=2 ready
+</code></pre><h3 id="重启">重启</h3>
+<ol>
+<li>启动 new master 进程</li>
+<li>new master 执行 before_exec</li>
+<li>new master 执行 before_fork，并向 old master 发送 TTOU 信号。创建最后一个 worker 进程前(before_fork)，向 old master 发送 QUIT 信号</li>
+<li>new worker 执行 after_exec</li>
+<li>old master 接收到 QUIT 信号后，结束掉 old woker 进程，然后退出</li>
+</ol>
+<pre><code class="language-log" data-lang="log">[#25513 master-n] : executing [&quot;unicorn&quot;, &quot;-c&quot;, &quot;config/unicorn.conf.rb&quot;, &quot;-D&quot;] # 创建新的 master
+[#25513 master-n] : before_exec
+[#25513 master-n] : inherited addr=0.0.0.0:8080 fd=20
+[#25513 master-n] : Refreshing Gem list
+[#25513 master-n] : before_fork
+[#25513 master-n] : before_fork run_once     # 执行一次
+[#25513 master-n] : kill 25404 TTOU          # 创建 woker 前(before_fork) 向旧的 master 发送 TTOU
+[#25513 master-n] : before_fork
+[#25513 master-n] : kill 25404 TTOU
+[#25524 worker-0] : after_fork
+[#25524 worker-0] : worker=0 ready
+[#25513 master-n] : before_fork
+[#25513 master-n] : kill 25404 QUIT          # 创建最后一个 woker (before_fork)前后向旧的 master 发送 QUIT
+[#25527 worker-1] : after_fork
+[#25527 worker-1] : worker=1 ready
+[#25513 master-n] : master process ready
+[#25530 worker-2] : after_fork
+[#25530 worker-2] : worker=2 ready
+[#25404 master-o] : reaped #&lt;Process::Status: pid 25407 exit 0&gt; worker=0  # 旧的 master 开始清理旧的 woker
+[#25404 master-o] : reaped #&lt;Process::Status: pid 25410 exit 0&gt; worker=1
+[#25404 master-o] : reaped #&lt;Process::Status: pid 25413 exit 0&gt; worker=2
+[#25404 master-o] : master complete                                       # 旧的 master 退出
+</code></pre><p>关键点</p>
+<ul>
+<li>新的 master 和所有的 woker 就绪之后，才会终止旧的进程</li>
+<li>新的 master 和旧的 master 通过信号通信</li>
+<li>旧的 master 负责清理旧的 woker，然后退出</li>
+</ul>
+<h3 id="终止">终止</h3>
+<ol>
+<li>master 结束掉所有的 worker 进程，然后退出。</li>
+</ol>
+<pre><code class="language-log" data-lang="log">[#25513] : reaped #&lt;Process::Status: pid 25524 exit 0&gt; worker=0
+[#25513] : reaped #&lt;Process::Status: pid 25527 exit 0&gt; worker=1
+[#25513] : reaped #&lt;Process::Status: pid 25530 exit 0&gt; worker=2
+[#25513] : master complete
+</code></pre><h2 id="master-主要工作">master 主要工作</h2>
+<p>master 负责管理子进程，在无限循环中等待信号、以及检查 woker 数量和是否超时，当 woker 数量减少时会创建新的 woker，当 woker 运行超时时会被 kill：</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby">@sig_queue <span style="color:#f92672">=</span> <span style="color:#f92672">[]</span>
+@queue_sigs <span style="color:#f92672">=</span> <span style="color:#f92672">[</span><span style="color:#e6db74">:WINCH</span>, <span style="color:#e6db74">:QUIT</span>, <span style="color:#e6db74">:INT</span>, <span style="color:#e6db74">:TERM</span>, <span style="color:#e6db74">:USR1</span>, <span style="color:#e6db74">:USR2</span>, <span style="color:#e6db74">:HUP</span>, <span style="color:#e6db74">:TTIN</span>, <span style="color:#e6db74">:TTOU</span><span style="color:#f92672">]</span>
+@queue_sigs<span style="color:#f92672">.</span>each { <span style="color:#f92672">|</span>sig<span style="color:#f92672">|</span> trap(sig) { @sig_queue <span style="color:#f92672">&lt;&lt;</span> sig } }
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">log</span>(message)
+  puts <span style="color:#e6db74">&#34;#</span><span style="color:#e6db74">#{</span><span style="color:#66d9ef">Process</span><span style="color:#f92672">.</span>pid<span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">#{</span>message<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">master</span>(pid)
+  <span style="color:#66d9ef">Process</span><span style="color:#f92672">.</span>detach(pid)
+
+  <span style="color:#66d9ef">loop</span> <span style="color:#66d9ef">do</span>
+    <span style="color:#66d9ef">case</span> @sig_queue<span style="color:#f92672">.</span>shift
+    <span style="color:#66d9ef">when</span> <span style="color:#66d9ef">nil</span>
+      <span style="color:#75715e"># 检查 worker 超时</span>
+      <span style="color:#75715e"># 检查 worker 数量</span>
+      sleep <span style="color:#ae81ff">0</span><span style="color:#f92672">.</span><span style="color:#ae81ff">5</span>
+    <span style="color:#66d9ef">when</span> <span style="color:#e6db74">:USR1</span>
+      log <span style="color:#e6db74">&#34;receive :USR1&#34;</span>
+    <span style="color:#66d9ef">when</span> <span style="color:#e6db74">:USR2</span>
+      log <span style="color:#e6db74">&#34;receive :USR2&#34;</span>
+    <span style="color:#66d9ef">when</span> <span style="color:#e6db74">:TERM</span>
+      log <span style="color:#e6db74">&#34;receive :TERM&#34;</span>
+      <span style="color:#66d9ef">break</span>
+    <span style="color:#66d9ef">end</span>
+  <span style="color:#66d9ef">end</span>
+
+  sleep <span style="color:#ae81ff">1</span>
+<span style="color:#66d9ef">end</span>
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">worker</span>(ppid)
+  <span style="color:#75715e"># TODO</span>
+<span style="color:#66d9ef">end</span>
+
+ppid <span style="color:#f92672">=</span> <span style="color:#66d9ef">Process</span><span style="color:#f92672">.</span>pid
+
+<span style="color:#66d9ef">if</span> pid <span style="color:#f92672">=</span> fork
+  master(pid)
+<span style="color:#66d9ef">else</span>
+  worker(ppid)
+<span style="color:#66d9ef">end</span>
+</code></pre></div><ul>
+<li><a href="https://ruby-doc.org/core-2.5.0/Signal.html">trap</a> 方法可以注册信号处理函数。当信号发生时，会执行 <code>trap</code> 后面的代码块。</li>
+</ul>
+<h2 id="问题线程与进程">问题：线程与进程</h2>
+<p>线程创建后执行 <code>fork</code> 操作，正在执行的线程会是怎样的存在？在 Linux 中并不推荐多线程中使用 fork，充满了不确定性，可参考 <a href="https://www.cnblogs.com/liyuan989/p/4279210.html">谨慎使用多线程中的fork</a>。</p>
+<p>来段代码，测试几个比较关心的问题：</p>
+<blockquote>
+<ol>
+<li>也就是说除了调用 fork 的线程外，其他线程在子进程中“蒸发”了。</li>
+<li>假设在 fork 之前，一个线程对某个锁进行的 lock 操作，即持有了该锁，然后另外一个线程调用了 fork 创建子进程。可是在子进程中持有那个锁的线程却&quot;消失&quot;了，从子进程的角度来看，这个锁被“永久”的上锁了，因为它的持有者“蒸发”了。</li>
+</ol>
+</blockquote>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-ruby" data-lang="ruby"><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">log</span>(message )
+  <span style="color:#66d9ef">STDERR</span><span style="color:#f92672">.</span>puts <span style="color:#e6db74">&#34;#</span><span style="color:#e6db74">#{</span><span style="color:#66d9ef">Process</span><span style="color:#f92672">.</span>pid<span style="color:#e6db74">}</span><span style="color:#e6db74"> </span><span style="color:#e6db74">#{</span>message<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>
+<span style="color:#66d9ef">end</span>
+
+log(<span style="color:#e6db74">&#34;parent pid&#34;</span>)
+mutex <span style="color:#f92672">=</span> <span style="color:#66d9ef">Mutex</span><span style="color:#f92672">.</span>new
+
+t <span style="color:#f92672">=</span> <span style="color:#66d9ef">Thread</span><span style="color:#f92672">.</span>new <span style="color:#66d9ef">do</span>
+  mutex<span style="color:#f92672">.</span>synchronize <span style="color:#66d9ef">do</span>
+    log(<span style="color:#e6db74">&#34;thread mutex start&#34;</span>)
+    sleep <span style="color:#ae81ff">2</span>
+  <span style="color:#66d9ef">end</span>
+  log(<span style="color:#e6db74">&#34;thread mutex end&#34;</span>)
+<span style="color:#66d9ef">end</span>
+
+sleep <span style="color:#ae81ff">1</span> <span style="color:#75715e"># 让线程先执行</span>
+
+<span style="color:#66d9ef">if</span> pid <span style="color:#f92672">=</span> fork
+  log(<span style="color:#e6db74">&#34;parent before, alive?: </span><span style="color:#e6db74">#{</span>t<span style="color:#f92672">.</span>alive?<span style="color:#e6db74">}</span><span style="color:#e6db74">, locked: </span><span style="color:#e6db74">#{</span>mutex<span style="color:#f92672">.</span>locked?<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> )
+  sleep <span style="color:#ae81ff">2</span>
+  log(<span style="color:#e6db74">&#34;parent after, alive?: </span><span style="color:#e6db74">#{</span>t<span style="color:#f92672">.</span>alive?<span style="color:#e6db74">}</span><span style="color:#e6db74">, locked: </span><span style="color:#e6db74">#{</span>mutex<span style="color:#f92672">.</span>locked?<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> )
+<span style="color:#66d9ef">else</span>
+  <span style="color:#75715e"># 线程占用 mutex 时，子进程被创建</span>
+  log(<span style="color:#e6db74">&#34;child before, alive?: </span><span style="color:#e6db74">#{</span>t<span style="color:#f92672">.</span>alive?<span style="color:#e6db74">}</span><span style="color:#e6db74">, locked: </span><span style="color:#e6db74">#{</span>mutex<span style="color:#f92672">.</span>locked?<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> )
+  sleep <span style="color:#ae81ff">2</span>
+  log(<span style="color:#e6db74">&#34;child after, alive?: </span><span style="color:#e6db74">#{</span>t<span style="color:#f92672">.</span>alive?<span style="color:#e6db74">}</span><span style="color:#e6db74">, locked: </span><span style="color:#e6db74">#{</span>mutex<span style="color:#f92672">.</span>locked?<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span> )
+<span style="color:#66d9ef">end</span>
+
+log(<span style="color:#e6db74">&#34;done&#34;</span>)
+
+sleep <span style="color:#ae81ff">1</span>
+</code></pre></div><p>输出结果如下(ruby 2.5.1p57 x86_64-linux-gnu)：</p>
+<pre><code class="language-log" data-lang="log">#9544 parent pid                                 # 父进程 id
+#9544 thread mutex start                         # 父进程中，线程启动，持有 mutex
+#9544 parent before, alive?: true, locked: true  # 父进程中，mutex 被占用
+#9547 child before, alive?: false, locked: false # 子进程中，mutex 未被占用，线程没有执行
+#9544 thread mutex end                           # 父进程中，线程结束，释放 mutex
+#9544 parent after, alive?: false, locked: false
+#9547 child after, alive?: false, locked: false  # 子进程中，线程依旧没有执行
+#9547 done
+#9544 done
+</code></pre><ul>
+<li>fork 前创建线程，fork 后线程并不会在子进程中继续执行</li>
+<li>fork 前线程占用了 Mutex，在 fork 后子进程并不会继续占用</li>
+</ul>
+<p>又产生了新的问题：</p>
+<ul>
+<li>Ruby 中的 Mutex 是否和 Linux 系统中的锁对应呢？ Ruby 中的多线程是否和 Linux 中的多线程对应呢？还是 Ruby 语言本身进行了特殊的处理？</li>
+<li>如果进程中存在文件的读、写操作，是否会造成死锁？或者调用某些方法是否会造成死锁？</li>
+</ul>
+<p>如果在 fork 时线程持有了锁， fork 之后，子进程中的线程不会执行，锁也就无法释放，此时如果子进程尝试获取锁就会一直等待。(上面的示例并没有出现这种情况，原因未知)</p>
+<p>当前需求是在 master 进程中执行监控线程。woker 进程不需要执行线程以及占用相同的锁，发生上述问题也不会产生不良影响。</p>
+<h2 id="结论">结论</h2>
+<ul>
+<li>大部分时间 master 都是比较清闲的</li>
+<li>可以考虑在 <code>befork_fork</code> 回调里 <code>run_once</code> 启动一个单独的线程进行监控数据收集</li>
+</ul>
+<h2 id="参考">参考</h2>
+<ul>
+<li><a href="https://yhbt.net/unicorn/">unicorn</a></li>
+<li><a href="https://ruby-doc.org/core-2.5.0/Signal.html">Signal</a></li>
+<li><code>man 7 signal</code></li>
+<li><a href="https://www.cnblogs.com/liyuan989/p/4279210.html">谨慎使用多线程中的fork</a></li>
+<li><a href="https://blog.codingnow.com/2011/01/fork_multi_thread.html">极不和谐的 fork 多线程程序</a></li>
+</ul>
+
+                    
+                    <HR width="100%" id="EOF">
+		    <p style="color:#777;">Last modified on 2020-05-15</p>
+                    
+                </div>
+            </div>
+            
+            
+            <nav class="post-pagination">
+
+                
+                <a class="newer-posts" href="https://notfound.cn/posts/java-native-interface-start/">
+			Next<br>JNI 基本使用
+                </a>
+                
+                
+                
+                <a class="older-posts" href="https://notfound.cn/posts/monitoring-process-ruby/">
+			Previous<br>监控 Ruby 进程
+                </a>
+                
+            </nav>
+            <div class="post-comment-wrapper">
+                
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+            </div><div id="single-column-footer">
+Hugo Theme <a href="https://github.com/amazingrise/hugo-theme-diary">Diary</a> by <a href="https://amazingrise.net">Rise</a>
+<br>
+Ported from <a href="https://mak1t0.cc/" target="_blank" rel="noreferrer noopener">Makito</a>'s <a href="https://github.com/SumiMakito/hexo-theme-journal/" target="_blank" rel="noreferrer noopener">Journal.</a> <br>
+<br>
+
+&copy;
+	
+	2021<br><a href="http://www.beian.miit.gov.cn">粤ICP备17092723号</a>
+
+	
+
+<script>
+	var _hmt = _hmt || [];
+	(function () {
+		var hm = document.createElement("script");
+		hm.src = "https://hm.baidu.com/hm.js?f949ca6d9df034921c6c97be6180abb1";
+		var s = document.getElementsByTagName("script")[0];
+		s.parentNode.insertBefore(hm, s);
+	})();
+</script>
+</div>
+            </div>
+    <script>
+let app;
+
+app = new Vue({
+    el: '#app',
+    data: {
+        scrollY: 0,
+        navOpacity: 0,
+        isDrawerOpen: false,
+        mounted: false,
+        isDarkMode: false
+    },
+    methods: {
+            sgn(t, x) {
+                let k = 1. / (1. - 2 * t);
+                if (x <= t) return 0;
+                else if (x >= 1 - t) return 1;
+                else {
+                    return k * (x - t);
+                }
+            },
+            handleScroll() {
+                this.scrollY = window.scrollY;
+                this.navOpacity = this.sgn(.0, Math.min(1, Math.max(0, window.scrollY / (this.pageHeadHeight() - this.navBarHeight() * 0.8))));
+                const {navBar, navBackground, navTitle, extraContainer, streamContainer} = this.$refs;
+
+                if (this.navOpacity >= 1) {
+                    navBackground.style.opacity = 1;
+                    navTitle.style.opacity = 1;
+                } else {
+                    navBackground.style.opacity = 0;
+                    navTitle.style.opacity = 0;
+                }
+            },
+            handleResize() {
+                const {navBar, navBackground, navTitle, extraContainer, streamContainer} = this.$refs;
+                extraContainer.style.left = (streamContainer.offsetWidth - extraContainer.offsetWidth) + 'px';
+            },
+            navBarHeight() {
+                return this.$refs.navBar.offsetHeight;
+            },
+            pageHeadHeight() {
+                return this.$refs.pageHead.offsetHeight;
+            },
+            toggleDrawer() {
+                this.isDrawerOpen = !this.isDrawerOpen;
+                document.getElementsByTagName('html')[0].style.overflow = this.isDrawerOpen ? 'hidden' : 'unset';
+            },
+            closeDrawer() {
+                this.isDrawerOpen = false;
+                document.getElementsByTagName('html')[0].style.overflow = this.isDrawerOpen ? 'hidden' : 'unset';
+            },
+            toggleDarkMode() {
+                this.isDarkMode = !this.isDarkMode;
+                if (this.isDarkMode==true){
+                    document.cookie = "night=1;path=/";
+                    document.body.classList.add("night");
+                } else {
+                    document.cookie = "night=0;path=/";
+                    document.body.classList.remove("night");
+                }
+            }
+    },
+    created() {
+        window.addEventListener('scroll', this.handleScroll);
+        window.addEventListener('resize', this.handleResize);
+        window._nonDesktop = function () {
+            let check = false;
+            (function (a) {
+                if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
+            })(navigator.userAgent || navigator.vendor || window.opera);
+            return check;
+        };
+        
+        var night = document.cookie.replace(/(?:(?:^|.*;\s*)night\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+        if (night==""){
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                
+            }
+        }else{
+            
+            if (night=="1") {
+                this.toggleDarkMode();
+            }
+        }
+    },
+    mounted() {
+        this.handleScroll();
+        this.handleResize();
+        this.mounted = true;
+
+        
+    },
+    destroyed() {
+        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener('resize', this.handleResize);
+    }
+});
+</script>
+
+<script src="https://notfound.cn/js/journal.js"></script>
+    </body>
+</html>

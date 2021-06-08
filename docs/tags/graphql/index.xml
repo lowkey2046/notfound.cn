@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>graphql on NotFound</title>
+    <link>https://notfound.cn/tags/graphql/</link>
+    <description>Recent content in graphql on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 27 Mar 2021 17:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/graphql/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Context</title>
+      <link>https://notfound.cn/posts/graphql-java-context/</link>
+      <pubDate>Sat, 27 Mar 2021 17:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-context/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Context  OpenJDK 11 Gradle 6.8  DataFetchingEnvironment 中存在一个 Context ，在整个查询生命周期中不变。
+修改了示例 [https://notfound.cn/posts/graphql-java-getting-started/] 在 context 中传递 user 信息。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-security&amp;#39; implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; testImplementation &amp;#39;org.springframework.security:spring-security-test&amp;#39; Spring Security 配置 @Configuration @EnableWebSecurity public class WebSecurityConfig extends WebSecurityConfigurerAdapter { @Override protected void configure(HttpSecurity http) throws Exception { http.csrf().disable() .authorizeRequests().anyRequest().permitAll() .and() .httpBasic(); } @Bean @Override public UserDetailsService userDetailsService() { UserDetails user = User.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Batching</title>
+      <link>https://notfound.cn/posts/graphql-java-batching/</link>
+      <pubDate>Sat, 27 Mar 2021 09:40:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-batching/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Batching  OpenJDK 11 Gradle 6.8  通过 java-dataloader 处理 N+1 问题。
+依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39;  graphql-java 中已将添加 java-dataloader 依赖，不需要额外添加。  源码 @Component public class StarWarsWiring { private final DataLoaderRegistry dataLoaderRegistry; public StarWarsWiring() { this.dataLoaderRegistry = new DataLoaderRegistry(); dataLoaderRegistry.register(&amp;#34;characters&amp;#34;, newCharacterDataLoader()); } //提供 DataLoaderRegistry 给 graphql-java-spring-webmvc 使用  @Bean public DataLoaderRegistry dataLoaderRegistry() { // DataLoaderRegistry 是全局的，在它之上注册的 DataLoader 也是全局的  // 所有请求都会共用相同的缓存  return dataLoaderRegistry; } private DataLoader&amp;lt;String,Character&amp;gt; newCharacterDataLoader() { return new DataLoader&amp;lt;&amp;gt;(characterBatchLoader); } private BatchLoader&amp;lt;String, Character&amp;gt; characterBatchLoader = keys -&amp;gt; { // BatchLoader 中存在缓存，多次请求相同数据时也会使用缓存  return CompletableFuture.</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot: Schema</title>
+      <link>https://notfound.cn/posts/graphql-java-schema/</link>
+      <pubDate>Fri, 26 Mar 2021 21:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-schema/</guid>
+      <description>GraphQL Java 以及 Spring Boot: Schema  OpenJDK 11 Gradle 6.8  依赖 implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; graphql dsl 创建 src/main/resources/starWarsSchema.graphqls :
+schema { query: Query } type Query { hero(episode: Episode) : Character human(id: String) : Human droid(id: ID!): Droid } enum Episode { NEWHOPE EMPIRE JEDI } interface Character { id: ID! name: String! friends: [Character] appearsIn: [Episode]!</description>
+    </item>
+    
+    <item>
+      <title>GraphQL Java 以及 Spring Boot 入门</title>
+      <link>https://notfound.cn/posts/graphql-java-getting-started/</link>
+      <pubDate>Wed, 24 Mar 2021 00:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/graphql-java-getting-started/</guid>
+      <description>GraphQL Java 以及 Spring Boot 入门  OpenJDK 11 Gradle 6.8  Spring Initializr Spring Initializr 生成 Spring Boot 项目，只需要选择 Spring Web 一项
+依赖 添加 graphql-java 以及 graphql-java-spring-boot-starter-webmvc ，所有依赖如下：
+implementation &amp;#39;com.graphql-java:graphql-java:16.2&amp;#39; // 新 implementation &amp;#39;com.graphql-java:graphql-java-spring-boot-starter-webmvc:2.0&amp;#39; // 新 implementation &amp;#39;com.google.guava:guava:30.1.1-jre&amp;#39; // 新(可选)  implementation &amp;#39;org.springframework.boot:spring-boot-starter-web&amp;#39; testImplementation &amp;#39;org.springframework.boot:spring-boot-starter-test&amp;#39; Schema 新建文件 src/main/resources/schema.graphqls
+type Query{ hello: String } GraphQLProvider 需要提供 GraphQL bean 给 graphql-java-spring-boot-starter-webmvc 使用。
+新建文件 src/main/java/cn/notfound/GraphQLProvider.java
+@Component public class GraphQLProvider { private GraphQL graphQL; private GraphQLDataFetchers dataFetchers; @Autowired public GraphQLProvider(GraphQLDataFetchers dataFetchers) { this.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>maven on NotFound</title>
+    <link>https://notfound.cn/tags/maven/</link>
+    <description>Recent content in maven on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Tue, 19 May 2020 21:08:56 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/maven/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Maven 基本使用</title>
+      <link>https://notfound.cn/posts/maven-basic/</link>
+      <pubDate>Tue, 19 May 2020 21:08:56 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/maven-basic/</guid>
+      <description>Apache Maven 3.6.3  生成 maven 工程 mvn archetype:generate \  -DarchetypeGroupId=org.apache.maven.archetypes \  -DarchetypeArtifactId=maven-archetype-quickstart \  -DarchetypeVersion=1.4 \  -DarchetypeCatalog=internal \  -DgroupId=com.example \  -DartifactId=demo \  -Dversion=0.0.1-SNAPSHOT \  -Dpackage=com.example.demo pom.xml 修改编译目标版本：
+&amp;lt;properties&amp;gt; &amp;lt;project.build.sourceEncoding&amp;gt;UTF-8&amp;lt;/project.build.sourceEncoding&amp;gt; &amp;lt;maven.compiler.source&amp;gt;1.8&amp;lt;/maven.compiler.source&amp;gt; &amp;lt;maven.compiler.target&amp;gt;1.8&amp;lt;/maven.compiler.target&amp;gt; &amp;lt;/properties&amp;gt; 编译、测试、打包等 # 移除 target 目录 mvn clean # 编译 mvn compile # 测试 mvn test # 打包 mvn package # 安装 mvn install 可执行 jar 默认情况 jar 找不到 Main 方法：</description>
+    </item>
+    
+    <item>
+      <title>配置 gradle 和 maven 源</title>
+      <link>https://notfound.cn/posts/gradle-maven-mirror/</link>
+      <pubDate>Fri, 03 May 2019 13:05:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/gradle-maven-mirror/</guid>
+      <description>配置 gradle 和 maven 源，环境为 Ubuntu 18.04。
+配置 gradle 源 编辑文件 ~/.gradle/init.gradle :
+allprojects { def google_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/google&amp;#39;) def central_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/central&amp;#39;) def jcenter_uri = new URI(&amp;#39;https://maven.aliyun.com/repository/jcenter&amp;#39;) repositories { all { ArtifactRepository repo -&amp;gt; if (repo instanceof MavenArtifactRepository) { def url = repo.url.toString() if (url.startsWith(&amp;#39;https://repo.maven.apache.org/maven2/&amp;#39;) || url.startsWith(&amp;#39;https://repo1.maven.org/maven2&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${central_uri}.&amp;#34; repo.setUrl(central_uri) } else if (url.startsWith(&amp;#39;https://jcenter.bintray.com/&amp;#39;)) { project.logger.lifecycle &amp;#34;Repository ${repo.url} replaced by ${jcenter_uri}.&amp;#34; repo.setUrl(jcenter_uri) } else if (url.</description>
+    </item>
+    
+  </channel>
+</rss>

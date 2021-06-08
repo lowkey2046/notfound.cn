@@ -1,0 +1,890 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>NotFound</title>
+    <link>https://notfound.cn/</link>
+    <description>Recent content on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Sat, 15 May 2021 16:00:00 +0800</lastBuildDate>
+    
+        <atom:link href="https://notfound.cn/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    
+        <item>
+        <title>Linux 编译安装 Ruby</title>
+        <link>https://notfound.cn/posts/ruby-compile/</link>
+        <pubDate>Thu, 18 Mar 2021 20:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/ruby-compile/</guid>
+        <description>NotFound https://notfound.cn/posts/ruby-compile/ -&lt;h2 id=&#34;linux-编译安装-ruby&#34;&gt;Linux 编译安装 Ruby&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Ubuntu 20.04&lt;/li&gt;
+&lt;li&gt;Ruby 3.0.0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;直接编译安装&#34;&gt;直接编译安装&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;wget http://cache.ruby-china.com/pub/ruby/3.0/ruby-3.0.0.tar.gz
+tar -zxvf ruby-3.0.0.tar.gz
+cd ruby-3.0.0
+./configure --prefix&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/ruby-3.0.0
+make -j8
+make install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;集成-jemalloc&#34;&gt;集成 jemalloc&lt;/h3&gt;
+&lt;p&gt;jemalloc 可以大幅度减少 sidekiq 内存碎片。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;sudo apt install libjemalloc-dev
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;编译方式&#34;&gt;编译方式&lt;/h4&gt;
+&lt;p&gt;编译时添加 &lt;code&gt;--with-jemalloc&lt;/code&gt; 参数即可：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;./configure --prefix&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/ruby-3.0.0 --with-jemalloc
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;检查 jemalloc:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;/opt/ruby-3.0.0/bin/ruby -r rbconfig -e &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;puts RbConfig::CONFIG[&amp;#39;MAINLIBS&amp;#39;]&amp;#34;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# 低版本&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;# ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;LIBS&amp;#39;]&amp;#34;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;输出：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;-lz -lpthread - lrt -lrt -ljemalloc -lgmp -ldl -lcrypt -lm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;环境变量方式&#34;&gt;环境变量方式&lt;/h4&gt;
+&lt;p&gt;设置环境变量 &lt;code&gt;LD_PRELOAD&lt;/code&gt; 即可&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;export LD_PRELOAD&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/usr/lib/x86_64-linux-gnu/libjemalloc.so
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;指定-openssl-版本&#34;&gt;指定 openssl 版本&lt;/h3&gt;
+&lt;p&gt;编译 openssl：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;wget https://www.openssl.org/source/openssl-1.1.1j.tar.gz
+tar -zxvf openssl-1.1.1j.tar.gz
+cd openssl-1.1.1j
+./config shared --prefix&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/openssl-1.1.1j
+make -j8
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;通过 &lt;code&gt;--with-openssl-dir&lt;/code&gt; 参数指定 openssl 路径：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;./configure --prefix&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/ruby-3.0.0 --with-openssl-dir&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/openssl-1.1.1j
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;可能遇到问题&#34;&gt;可能遇到问题&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-text&#34; data-lang=&#34;text&#34;&gt;$ gem sources --add https://gems.ruby-china.com/ --remove https://rubygems.org/
+Error fetching https://gems.ruby-china.com/:
+SSL_connect returned=1 errno=0 state=error: certificate verify failed (https://gems.ruby-china.com/specs.4.8.gz)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;导入环境变量即可：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;export SSL_CERT_FILE&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/etc/ssl/certs/ca-certificates.crt
+export SSL_CERT_DIR&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/etc/ssl/certs
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;环境变量&#34;&gt;环境变量&lt;/h3&gt;
+&lt;p&gt;输出 gem 信息：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;gem env
+gem env path
+gem env home
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;通过设置 &lt;code&gt;GEM_PATH&lt;/code&gt; 修改 gem 查找路径：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;export GEM_PATH&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/home/notfound/app/vendor/bundle/ruby/2.7.0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/rbenv/ruby-build/issues/1215&#34;&gt;https://github.com/rbenv/ruby-build/issues/1215&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://wiki.openssl.org/index.php/Compilation%5Fand%5FInstallation&#34;&gt;https://wiki.openssl.org/index.php/Compilation%5Fand%5FInstallation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/jemalloc/jemalloc/wiki/Getting-Started&#34;&gt;https://github.com/jemalloc/jemalloc/wiki/Getting-Started&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html&#34;&gt;https://www.cyningsun.com/07-07-2018/memory-allocator-contrasts.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/questions/11277227/whats-the-difference-between-gem-home-and-gem-path&#34;&gt;https://stackoverflow.com/questions/11277227/whats-the-difference-between-gem-home-and-gem-path&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/ruby-compile/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Java cli 以及配置文件路径处理</title>
+        <link>https://notfound.cn/posts/java-cli-and-config-path/</link>
+        <pubDate>Sun, 14 Mar 2021 16:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-cli-and-config-path/</guid>
+        <description>NotFound https://notfound.cn/posts/java-cli-and-config-path/ -&lt;h2 id=&#34;java-cli-以及配置文件路径处理&#34;&gt;Java cli 以及配置文件路径处理&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenJDK 11&lt;/li&gt;
+&lt;li&gt;Gradle 6.8&lt;/li&gt;
+&lt;li&gt;Apache Commons CLI&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;命令参数处理&#34;&gt;命令参数处理&lt;/h3&gt;
+&lt;h4 id=&#34;依赖&#34;&gt;依赖&lt;/h4&gt;
+&lt;p&gt;修改 &lt;code&gt;build.gradle&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;commons-cli&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;commons-cli&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;1.4&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;源码&#34;&gt;源码&lt;/h4&gt;
+&lt;p&gt;大致执行步骤：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;CommandLineParser parser &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; DefaultParser&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+Options options &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Options&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+options&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;all&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;do not hide entries starting with .&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+options&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;almost-all&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;do not list implied . and ..&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+options&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Option&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;builder&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+                  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;longOpt&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;block-size&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;desc&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;use SIZE-byte blocks&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hasArg&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+                  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;argName&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;SIZE&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+                  &lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;build&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;args&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;length&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; 0&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    HelpFormatter formatter &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; HelpFormatter&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    formatter&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;printHelp&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;ls&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; options&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    CommandLine line &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; parser&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;parse&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;options&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; args&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;line&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hasOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;block-size&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;block-size: &amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; line&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getOptionValue&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;block-size&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;line&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hasOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;a&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;line&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;hasOption&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;A&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;catch&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ParseException e&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Unexpected exception:&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; e&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getMessage&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;HelpFormatter&lt;/code&gt; 格式化输出参数帮助信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;自定义配置文件路径处理&#34;&gt;自定义配置文件路径处理&lt;/h3&gt;
+&lt;p&gt;通过 &lt;code&gt;user.dir&lt;/code&gt; 获取当前的执行目录，结合 cli 可以获取配置文件绝对路径：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getProperty&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;user.dir&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://commons.apache.org/proper/commons-cli/usage.html&#34;&gt;Cli Usage Scenarios&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-cli-and-config-path/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>使用 Java 实现 Git SSH 服务端</title>
+        <link>https://notfound.cn/posts/java-ssh-git-server-start/</link>
+        <pubDate>Sat, 13 Mar 2021 18:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-ssh-git-server-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-ssh-git-server-start/ -&lt;h2 id=&#34;使用-java-实现-git-ssh-服务端&#34;&gt;使用 Java 实现 Git SSH 服务端&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenJDK 11&lt;/li&gt;
+&lt;li&gt;Gradle 6.8&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/mina-sshd&#34;&gt;Apache MINA SSHD&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;依赖&#34;&gt;依赖&lt;/h3&gt;
+&lt;p&gt;修改 &lt;code&gt;build.gradle&lt;/code&gt; 文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.apache.sshd&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sshd-core&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2.6.0&amp;#39;&lt;/span&gt;
+implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.apache.sshd&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;sshd-git&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2.6.0&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#75715e&#34;&gt;// SSH KEY ed25519
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;// implementation group: &amp;#39;net.i2p.crypto&amp;#39;, name: &amp;#39;eddsa&amp;#39;, version: &amp;#39;0.3.0&amp;#39;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;如果需要支持 ed25519，需要引入单独的包&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;代码&#34;&gt;代码&lt;/h3&gt;
+&lt;p&gt;服务端主要使用包内自带的处理方式：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; args&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; InterruptedException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    SshServer sshd &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; SshServer&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setUpDefaultServer&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setPort&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;8082&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setHost&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 设置服务端私钥
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setKeyPairProvider&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; FileKeyPairProvider&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Path&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;of&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/home/notfound/.ssh/id_rsa&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)));&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 禁用密码验证
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setPasswordAuthenticator&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 禁用交互验证
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setKeyboardInteractiveAuthenticator&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 使用 ~/.ssh/authorized_keys 中的公钥验证客户端
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setPublickeyAuthenticator&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;DefaultAuthorizedKeysAuthenticator&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;INSTANCE&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 设置仓库根目录
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    GitLocationResolver resolver &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; GitLocationResolver&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; Path &lt;span style=&#34;color:#a6e22e&#34;&gt;resolveRootDirectory&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String command&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; args&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; ServerSession session&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; FileSystem fs&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color:#75715e&#34;&gt;// 输出客户端公钥
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;                System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;AuthorizedKeyEntriesPublickeyAuthenticator&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;AUTHORIZED_KEY&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+                &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; fs&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getPath&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/srv/git-data&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;};&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 处理 git 操作
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setCommandFactory&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; GitPackCommandFactory&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;withGitLocationResolver&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;resolver&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+    sshd&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;start&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 其他操作
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;ServerSession 中的 &lt;code&gt;setAttribute&lt;/code&gt; 可以携带自定义数据， &lt;code&gt;DefaultAuthorizedKeysAuthenticator.INSTANCE&lt;/code&gt; 在 ServerSession 对象中保存了客户端公钥&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/mina-sshd/blob/sshd-2.6.0/docs/git.md&#34;&gt;GIT support&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-ssh-git-server-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>ActiveMQ Artemis 安装和使用</title>
+        <link>https://notfound.cn/posts/java-artemis-start/</link>
+        <pubDate>Wed, 03 Mar 2021 00:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-artemis-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-artemis-start/ -&lt;h2 id=&#34;activemq-artemis-安装和使用&#34;&gt;ActiveMQ Artemis 安装和使用&lt;/h2&gt;
+&lt;h3 id=&#34;安装&#34;&gt;安装&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;wget https://mirrors.tuna.tsinghua.edu.cn/apache/activemq/activemq-artemis/2.17.0/apache-artemis-2.17.0-bin.tar.gz
+tar -zxvf apache-artemis-2.17.0-bin.tar.gz
+sudo mv apache-artemis-2.17.0 /opt/artemis
+sudo chown -R root:root /opt/artemis
+export ARTEMIS_HOME&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/artemis
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;命令&#34;&gt;命令&lt;/h3&gt;
+&lt;p&gt;启动、停止等命令：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 创建 broker 实例&lt;/span&gt;
+$ARTEMIS_HOME/bin/artemis create /srv/example
+&lt;span style=&#34;color:#75715e&#34;&gt;# 启动服务&lt;/span&gt;
+/srv/example/bin/artemis run
+&lt;span style=&#34;color:#75715e&#34;&gt;# 启动服务，后台运行&lt;/span&gt;
+/srv/example/bin/artemis-service start
+&lt;span style=&#34;color:#75715e&#34;&gt;# 查看服务状态&lt;/span&gt;
+/srv/example/bin/artemis-service status
+&lt;span style=&#34;color:#75715e&#34;&gt;# 停止服务&lt;/span&gt;
+/srv/example/bin/artemis-service stop
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;服务启动后，可进入页面管理 &lt;a href=&#34;http://localhost:8161/console&#34;&gt;http://localhost:8161/console&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;基本使用&#34;&gt;基本使用&lt;/h3&gt;
+&lt;p&gt;添加依赖&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.apache.activemq&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;artemis-jms-client-all&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2.17.0&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;生产者&#34;&gt;生产者&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;Connection connection &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    ConnectionFactory cf &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; ActiveMQConnectionFactory&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;tcp://localhost:61616&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 JMS 连接
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    connection &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; cf&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createConnection&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 JMS Session
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    Session session &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; connection&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createSession&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; Session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;AUTO_ACKNOWLEDGE&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    Queue queue &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createQueue&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;exampleQueue&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 producer
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    MessageProducer producer &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createProducer&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;queue&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 message
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    TextMessage message &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createTextMessage&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello ActiveMQ!&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 发送消息
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    producer&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;send&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;message&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;finally&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;connection &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        connection&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;close&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;消费者&#34;&gt;消费者&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;Connection connection &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+ConnectionFactory cf &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; ActiveMQConnectionFactory&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;tcp://localhost:61616&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 JMS 连接
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    connection &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; cf&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createConnection&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    connection&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;start&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 JMS Session
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    Session session &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; connection&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createSession&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; Session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;AUTO_ACKNOWLEDGE&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    Queue queue &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createQueue&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;exampleQueue&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 创建 consumer
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    MessageConsumer consumer &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;createConsumer&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;queue&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#75715e&#34;&gt;// 接受 message
+&lt;/span&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&lt;/span&gt;    TextMessage message &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;TextMessage&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; consumer&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;receive&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;5000&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    System&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;out&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getText&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;finally&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;connection &lt;span style=&#34;color:#f92672&#34;&gt;!=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        connection&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;close&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://activemq.apache.org/components/artemis/documentation/latest/using-server.html&#34;&gt;Using the Server&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/activemq-artemis/tree/2.17.0/examples/features/broker-connection/amqp-receiving-messages&#34;&gt;AMQP Broker Connection with Receivers&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://github.com/apache/activemq-artemis/tree/2.17.0/examples/features/standard/queue&#34;&gt;JMS Queue Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.ibm.com/zh/depmodels/cloud/articles/cl-lo-activemq-artemis-and-qpid-to-apply-in-the-enterprise/&#34;&gt;深入了解 ActiveMQ Artemis 和 Qpid 以在企业中应用&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-artemis-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Servlet 中使用 Freemarker</title>
+        <link>https://notfound.cn/posts/java-servlet-freemarker-start/</link>
+        <pubDate>Sat, 27 Feb 2021 00:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-servlet-freemarker-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-servlet-freemarker-start/ -&lt;h2 id=&#34;servlet-使用-freemarker&#34;&gt;Servlet 使用 freemarker&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenJDK 11&lt;/li&gt;
+&lt;li&gt;Gradle&lt;/li&gt;
+&lt;li&gt;Freemarker&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;依赖&#34;&gt;依赖&lt;/h3&gt;
+&lt;p&gt;新建 &lt;code&gt;build.gradle&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;plugins &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    id &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;war&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    mavenCentral&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+dependencies &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    compileOnly group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;4.0.1&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.freemarker&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;freemarker&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;2.3.31&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;添加模板&#34;&gt;添加模板&lt;/h3&gt;
+&lt;p&gt;添加 &lt;code&gt;src/main/webapp/template/hello.ftlh&lt;/code&gt; ：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-ftlh&#34; data-lang=&#34;ftlh&#34;&gt;Hello, ${name}!
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;需要禁止直接访问 &lt;code&gt;.*ftlh&lt;/code&gt; 文件，可在 &lt;code&gt;web.xml&lt;/code&gt; 中配置。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新版本(2.3.24+)的 freemarker 文件后缀为 &lt;code&gt;.ftlh&lt;/code&gt; ：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;templates whose source name ends with &amp;ldquo;.ftlh&amp;rdquo; gets &amp;ldquo;HTML&amp;rdquo; output format, and those with &amp;ldquo;.ftlx&amp;rdquo; get &amp;ldquo;XML&amp;rdquo; output format.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;方法一-servlet-forward&#34;&gt;方法一：servlet forward&lt;/h3&gt;
+&lt;p&gt;可通过 servlet forward 使用模板，设置 HttpServletRequest 对象属性后，视图的获取 forward 给 FreemarkerServlet。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;新建文件 &lt;code&gt;src/main/webapp/WEB-INF/web.xml&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;web-app&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://xmlns.jcp.org/xml/ns/javaee&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;version=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;4.0&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;freemarker&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-class&amp;gt;&lt;/span&gt;freemarker.ext.servlet.FreemarkerServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-class&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;TemplatePath&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;/template&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-mapping&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;freemarker&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url-pattern&amp;gt;&lt;/span&gt;*.ftlh&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url-pattern&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-mapping&amp;gt;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;security-constraint&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;web-resource-collection&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;web-resource-name&amp;gt;&lt;/span&gt;FreeMarker MVC Views&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/web-resource-name&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url-pattern&amp;gt;&lt;/span&gt;*.ftlh&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url-pattern&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/web-resource-collection&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;auth-constraint&amp;gt;&lt;/span&gt;
+            &lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;!-- 禁止 Web 直接访问 .ftlh --&amp;gt;&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/auth-constraint&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/security-constraint&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/web-app&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;新建文件 &lt;code&gt;src/main/java/example/HelloServlet.java&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; example&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@WebServlet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;HelloServlet&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;extends&lt;/span&gt; HttpServlet &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;protected&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;doGet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;HttpServletRequest req&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; HttpServletResponse resp&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        String name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;name &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Java&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+        req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setAttribute&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getRequestDispatcher&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello.ftlh&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;forward&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;req&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; resp&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;方法二-手动读取模板&#34;&gt;方法二： 手动读取模板&lt;/h3&gt;
+&lt;p&gt;可以手动读取模板并使用，和非 Servlet 环境类似。&lt;/p&gt;
+&lt;p&gt;新建 &lt;code&gt;src/main/java/example/HelloServlet2.java&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; example&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@WebServlet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/hello2&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;HelloServlet2&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;extends&lt;/span&gt; HttpServlet &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; Configuration cfg&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;init&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        cfg &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Configuration&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Configuration&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;VERSION_2_3_31&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        cfg&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setServletContextForTemplateLoading&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;getServletContext&lt;span style=&#34;color:#f92672&#34;&gt;(),&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;template&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;protected&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;doGet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;HttpServletRequest req&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; HttpServletResponse resp&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        String name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;name &lt;span style=&#34;color:#f92672&#34;&gt;==&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;null&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Java&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+        HashMap&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; String&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt; model &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; HashMap&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+        model&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;put&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        Template template &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; cfg&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getTemplate&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;hello.ftlh&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            template&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;process&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;model&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; resp&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getWriter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;catch&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;TemplateException e&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throw&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; ServletException&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;e&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;模板根目录有多种设置方法，servlet 中可使用 &lt;code&gt;setServletContextForTemplateLoading&lt;/code&gt; 。&lt;/li&gt;
+&lt;li&gt;需要注意线程安全问题， &lt;code&gt;getTemplate&lt;/code&gt; 方法是线程安全的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.viralpatel.net/freemarker-servlet-tutorial-example/&#34;&gt;FreeMarker Servlet Tutorial with Example&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://blog.csdn.net/acmman/article/details/79248718&#34;&gt;freemarker 结合Servlet使用&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://freemarker.apache.org/docs/pgui%5Fconfig%5Foutputformatsautoesc.html&#34;&gt;Associating output formats with templates&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://freemarker.apache.org/docs/pgui%5Fmisc%5Fservlet.html&#34;&gt;Using FreeMarker with servlets&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://freemarker.apache.org/docs/pgui%5Fmisc%5Fmultithreading.html&#34;&gt;Multithreading&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://www.freemarker.net/&#34;&gt;FreeMarker 简介&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-servlet-freemarker-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Java Mail 发送邮件</title>
+        <link>https://notfound.cn/posts/java-mail-send-start/</link>
+        <pubDate>Wed, 24 Feb 2021 00:00:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-mail-send-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-mail-send-start/ -&lt;h2 id=&#34;java-mail-发送邮件&#34;&gt;Java Mail 发送邮件&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;OpenJDK 11&lt;/li&gt;
+&lt;li&gt;Tomcat9&lt;/li&gt;
+&lt;li&gt;Gradle&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;使用本地测试邮件服务器 &lt;a href=&#34;https://mailcatcher.me/&#34;&gt;mailcatcher&lt;/a&gt;&lt;/p&gt;
+&lt;h3 id=&#34;依赖&#34;&gt;依赖&lt;/h3&gt;
+&lt;p&gt;新建文件 &lt;code&gt;build.gradle&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;plugins &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    id &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;war&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    mavenCentral&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+dependencies &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    compileOnly group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;4.0.1&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.mail&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.mail-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;1.6.2&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;com.sun.mail&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.mail&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;1.6.2&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.activation&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.activation-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;1.2.0&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;com.sun.activation&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.activation&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;1.2.0&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;servlet&#34;&gt;Servlet&lt;/h3&gt;
+&lt;p&gt;新建文件 &lt;code&gt;src/main/java/MailServlet.java&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;@MultipartConfig&lt;/span&gt;
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@WebServlet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;
+        urlPatterns &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/mail.do&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;},&lt;/span&gt;
+        initParams &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+                &lt;span style=&#34;color:#a6e22e&#34;&gt;@WebInitParam&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mailHost&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; value &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;127.0.0.1&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;),&lt;/span&gt;
+                &lt;span style=&#34;color:#a6e22e&#34;&gt;@WebInitParam&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;name &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mailPort&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; value &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;1025&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;MailServlet2&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;extends&lt;/span&gt; HttpServlet &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; Properties props&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;init&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        String mailHost &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getServletConfig&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getInitParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mailHost&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String mailPort &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getServletConfig&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getInitParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mailPort&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        props &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Properties&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        props&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;put&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mail.smtp.host&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; mailHost&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        props&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setProperty&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mail.smtp.port&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; mailPort&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;protected&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;doPost&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;HttpServletRequest req&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; HttpServletResponse resp&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setCharacterEncoding&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;StandardCharsets&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;UTF_8&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+        resp&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setContentType&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text/html;charset=UTF-8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        String from &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;from&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String to &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;to&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String subject &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;subject&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String text &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getParameter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        Part part &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; req&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getPart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            Message message &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getMessage&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;from&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; to&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; subject&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; text&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; part&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+            Transport&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;send&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;message&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+            resp&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getWriter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;println&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;邮件发送成功&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;catch&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;MessagingException e&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            e&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;printStackTrace&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; Message &lt;span style=&#34;color:#a6e22e&#34;&gt;getMessage&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String from&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; String to&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; String subject&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; String text&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; Part part&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+            &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; MessagingException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        Session session &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; Session&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getDefaultInstance&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;props&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        Message message &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; MimeMessage&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;session&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setFrom&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; InternetAddress&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;from&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setRecipient&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;RecipientType&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;TO&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; InternetAddress&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;to&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setSubject&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;subject&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setSentDate&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Date&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+
+        Multipart multipart &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; MimeMultipart&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+        MimeBodyPart htmlPart &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; MimeBodyPart&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        htmlPart&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setContent&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;text&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text/html;charset=UTF-8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        multipart&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addBodyPart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;htmlPart&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        String filename &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; getFilename&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;part&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;if&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(!&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;equals&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;))&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            ByteArrayDataSource ds &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; ByteArrayDataSource&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;part&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getInputStream&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(),&lt;/span&gt; part&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getContentType&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;());&lt;/span&gt;
+            MimeBodyPart filePart &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; MimeBodyPart&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+            filePart&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setDataHandler&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; DataHandler&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;ds&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+            filePart&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setFileName&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;MimeUtility&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;encodeText&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;filename&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;UTF-8&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;B&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+            multipart&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addBodyPart&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;filePart&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+        message&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setContent&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;multipart&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; message&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;private&lt;/span&gt; String &lt;span style=&#34;color:#a6e22e&#34;&gt;getFilename&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;Part part&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        String header &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; part&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getHeader&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Content-Disposition&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String filename &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; header&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;substring&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;header&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;indexOf&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;filename=\&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;+&lt;/span&gt; 10&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt;
+                header&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;lastIndexOf&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;\&amp;#34;&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;return&lt;/span&gt; filename&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;表单&#34;&gt;表单&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-html&#34; data-lang=&#34;html&#34;&gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;form&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;action&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;mail.do&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;method&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;post&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;enctype&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;multipart/form-data&amp;#34;&lt;/span&gt;&amp;gt;
+  &amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;submit&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;发送&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;send&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;br&lt;/span&gt;&amp;gt;
+  发信人：&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;from&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;br&lt;/span&gt;&amp;gt;
+  收信人：&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;to&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;br&lt;/span&gt;&amp;gt;
+  主  题：&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;subject&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;br&lt;/span&gt;&amp;gt;
+  附  件：&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;input&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;type&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;file&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;value&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;br&lt;/span&gt;&amp;gt;
+  &amp;lt;&lt;span style=&#34;color:#f92672&#34;&gt;textarea&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;text&amp;#34;&lt;/span&gt;&amp;gt;&amp;lt;/&lt;span style=&#34;color:#f92672&#34;&gt;textarea&lt;/span&gt;&amp;gt;
+&amp;lt;/&lt;span style=&#34;color:#f92672&#34;&gt;form&lt;/span&gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.tutorialspoint.com/javamail%5Fapi/javamail%5Fapi%5Fsend%5Finlineimage%5Fin%5Femail.htm&#34;&gt;JavaMail API - Sending Emails&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;《JSP &amp;amp; Servlet 学习笔记(第2版)》&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-mail-send-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>JGit HTTP Server 使用</title>
+        <link>https://notfound.cn/posts/java-jgit-http-server-start/</link>
+        <pubDate>Sun, 21 Feb 2021 18:11:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-jgit-http-server-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-jgit-http-server-start/ -&lt;ul&gt;
+&lt;li&gt;Gradle&lt;/li&gt;
+&lt;li&gt;Tomcat&lt;/li&gt;
+&lt;li&gt;JGit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;jgit-http-server-使用&#34;&gt;JGit HTTP Server 使用&lt;/h2&gt;
+&lt;p&gt;使用 JGit 实现 git HTTP server。&lt;/p&gt;
+&lt;h3 id=&#34;实现&#34;&gt;实现&lt;/h3&gt;
+&lt;h4 id=&#34;依赖&#34;&gt;依赖&lt;/h4&gt;
+&lt;p&gt;新建文件 &lt;code&gt;build.gradle&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;plugins &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    id &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;war&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    mavenCentral&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+dependencies &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    compileOnly group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;4.0.1&amp;#39;&lt;/span&gt;
+    implementation group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.eclipse.jgit&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.eclipse.jgit.http.server&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;5.10.0.202012080955-r&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;配置&#34;&gt;配置&lt;/h4&gt;
+&lt;p&gt;新建文件 &lt;code&gt;src/main/webapp/WEB-INF/web.xml&lt;/code&gt; ：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;web-app&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://xmlns.jcp.org/xml/ns/javaee&amp;#34;&lt;/span&gt;
+         &lt;span style=&#34;color:#a6e22e&#34;&gt;xmlns:xsi=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://www.w3.org/2001/XMLSchema-instance&amp;#34;&lt;/span&gt;
+         &lt;span style=&#34;color:#a6e22e&#34;&gt;xsi:schemaLocation=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;http://xmlns.jcp.org/xml/ns/javaee
+&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd&amp;#34;&lt;/span&gt;
+         &lt;span style=&#34;color:#a6e22e&#34;&gt;version=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;4.0&amp;#34;&lt;/span&gt;
+         &lt;span style=&#34;color:#a6e22e&#34;&gt;metadata-complete=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;display-name&amp;gt;&lt;/span&gt;JGit HTTP Server&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/display-name&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;description&amp;gt;&lt;/span&gt;Welcome to JGit HTTP Server&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/description&amp;gt;&lt;/span&gt;
+
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;GitServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-class&amp;gt;&lt;/span&gt;org.eclipse.jgit.http.server.GitServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-class&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;base-path&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;/srv/git-data&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;init-param&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-name&amp;gt;&lt;/span&gt;export-all&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-name&amp;gt;&lt;/span&gt;
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;param-value&amp;gt;&lt;/span&gt;0&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/param-value&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/init-param&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-mapping&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;servlet-name&amp;gt;&lt;/span&gt;GitServlet&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-name&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;url-pattern&amp;gt;&lt;/span&gt;/git/*&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/url-pattern&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/servlet-mapping&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/web-app&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;base-path&lt;/code&gt; 仓库根目录。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;export-all&lt;/code&gt; 是否可导出&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;仓库&#34;&gt;仓库&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;创建仓库目录：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;mkdir -p /srv/git-data
+cd /srv/git-data
+git init --bare exampl.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;设置仓库为可导出，不需要鉴权：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;touch example.git/git-daemon-export-ok
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可以拉取，但无法推送：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;git clone http://localhost:8080/xxx/git/example.git
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;工作过程&#34;&gt;工作过程&lt;/h3&gt;
+&lt;h4 id=&#34;upload-pack-过程&#34;&gt;upload-pack 过程&lt;/h4&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;https://notfound.cn/ox-hugo/jgit-http-server-filter.svg&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h4 id=&#34;receive-pack-过程&#34;&gt;receive-pack 过程&lt;/h4&gt;
+&lt;p&gt;与 upload-pack 相似，将其中关键字 &lt;code&gt;UploadPack&lt;/code&gt; 替换为 &lt;code&gt;ReceivePack&lt;/code&gt; 。&lt;/p&gt;
+&lt;h3 id=&#34;自定义访问控制&#34;&gt;自定义访问控制&lt;/h3&gt;
+&lt;h4 id=&#34;实现-repositoryresolver-接口&#34;&gt;实现 RepositoryResolver 接口&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;参照 &lt;code&gt;FileResolver&lt;/code&gt; 实现 &lt;code&gt;RepositoryResolver&lt;/code&gt; ，默认实现查看 web.xml &lt;code&gt;export-all&lt;/code&gt; 配置或者 .git 仓库目录下是否存在 &lt;code&gt;git-daemon-export-ok&lt;/code&gt; 文件；&lt;/li&gt;
+&lt;li&gt;继承 &lt;code&gt;GitServlet&lt;/code&gt; 并通过 &lt;code&gt;setRepositoryResolver&lt;/code&gt; 替换掉 &lt;code&gt;resolver&lt;/code&gt; ；&lt;/li&gt;
+&lt;li&gt;需要自定义 &lt;code&gt;Filter&lt;/code&gt; 修改 &lt;code&gt;HttpServletResponse&lt;/code&gt; ，在需要认证时 JGit 返回 401，但未添加 &lt;code&gt;WWW-Authenticate&lt;/code&gt; 头部，导致输入密码也无效。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可控制仓库的访问，但无法直接区读、写操作。&lt;/p&gt;
+&lt;h4 id=&#34;实现-uploadpackfactory-接口&#34;&gt;实现 UploadPackFactory 接口&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;参考 &lt;code&gt;DefaultUploadPackFactory&lt;/code&gt; 实现 &lt;code&gt;UploadPackFactory&lt;/code&gt; 接口，默认可拉取；&lt;/li&gt;
+&lt;li&gt;继承 &lt;code&gt;GitServlet&lt;/code&gt; 并通过 &lt;code&gt;setUploadPackFactory&lt;/code&gt; 替换掉 &lt;code&gt;uploadPackFactory&lt;/code&gt; ；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可对仓库进行读权限控制。&lt;/p&gt;
+&lt;h4 id=&#34;实现-receivepackfactory-接口&#34;&gt;实现 ReceivePackFactory 接口&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;参考 &lt;code&gt;DefaultReceivePackFactory&lt;/code&gt; 实现 &lt;code&gt;ReceivePackFactory&lt;/code&gt; 接口，默认不可推送；&lt;/li&gt;
+&lt;li&gt;继承 &lt;code&gt;GitServlet&lt;/code&gt; 并通过 &lt;code&gt;setReceivePackFactory&lt;/code&gt; 替换掉 &lt;code&gt;receivePackFactory&lt;/code&gt; 。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;可对仓库进行写权限控制。&lt;/p&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://download.eclipse.org/jgit/site/5.10.0.202012080955-r/apidocs/index.html&#34;&gt;Class GitServlet&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-jgit-http-server-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Tomcat embed 使用</title>
+        <link>https://notfound.cn/posts/java-tomcat-embed-start/</link>
+        <pubDate>Tue, 16 Feb 2021 17:41:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-tomcat-embed-start/</guid>
+        <description>NotFound https://notfound.cn/posts/java-tomcat-embed-start/ -&lt;h2 id=&#34;tomcat-embed-使用&#34;&gt;Tomcat embed 使用&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;gradle&lt;/li&gt;
+&lt;li&gt;tomcat9&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;仅为了方便 IDEA 调试，用于开发环境&lt;/p&gt;
+&lt;h3 id=&#34;修改-build-dot-gradle&#34;&gt;修改 &lt;code&gt;build.gradle&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-groovy&#34; data-lang=&#34;groovy&#34;&gt;plugins &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    id &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;war&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+repositories &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    mavenCentral&lt;span style=&#34;color:#f92672&#34;&gt;()&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+dependencies &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    providedCompile group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.apache.tomcat.embed&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tomcat-embed-core&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;9.0.43&amp;#39;&lt;/span&gt;
+    providedCompile group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;org.apache.tomcat.embed&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;tomcat-embed-jasper&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;9.0.43&amp;#39;&lt;/span&gt;
+    providedCompile group: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; name: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;javax.servlet-api&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; version: &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;4.0.1&amp;#39;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+war &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    rootSpec&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;exclude&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;example/Main.class&amp;#39;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;添加-src-main-java-example-helloservlet-dot-java&#34;&gt;添加 &lt;code&gt;src/main/java/example/HelloServlet.java&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; example&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.servlet.ServletException&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.servlet.annotation.WebServlet&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.servlet.http.HttpServlet&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.servlet.http.HttpServletRequest&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; javax.servlet.http.HttpServletResponse&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.io.IOException&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.io.PrintWriter&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#a6e22e&#34;&gt;@WebServlet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/hello&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt;
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;HelloServlet&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;extends&lt;/span&gt; HttpServlet &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#a6e22e&#34;&gt;@Override&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;protected&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;doGet&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;HttpServletRequest req&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; HttpServletResponse resp&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;throws&lt;/span&gt; ServletException&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; IOException &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        PrintWriter out &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; resp&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getWriter&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        out&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;write&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;Hello World&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        out&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;close&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;添加-src-main-java-example-main-dot-java&#34;&gt;添加 &lt;code&gt;src/main/java/example/Main.java&lt;/code&gt;&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;package&lt;/span&gt; example&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.Context&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.LifecycleException&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.WebResourceRoot&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.startup.Tomcat&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.webresources.DirResourceSet&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; org.apache.catalina.webresources.StandardRoot&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#f92672&#34;&gt;import&lt;/span&gt; java.io.File&lt;span style=&#34;color:#f92672&#34;&gt;;&lt;/span&gt;
+
+&lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;Main&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+    &lt;span style=&#34;color:#66d9ef&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;main&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;String&lt;span style=&#34;color:#f92672&#34;&gt;[]&lt;/span&gt; args&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+        Tomcat tomcat &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; Tomcat&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        tomcat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setPort&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;8081&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        tomcat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getConnector&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+
+        String webappBase &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; File&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;src/main/webapp/&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getAbsolutePath&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        Context context &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; tomcat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addWebapp&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; webappBase&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        String classesBase &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; File&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;build/classes/java/main/&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;).&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getAbsolutePath&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        WebResourceRoot resources &lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; StandardRoot&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;context&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+        resources&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;addPreResources&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#66d9ef&#34;&gt;new&lt;/span&gt; DirResourceSet&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;resources&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt;
+                                                     &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/WEB-INF/classes&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; classesBase&lt;span style=&#34;color:#f92672&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;/&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;));&lt;/span&gt;
+        context&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;setResources&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;resources&lt;span style=&#34;color:#f92672&#34;&gt;);&lt;/span&gt;
+
+        &lt;span style=&#34;color:#66d9ef&#34;&gt;try&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            tomcat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;start&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt; &lt;span style=&#34;color:#66d9ef&#34;&gt;catch&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;(&lt;/span&gt;LifecycleException e&lt;span style=&#34;color:#f92672&#34;&gt;)&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;{&lt;/span&gt;
+            e&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;printStackTrace&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+        &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+
+        tomcat&lt;span style=&#34;color:#f92672&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;getServer&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;().&lt;/span&gt;&lt;span style=&#34;color:#a6e22e&#34;&gt;await&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;();&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;主要是构建一个 war 类似的目录结构。可先编译成 war 包，再根据 war 目录结构调整代码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://devcenter.heroku.com/articles/create-a-java-web-application-using-embedded-tomcat&#34;&gt;Create a Java Web Application Using Embedded Tomcat&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/java-tomcat-embed-start/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>HTTP 认证过程</title>
+        <link>https://notfound.cn/posts/http-authentication/</link>
+        <pubDate>Tue, 16 Feb 2021 16:28:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/http-authentication/</guid>
+        <description>NotFound https://notfound.cn/posts/http-authentication/ -&lt;h2 id=&#34;http-认证过程&#34;&gt;HTTP 认证过程&lt;/h2&gt;
+&lt;p&gt;访问 Tomcat 管理页 &lt;a href=&#34;http://localhost:8080/manager/html&#34;&gt;http://localhost:8080/manager/html&lt;/a&gt; 时，大致过程如下：&lt;/p&gt;
+&lt;figure&gt;
+    &lt;img src=&#34;https://notfound.cn/ox-hugo/http-auth.svg&#34;/&gt; 
+&lt;/figure&gt;
+
+&lt;h3 id=&#34;密码编码问题&#34;&gt;密码编码问题&lt;/h3&gt;
+&lt;p&gt;主流浏览器基本都是使用 &lt;code&gt;UTF-8&lt;/code&gt;&lt;/p&gt;
+&lt;h3 id=&#34;特殊符号问题冒号&#34;&gt;特殊符号问题冒号&lt;/h3&gt;
+&lt;p&gt;用户名中不能包含冒号 &lt;code&gt;:&lt;/code&gt;&lt;/p&gt;
+&lt;h3 id=&#34;参考&#34;&gt;参考&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/WWW-Authenticate&#34;&gt;WWW-Authenticate&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Authorization&#34;&gt;Authorization&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Authentication&#34;&gt;HTTP 身份验证&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://stackoverflow.com/questions/11612854/http-https-basic-authentication-colon-in-username&#34;&gt;HTTP/HTTPS basic authentication: colon in username&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+- https://notfound.cn/posts/http-authentication/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+    
+        <item>
+        <title>Linux 安装配置 Tomcat 9</title>
+        <link>https://notfound.cn/posts/java-tomcat-install/</link>
+        <pubDate>Tue, 16 Feb 2021 15:22:00 +0800</pubDate>
+        
+        <guid>https://notfound.cn/posts/java-tomcat-install/</guid>
+        <description>NotFound https://notfound.cn/posts/java-tomcat-install/ -&lt;h2 id=&#34;linux-安装配置-tomcat-9&#34;&gt;Linux 安装配置 Tomcat 9&lt;/h2&gt;
+&lt;h3 id=&#34;manjaro-linux&#34;&gt;Manjaro Linux&lt;/h3&gt;
+&lt;h4 id=&#34;安装-tomcat9-tomcat-native&#34;&gt;安装 tomcat9 tomcat-native&lt;/h4&gt;
+&lt;p&gt;执行 pacman 直接安装：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;sudo pacman -S tomcat9 tomcat-native
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;通过-systemd-控制-tomcat&#34;&gt;通过 systemd 控制 Tomcat&lt;/h4&gt;
+&lt;p&gt;systemctl 可启动、重启、停止、查看日志：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 启动 tomcat9&lt;/span&gt;
+sudo systemctl start tomcat9.service
+&lt;span style=&#34;color:#75715e&#34;&gt;# 停止 tomcat9&lt;/span&gt;
+sudo systemctl stop tomcat9.service
+&lt;span style=&#34;color:#75715e&#34;&gt;# 重启 tomcat9&lt;/span&gt;
+sudo systemctl restart tomcat9.service
+&lt;span style=&#34;color:#75715e&#34;&gt;# 开机启动 tomcat9&lt;/span&gt;
+sudo systemctl enable tomcat9.service
+&lt;span style=&#34;color:#75715e&#34;&gt;# 查看 tomcat9 启动状态&lt;/span&gt;
+systemctl status tomcat9.service
+&lt;span style=&#34;color:#75715e&#34;&gt;# 查看日志&lt;/span&gt;
+journalctl -f --unit&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;tomcat9.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;访问 &lt;a href=&#34;http://localhost:8080/&#34;&gt;http://localhost:8080/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;查看环境变量&#34;&gt;查看环境变量&lt;/h4&gt;
+&lt;p&gt;&lt;code&gt;export&lt;/code&gt; 环境变量，方便操作：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# 查看环境变量&lt;/span&gt;
+systemctl show tomcat9.service | grep Environment
+export CATALINA_HOME&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/usr/share/tomcat9
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h4 id=&#34;页面查看-tomcat-运行状态&#34;&gt;页面查看 Tomcat 运行状态&lt;/h4&gt;
+&lt;p&gt;修改 &lt;code&gt;$CATALINA_HOME/conf/tomcat-users.xml&lt;/code&gt; ，在 &lt;code&gt;tomcat-users&lt;/code&gt; 标签之间添加：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;user&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;username=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;tomcat&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;password=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;YOUR_PASSWORD&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;roles=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;manager-gui&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;访问 &lt;a href=&#34;http://localhost:8080/manager/status&#34;&gt;http://localhost:8080/manager/status&lt;/a&gt; ，输入用户名和密码后，可查看 Tomcat 状态。&lt;/p&gt;
+&lt;h4 id=&#34;war-部署&#34;&gt;War 部署&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;将 war 放置到 &lt;code&gt;$CATALINA_HOME/webapps/&lt;/code&gt; ，文件会自动解压，访问路径会有文件名前缀。如 &lt;code&gt;app.war&lt;/code&gt; 访问 URL 为 &lt;a href=&#34;http://localhost:8080/app&#34;&gt;http://localhost:8080/app&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;ROOT.war&lt;/code&gt; ，URL 路径会从根开始，不带任何前缀&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;绑定新端口-8081&#34;&gt;绑定新端口 8081&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;编辑 &lt;code&gt;$CATALINA_HOME/conf/server.xml&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-xml&#34; data-lang=&#34;xml&#34;&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;Service&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;App&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;Connector&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;port=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;8081&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;protocol=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;HTTP/1.1&amp;#34;&lt;/span&gt;
+             &lt;span style=&#34;color:#a6e22e&#34;&gt;connectionTimeout=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;20000&amp;#34;&lt;/span&gt;
+             &lt;span style=&#34;color:#a6e22e&#34;&gt;redirectPort=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;8443&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;Engine&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;App&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;defaultHost=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;localhost&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;Host&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;name=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;localhost&amp;#34;&lt;/span&gt;  &lt;span style=&#34;color:#a6e22e&#34;&gt;appBase=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;app&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;unpackWARs=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;autoDeploy=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;true&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#f92672&#34;&gt;&amp;gt;&lt;/span&gt;
+
+      &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;Valve&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;className=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;org.apache.catalina.valves.AccessLogValve&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;directory=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;logs&amp;#34;&lt;/span&gt;
+             &lt;span style=&#34;color:#a6e22e&#34;&gt;prefix=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;app_access_log&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#a6e22e&#34;&gt;suffix=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;.txt&amp;#34;&lt;/span&gt;
+             &lt;span style=&#34;color:#a6e22e&#34;&gt;pattern=&lt;/span&gt;&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#34;%h %l %u %t &amp;amp;quot;%r&amp;amp;quot; %s %b&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#f92672&#34;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/Host&amp;gt;&lt;/span&gt;
+  &lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/Engine&amp;gt;&lt;/span&gt;
+&lt;span style=&#34;color:#f92672&#34;&gt;&amp;lt;/Service&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;创建目录并修改权限&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;color:#75715e&#34;&gt;# webapps 为软链， 可查看软链指向的目录，在 Manjaro 上为 /var/lib/tomcat9/webapps&lt;/span&gt;
+readlink $CATALINA_HOME/webapps
+&lt;span style=&#34;color:#75715e&#34;&gt;# 创建目录&lt;/span&gt;
+sudo mkdir /var/lib/tomcat9/app
+&lt;span style=&#34;color:#75715e&#34;&gt;# 修改权限&lt;/span&gt;
+sudo chown tomcat9:tomcat9 /var/lib/tomcat9/app
+&lt;span style=&#34;color:#75715e&#34;&gt;# 创建软链&lt;/span&gt;
+sudo ln -s /var/lib/tomcat9/app $CATALINA_HOME/app
+&lt;span style=&#34;color:#75715e&#34;&gt;# 设置根路径 war&lt;/span&gt;
+sudo cp app.war /var/lib/tomcat9/app/ROOT.war
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;手动下载安装&#34;&gt;手动下载安装&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;wget https://mirrors.bfsu.edu.cn/apache/tomcat/tomcat-9/v9.0.43/bin/apache-tomcat-9.0.43.tar.gz
+tar -zxvf apache-tomcat-9.0.43.tar.gz
+sudo mv apache-tomcat-9.0.43 /opt/tomcat
+export CATALINA_HOME&lt;span style=&#34;color:#f92672&#34;&gt;=&lt;/span&gt;/opt/tomcat
+&lt;span style=&#34;color:#75715e&#34;&gt;# 启动&lt;/span&gt;
+$CATALINA_HOME/bin/startup.sh
+&lt;span style=&#34;color:#75715e&#34;&gt;# 停止&lt;/span&gt;
+$CATALINA_HOME/bin/shutdown.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;- https://notfound.cn/posts/java-tomcat-install/ - &lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</description>
+        </item>
+    
+    
+  </channel>
+</rss> 

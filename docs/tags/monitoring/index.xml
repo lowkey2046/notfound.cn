@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>monitoring on NotFound</title>
+    <link>https://notfound.cn/tags/monitoring/</link>
+    <description>Recent content in monitoring on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Mon, 18 May 2020 20:20:37 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/monitoring/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>监控 socket 连接数</title>
+      <link>https://notfound.cn/posts/monitoring-socket/</link>
+      <pubDate>Mon, 18 May 2020 20:20:37 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-socket/</guid>
+      <description>系统环境 Ubuntu 18.04  通过 gem raindrops 可以获取连接数量，包括正在建立的连接数和已完成的连接数。
+连接数 包括两种连接: UNIX domain socket 和 TCP socket。
+UNIX domain socket 用法 require &amp;#39;raindrops&amp;#39; paths = [&amp;#39;/run/containerd/containerd.sock&amp;#39;] Raindrops::Linux.unix_listener_stats(paths) # {&amp;#34;/run/containerd/containerd.sock&amp;#34;=&amp;gt;#&amp;lt;struct Raindrops::ListenStats active=2, queued=0&amp;gt;} active=2, queued=0
+原理 UNIX domain sockets 连接信息保存在 /proc/net/unix 中，需要解析该文件。
+如：
+$ cat /proc/net/unix | grep &amp;#34;containerd.sock&amp;#34; Num RefCount Protocol Flags Type St Inode Path 0000000000000000: 00000002 00000000 00010000 0001 01 26912 /run/containerd/containerd.sock 0000000000000000: 00000003 00000000 00000000 0001 03 31496 /run/containerd/containerd.</description>
+    </item>
+    
+    <item>
+      <title>监控 Ruby 进程</title>
+      <link>https://notfound.cn/posts/monitoring-process-ruby/</link>
+      <pubDate>Thu, 14 May 2020 20:12:27 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-process-ruby/</guid>
+      <description>系统环境 Ubuntu 18.04  指标   当前进程占用的内存：
+cat /proc/self/status | grep VmRSS VmRSS: 740 kB match = File.read(&amp;#39;/proc/self/status&amp;#39;).match(/VmRSS:\s+(\d+)/) match &amp;amp;&amp;amp; match[1].to_f * 1024   当前进程打开的文件描述符总数：
+ls /proc/self/fd | wc -l Dir.glob(&amp;#39;/proc/self/fd/*&amp;#39;).length   当前进程可打开的最大文件描述符数量：
+cat /proc/self/limits | grep &amp;#34;Max open files&amp;#34; match = File.read(&amp;#39;/proc/self/limits&amp;#39;).match(/Max open files\s*(\d+)/) match &amp;amp;&amp;amp; match[1]   进程 CPU 时钟：
+Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID, :float_second)   墙上时钟，受系统时间影响，调整系统时间时会发生变化：
+Process.clock_gettime(Process::CLOCK_REALTIME, :float_second)   系统启动时一直计数，不会受到系统时间的影响：
+Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)   线程 CPU 时钟：</description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 安装 Grafana</title>
+      <link>https://notfound.cn/posts/monitoring-grafana/</link>
+      <pubDate>Thu, 14 May 2020 18:39:26 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-grafana/</guid>
+      <description> 系统环境 Ubuntu 18.04  安装 下载 https://prometheus.io/download/
+# 下载 wget https://dl.grafana.com/oss/release/grafana-6.7.3.linux-amd64.tar.gz # 解压 tar -zxvf grafana-6.7.3.linux-amd64.tar.gz # 启动 ./bin/grafana-server web 访问 http://localhost:9090 ，用户名: admin，密码: admin。
+配置  添加数据源 Prometheus 添加 Dashboard  忘记密码 grafana-cli admin reset-admin-password &amp;lt;new password&amp;gt; 参考  Install on Debian or Ubuntu  </description>
+    </item>
+    
+    <item>
+      <title>Ubuntu 搭建 Prometheus</title>
+      <link>https://notfound.cn/posts/monitoring-prometheus/</link>
+      <pubDate>Thu, 14 May 2020 18:38:20 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-prometheus/</guid>
+      <description>系统环境 Ubuntu 18.04  安装 下载 https://prometheus.io/download/
+# 下载 wget https://github.com/prometheus/prometheus/releases/download/v2.18.1/prometheus-2.18.1.linux-amd64.tar.gz # 解压　 tar -zxvf prometheus-2.18.1.linux-amd64.tar.gz # 启动 ./prometheus --config.file=prometheus.yml 访问 http://localhost:9090 即可。
+目录结构如下：
+.... ├── data # 数据目录 ├── prometheus # 执行文件 ├── prometheus.yml # 配置文件 ├── promtool # 工具（没用过 ... 配置 global: scrape_interval: 15s # 收集数据的时间间隔 scrape_configs: - job_name: &amp;#39;prometheus&amp;#39; # 作业名称 # metrics_path defaults to &amp;#39;/metrics&amp;#39; # scheme defaults to &amp;#39;http&amp;#39;. static_configs: - targets: [&amp;#39;localhost:9090&amp;#39;] Metric 类型 Counter 累加 metric。累加，如 prometheus_http_requests_total。</description>
+    </item>
+    
+  </channel>
+</rss>

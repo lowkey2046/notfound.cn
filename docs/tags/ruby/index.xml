@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ruby on NotFound</title>
+    <link>https://notfound.cn/tags/ruby/</link>
+    <description>Recent content in ruby on NotFound</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <copyright>&lt;a href=&#34;http://www.beian.miit.gov.cn&#34;&gt;粤ICP备17092723号&lt;/a&gt;
+</copyright>
+    <lastBuildDate>Thu, 13 May 2021 21:00:00 +0800</lastBuildDate><atom:link href="https://notfound.cn/tags/ruby/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Ruby Process.spawn 缓冲区满导致阻塞</title>
+      <link>https://notfound.cn/posts/ruby-process-spawn/</link>
+      <pubDate>Thu, 13 May 2021 21:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-process-spawn/</guid>
+      <description>Ruby Process.spawn 缓冲区满导致阻塞 Ruby Process.spawn 阻塞 Ruby 中使用 Process.spawn 和 pipe 时，pipe 缓冲区为 64 KB，如果不及时读取数据，将会发生阻塞。
+# 未超出缓冲区容量 # cmd = &amp;#34;bash -c &amp;#39;for i in {1..6500}; do echo &amp;#39;123456789&amp;#39;; done&amp;#39;&amp;#34; # 超出缓冲区容量 cmd = &amp;#34;bash -c &amp;#39;for i in {1..6600}; do echo &amp;#39;123456789&amp;#39;; done&amp;#39;&amp;#34; out_r, out_w = IO.pipe cmd_pid = Process.spawn(cmd, :out =&amp;gt; out_w, :err =&amp;gt; out_w) out_w.close Process.wait(cmd_pid) exitstatus = $?.exitstatus out = out_r.read puts &amp;#34;child: cmd out length = #{out.</description>
+    </item>
+    
+    <item>
+      <title>Linux 编译安装 Ruby</title>
+      <link>https://notfound.cn/posts/ruby-compile/</link>
+      <pubDate>Thu, 18 Mar 2021 20:00:00 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-compile/</guid>
+      <description>Linux 编译安装 Ruby  Ubuntu 20.04 Ruby 3.0.0  直接编译安装 wget http://cache.ruby-china.com/pub/ruby/3.0/ruby-3.0.0.tar.gz tar -zxvf ruby-3.0.0.tar.gz cd ruby-3.0.0 ./configure --prefix=/opt/ruby-3.0.0 make -j8 make install 集成 jemalloc jemalloc 可以大幅度减少 sidekiq 内存碎片。
+sudo apt install libjemalloc-dev 编译方式 编译时添加 --with-jemalloc 参数即可：
+./configure --prefix=/opt/ruby-3.0.0 --with-jemalloc 检查 jemalloc:
+/opt/ruby-3.0.0/bin/ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;MAINLIBS&amp;#39;]&amp;#34; # 低版本 # ruby -r rbconfig -e &amp;#34;puts RbConfig::CONFIG[&amp;#39;LIBS&amp;#39;]&amp;#34; 输出：
+-lz -lpthread - lrt -lrt -ljemalloc -lgmp -ldl -lcrypt -lm 环境变量方式 设置环境变量 LD_PRELOAD 即可</description>
+    </item>
+    
+    <item>
+      <title>Ruby Rack</title>
+      <link>https://notfound.cn/posts/ruby-rack/</link>
+      <pubDate>Thu, 21 May 2020 20:24:53 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-rack/</guid>
+      <description>模块化的 Ruby Web 服务接口
+rackup 创建 config.ru，添加：
+# config.ru run lambda {|env| [200, {&amp;#39;Content-Type&amp;#39; =&amp;gt; &amp;#39;text/plain&amp;#39;}, [&amp;#39;OK&amp;#39;] ]} 执行 rackup，启动 HTTP 服务器。
+过程 rackup 文件内容如下：
+#!/usr/bin/env ruby # frozen_string_literal: true require &amp;#34;rack&amp;#34; Rack::Server.start  Rack::Server#options  Rack::Server#default_options 这里决定了查找的默认文件名 options[:config]= &#39;config.ru&#39;   Rack::Server#start  Rack::Server#server 尝试 require puma thin falcon webrick 中的一个服务，假设为 webrick，则返回 Rack::Handler::WEBrick 类  Rack::Server#wrapped_app 解析 config.ru 获取 wrapped_app  Rack::Server#app  Rack::Server#build_app_and_options_from_config  Rack::Builder.parse_file Rack::Builder.load_file Rack::Builder.new_from_string 在 Rack::Builder 类上下文中执行 config.</description>
+    </item>
+    
+    <item>
+      <title>Webrick 工作过程</title>
+      <link>https://notfound.cn/posts/ruby-webrick/</link>
+      <pubDate>Tue, 19 May 2020 20:23:43 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/ruby-webrick/</guid>
+      <description>Webrick 是用 Ruby 语言实现的 HTTP 服务。
+运行过程 创建监听 socket require &amp;#39;webrick&amp;#39; server = WEBrick::HTTPServer.new :Port =&amp;gt; 8000 trap &amp;#39;INT&amp;#39; do server.shutdown end # SIGINT  创建监听套接字，创建 mount table。mount table 将路由和 servlet 关联在一起 注册 SIGINT 信号处理函数，接收到该信号时停止服务。CTRL + C 可产生该信号  挂载 proc server.mount_proc &amp;#39;/&amp;#39; do |req, res| res.body = &amp;#34;object_id: #{object_id}\n&amp;#34; end  mount 的路由为 / 实际 mount 的 servlet 是一个 HTTPServlet::ProcHandler 实例，该实例包裹了 proc 这里不同请求使用同一个实例， 由 HTTPServlet::ProcHandler#get_instance 决定 mount table 路由为 key，servlet 为 value 这里的 object_id 是哪个实例的？ 可处理 GET 和 POST 请求  挂载 class class Simple &amp;lt; WEBrick::HTTPServlet::AbstractServlet def do_GET(request, response) status, content_type, body = do_stuff_with(request) response.</description>
+    </item>
+    
+    <item>
+      <title>监控 socket 连接数</title>
+      <link>https://notfound.cn/posts/monitoring-socket/</link>
+      <pubDate>Mon, 18 May 2020 20:20:37 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-socket/</guid>
+      <description>系统环境 Ubuntu 18.04  通过 gem raindrops 可以获取连接数量，包括正在建立的连接数和已完成的连接数。
+连接数 包括两种连接: UNIX domain socket 和 TCP socket。
+UNIX domain socket 用法 require &amp;#39;raindrops&amp;#39; paths = [&amp;#39;/run/containerd/containerd.sock&amp;#39;] Raindrops::Linux.unix_listener_stats(paths) # {&amp;#34;/run/containerd/containerd.sock&amp;#34;=&amp;gt;#&amp;lt;struct Raindrops::ListenStats active=2, queued=0&amp;gt;} active=2, queued=0
+原理 UNIX domain sockets 连接信息保存在 /proc/net/unix 中，需要解析该文件。
+如：
+$ cat /proc/net/unix | grep &amp;#34;containerd.sock&amp;#34; Num RefCount Protocol Flags Type St Inode Path 0000000000000000: 00000002 00000000 00010000 0001 01 26912 /run/containerd/containerd.sock 0000000000000000: 00000003 00000000 00000000 0001 03 31496 /run/containerd/containerd.</description>
+    </item>
+    
+    <item>
+      <title>Unicorn 启动、重启和终止</title>
+      <link>https://notfound.cn/posts/unicorn-progress/</link>
+      <pubDate>Fri, 15 May 2020 20:43:44 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/unicorn-progress/</guid>
+      <description>起因，需要在 unicorn master 上开启一个线程定时收集 Ruby 进程运行数据。
+Unicorn 生命周期中设置了多个回调： after_fork、before_fork、before_exec、after_worker_exit 和 after_worker_ready，需要在合适的时间点创建线程。
+启动、重启和终止 在 unicorn 配置文件代码中打上日志，就可以知道大致的工作过程：
+# local variable to guard against running a hook multiple times run_once = true before_fork do |server, worker| server.logger.info &amp;#34;before_fork&amp;#34; if run_once server.logger.info &amp;#34;before_fork run_once&amp;#34; # do_something_once_here ... run_once = false # prevent from firing again end old_pid = &amp;#34;#{server.config[:pid]}.oldbin&amp;#34; if old_pid != server.pid begin sig = (worker.nr + 1) &amp;gt;= server.worker_processes ? :QUIT : :TTOU server.</description>
+    </item>
+    
+    <item>
+      <title>监控 Ruby 进程</title>
+      <link>https://notfound.cn/posts/monitoring-process-ruby/</link>
+      <pubDate>Thu, 14 May 2020 20:12:27 +0800</pubDate>
+      
+      <guid>https://notfound.cn/posts/monitoring-process-ruby/</guid>
+      <description>系统环境 Ubuntu 18.04  指标   当前进程占用的内存：
+cat /proc/self/status | grep VmRSS VmRSS: 740 kB match = File.read(&amp;#39;/proc/self/status&amp;#39;).match(/VmRSS:\s+(\d+)/) match &amp;amp;&amp;amp; match[1].to_f * 1024   当前进程打开的文件描述符总数：
+ls /proc/self/fd | wc -l Dir.glob(&amp;#39;/proc/self/fd/*&amp;#39;).length   当前进程可打开的最大文件描述符数量：
+cat /proc/self/limits | grep &amp;#34;Max open files&amp;#34; match = File.read(&amp;#39;/proc/self/limits&amp;#39;).match(/Max open files\s*(\d+)/) match &amp;amp;&amp;amp; match[1]   进程 CPU 时钟：
+Process.clock_gettime(Process::CLOCK_PROCESS_CPUTIME_ID, :float_second)   墙上时钟，受系统时间影响，调整系统时间时会发生变化：
+Process.clock_gettime(Process::CLOCK_REALTIME, :float_second)   系统启动时一直计数，不会受到系统时间的影响：
+Process.clock_gettime(Process::CLOCK_MONOTONIC, :float_second)   线程 CPU 时钟：</description>
+    </item>
+    
+  </channel>
+</rss>
